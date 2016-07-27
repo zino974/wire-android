@@ -1527,14 +1527,14 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     isGroupConversation));
                 break;
             case FILE:
-                assetIntentsManager.maybeOpenFileSharing();
+                assetIntentsManager.openFileSharing();
                 getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.file(isGroupConversation));
                 break;
             case VIDEO_MESSAGE:
                 getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.videomessage(
                     isGroupConversation));
                 extendedCursorContainer.close(false);
-                assetIntentsManager.maybeOpenVideo(getActivity(), AssetIntentsManager.IntentType.VIDEO_CURSOR_BUTTON);
+                assetIntentsManager.maybeCaptureVideo(getActivity(), AssetIntentsManager.IntentType.VIDEO_CURSOR_BUTTON);
                 break;
             case LOCATION:
                 getControllerFactory().getLocationController().showShareLocation();
@@ -1958,12 +1958,12 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public void openVideo() {
-        assetIntentsManager.maybeOpenVideo(getActivity(), AssetIntentsManager.IntentType.VIDEO);
+        assetIntentsManager.maybeCaptureVideo(getActivity(), AssetIntentsManager.IntentType.VIDEO);
     }
 
     @Override
     public void openGallery() {
-        assetIntentsManager.openGallery(getActivity());
+        assetIntentsManager.openGallery();
     }
 
     @Override

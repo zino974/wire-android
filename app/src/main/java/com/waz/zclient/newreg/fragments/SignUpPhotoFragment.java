@@ -44,6 +44,7 @@ import com.waz.zclient.core.controllers.tracking.attributes.OutcomeAttribute;
 import com.waz.zclient.core.controllers.tracking.attributes.RegistrationEventContext;
 import com.waz.zclient.core.controllers.tracking.events.registration.AddedPhotoEvent;
 import com.waz.zclient.pages.BaseFragment;
+import com.waz.zclient.pages.main.conversation.AssetIntentsManager;
 import com.waz.zclient.pages.main.profile.camera.CameraContext;
 import com.waz.zclient.pages.main.profile.camera.CameraFragment;
 import com.waz.zclient.ui.utils.BitmapUtils;
@@ -235,7 +236,7 @@ public class SignUpPhotoFragment extends BaseFragment<SignUpPhotoFragment.Contai
         super.onActivityResult(requestCode, resultCode, data);
         Fragment fragment = getChildFragmentManager().findFragmentByTag(CameraFragment.TAG);
         if (fragment != null) {
-            if (requestCode == CameraFragment.REQUEST_GALLERY_CODE && resultCode == Activity.RESULT_OK) {
+            if (requestCode == AssetIntentsManager.IntentType.GALLERY.requestCode && resultCode == Activity.RESULT_OK) {
                 initContainer.setVisibility(View.GONE);
                 initImage.setVisibility(View.GONE);
             }

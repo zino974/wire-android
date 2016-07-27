@@ -24,8 +24,8 @@ import com.waz.api.InitListener;
 import com.waz.api.Self;
 import com.waz.zclient.utils.IntentUtils;
 
-public class LaunchActivity extends BaseActivity implements InitListener {
-    public static final String TAG = LaunchActivity.class.getName();
+public class BackendPickerActivity extends BaseActivity implements InitListener {
+    public static final String TAG = BackendPickerActivity.class.getName();
     public static final String APP_PAGE = "APP_PAGE";
 
     @Override
@@ -78,7 +78,7 @@ public class LaunchActivity extends BaseActivity implements InitListener {
 
             startMain();
         } else if (BuildConfig.SHOW_BACKEND_PICKER) {
-            startActivity(new Intent(this, BackendPickerActivity.class));
+            startActivity(new Intent(this, AppEntryActivity.class));
             finish();
         } else {
             startSignUp();

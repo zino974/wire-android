@@ -108,10 +108,6 @@ public class BuildConfigUtils {
     }
 
     public static BackendConfig getBackendConfig(Context context) {
-        if (TestingGalleryUtils.isCustomGalleryInstalled(context.getPackageManager())) {
-            Toast.makeText(context, "Using staging backend with TestingGallery", Toast.LENGTH_LONG).show();
-            return BackendConfig.DevBackend();
-        }
         BackendConfig backendConfig = getCustomBackendConfig();
         if (backendConfig != null) {
             Toast.makeText(context, "Using custom backend " + backendConfig.baseUrl(), Toast.LENGTH_LONG).show();

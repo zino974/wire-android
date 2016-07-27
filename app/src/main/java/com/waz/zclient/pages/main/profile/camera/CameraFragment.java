@@ -20,21 +20,19 @@ package com.waz.zclient.pages.main.profile.camera;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.waz.api.ImageAsset;
 import com.waz.api.ImageAssetFactory;
-import com.waz.zclient.BuildConfig;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.camera.CameraPreviewObserver;
@@ -45,13 +43,13 @@ import com.waz.zclient.controllers.camera.CameraActionObserver;
 import com.waz.zclient.controllers.drawing.IDrawingController;
 import com.waz.zclient.controllers.orientation.OrientationControllerObserver;
 import com.waz.zclient.pages.BaseFragment;
+import com.waz.zclient.pages.main.conversation.AssetIntentsManager;
 import com.waz.zclient.pages.extendedcursor.image.CursorImagesPreviewLayout;
 import com.waz.zclient.pages.main.profile.camera.controls.CameraBottomControl;
 import com.waz.zclient.pages.main.profile.camera.controls.CameraTopControl;
 import com.waz.zclient.ui.animation.interpolators.penner.Expo;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.SquareOrientation;
-import com.waz.zclient.utils.TestingGalleryUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.ProgressView;
 
@@ -64,9 +62,7 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
                                                                                       CameraBottomControl.CameraBottomControlCallback {
     public static final String TAG = CameraFragment.class.getName();
 
-    public static final int REQUEST_GALLERY_CODE = 9411;
     public static final long CAMERA_ROTATION_COOLDOWN_DELAY = 1600L;
-    private static final String INTENT_GALLERY_TYPE = "image/*";
     private static final String CAMERA_CONTEXT = "CAMERA_CONTEXT";
     private static final String SHOW_GALLERY = "SHOW_GALLERY";
     private static final String SHOW_CAMERA_FEED = "SHOW_CAMERA_FEED";
@@ -81,6 +77,7 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
     private CameraTopControl cameraTopControl;
     private CameraBottomControl cameraBottomControl;
     private CameraFocusView focusView;
+    private AssetIntentsManager intentsManager;
 
     private CameraContext cameraContext = null;
     private boolean showCameraFeed;
@@ -128,6 +125,36 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
 
 
         return super.onCreateAnimation(transit, enter, nextAnim);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        intentsManager = new AssetIntentsManager(getActivity(), new AssetIntentsManager.Callback() {
+            @Override
+            public void onDataReceived(AssetIntentsManager.IntentType type, Uri uri) {
+                processGalleryImage(uri);
+            }
+
+            @Override
+            public void onCanceled(AssetIntentsManager.IntentType type) {
+                showCameraFeed();
+            }
+
+            @Override
+            public void onFailed(AssetIntentsManager.IntentType type) {
+                showCameraFeed();
+            }
+
+            @Override
+            public void openIntent(Intent intent, AssetIntentsManager.IntentType intentType) {
+                startActivityForResult(intent, intentType.requestCode);
+            }
+
+            @Override
+            public void onPermissionFailed(AssetIntentsManager.IntentType type) {}
+        }, savedInstanceState);
     }
 
     @Override
@@ -198,6 +225,7 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(ALREADY_OPENED_GALLERY, alreadyOpenedGallery);
+        intentsManager.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -288,15 +316,7 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
     @Override
     public void onPictureTaken(ImageAsset imageAsset) {
         this.imageAsset = imageAsset;
-
-        // TODO: Remove the workaround once issue https://wearezeta.atlassian.net/browse/AN-4223 fixed or Automation framework find a workaround
-        if (BuildConfig.IS_TEST_GALLERY_ALLOWED &&
-            LayoutSpec.isTablet(getActivity()) &&
-            TestingGalleryUtils.isCustomGalleryInstalled(getActivity().getPackageManager())) {
-            getControllerFactory().getCameraController().onBitmapSelected(imageAsset, false, cameraContext);
-        } else {
-            showPreview(imageAsset, true);
-        }
+        showPreview(imageAsset, true);
     }
 
     @Override
@@ -317,18 +337,7 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
     }
 
     public void openGallery() {
-        Intent i;
-        if (BuildConfig.IS_TEST_GALLERY_ALLOWED &&
-            TestingGalleryUtils.isCustomGalleryInstalled(getActivity().getPackageManager())) {
-            i = new Intent("com.wire.testing.GET_PICTURE");
-            i.addCategory(Intent.CATEGORY_DEFAULT);
-            i.setType(INTENT_GALLERY_TYPE);
-        } else {
-            i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType(INTENT_GALLERY_TYPE);
-        }
-        getActivity().startActivityForResult(i, REQUEST_GALLERY_CODE);
+        intentsManager.openGallery();
         getActivity().overridePendingTransition(R.anim.camera_in, R.anim.camera_out);
     }
 
@@ -369,12 +378,6 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
 
     @Override
     public void onCancelPreview() {
-        final Activity activity = getActivity();
-        if (activity != null &&
-            LayoutSpec.isTablet(activity)) {
-            ViewUtils.unlockOrientation(activity);
-        }
-
         dismissPreview();
     }
 
@@ -386,21 +389,10 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
 
     @Override
     public void onSendPictureFromPreview(ImageAsset imageAsset, CursorImagesPreviewLayout.Source source) {
-        final Activity activity = getActivity();
-        if (activity != null &&
-            LayoutSpec.isTablet(activity)) {
-            ViewUtils.unlockOrientation(activity);
-        }
-
         getControllerFactory().getCameraController().onBitmapSelected(imageAsset, pictureFromCamera, cameraContext);
     }
 
     private void showPreview(ImageAsset imageAsset, boolean bitmapFromCamera) {
-        if (LayoutSpec.isTablet(getActivity())) {
-            ViewUtils.lockCurrentOrientation(getActivity(),
-                                             getControllerFactory().getOrientationController().getLastKnownOrientation());
-        }
-
         pictureFromCamera = bitmapFromCamera;
         hideCameraFeed();
 
@@ -488,15 +480,7 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_GALLERY_CODE && resultCode == Activity.RESULT_OK) {
-            if (data != null && data.getData() != null) {
-                final Uri uri = data.getData();
-                processGalleryImage(uri);
-            } else {
-                showCameraFeed();
-                Toast.makeText(getActivity(), "Failed to insert image ", Toast.LENGTH_LONG).show();
-            }
-        }
+        intentsManager.onActivityResult(requestCode, resultCode, data);
     }
 
     private void processGalleryImage(Uri uri) {
@@ -507,14 +491,7 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
         }
 
         imageAsset = ImageAssetFactory.getImageAsset(uri);
-        // TODO: Remove the workaround once issue https://wearezeta.atlassian.net/browse/AN-4223 fixed or Automation framework find a workaround
-        if (BuildConfig.IS_TEST_GALLERY_ALLOWED &&
-            LayoutSpec.isTablet(getActivity()) &&
-            TestingGalleryUtils.isCustomGalleryInstalled(getActivity().getPackageManager())) {
-            getControllerFactory().getCameraController().onBitmapSelected(imageAsset, false, cameraContext);
-        } else {
-            showPreview(imageAsset, false);
-        }
+        showPreview(imageAsset, false);
     }
 
     public interface Container extends CameraActionObserver {
