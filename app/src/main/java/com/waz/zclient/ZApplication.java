@@ -28,7 +28,6 @@ import com.waz.api.LogLevel;
 import com.waz.api.NotificationsHandler;
 import com.waz.api.TrackingEventsHandler;
 import com.waz.api.impl.AccentColors;
-import com.waz.service.BackendConfig;
 import com.waz.service.ZMessaging;
 import com.waz.zclient.api.scala.ScalaStoreFactory;
 import com.waz.zclient.controllers.DefaultControllerFactory;
@@ -39,7 +38,9 @@ import com.waz.zclient.controllers.notifications.INotificationsController;
 import com.waz.zclient.core.stores.IStoreFactory;
 import com.waz.zclient.ui.text.TypefaceFactory;
 import com.waz.zclient.ui.text.TypefaceLoader;
+import com.waz.zclient.utils.BackendPicker;
 import com.waz.zclient.utils.BuildConfigUtils;
+import com.waz.zclient.utils.Callback;
 import com.waz.zclient.utils.WireLoggerTree;
 import timber.log.Timber;
 
@@ -114,8 +115,9 @@ public class ZApplication extends WireApplication implements NotificationsHandle
 
     @Override
     public void onCreate() {
-        BackendConfig backendConfig = BuildConfigUtils.getBackendConfig(this);
-        ZMessaging.useBackend(backendConfig);
+        super.onCreate();
+
+        ZMessaging.useBackend(BuildConfigUtils.defaultBackend());
 
         if (com.waz.zclient.BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
@@ -128,11 +130,6 @@ public class ZApplication extends WireApplication implements NotificationsHandle
         AndroidThreeTen.init(this);
         TypefaceFactory.getInstance().init(typefaceloader);
 
-        storeFactory = new ScalaStoreFactory(getApplicationContext());
-        controllerFactory = new DefaultControllerFactory(getApplicationContext());
-
-        storeFactory.getZMessagingApiStore().getAvs().setLogLevel(BuildConfigUtils.getLogLevelAVS(this));
-
         Thread.setDefaultUncaughtExceptionHandler(new WireUncaughtExceptionHandler(getControllerFactory(),
                                                                                    Thread.getDefaultUncaughtExceptionHandler()));
         // refresh
@@ -142,8 +139,21 @@ public class ZApplication extends WireApplication implements NotificationsHandle
         registerActivityLifecycleCallbacks(new LocalyticsActivityLifecycleCallbacks(this));
         Localytics.setPushDisabled(false);
 
-        //TODO put this back to the top - need to reorganise WireApplication
-        super.onCreate();
+        controllerFactory = new DefaultControllerFactory(getApplicationContext());
+
+        new BackendPicker(this).withBackend(new Callback<Void>() {
+            @Override
+            public void callback(Void aVoid) {
+                ensureInitialized();
+            }
+        });
+    }
+
+    public void ensureInitialized() {
+        if (storeFactory == null) {
+            storeFactory = new ScalaStoreFactory(getApplicationContext());
+            storeFactory.getZMessagingApiStore().getAvs().setLogLevel(BuildConfigUtils.getLogLevelAVS(this));
+        }
     }
 
     @Override

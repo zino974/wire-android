@@ -22,15 +22,13 @@ import android.media.AudioManager
 import android.os.{PowerManager, Vibrator}
 import android.support.multidex.MultiDexApplication
 import com.waz.api.{NetworkMode, ZMessagingApi, ZMessagingApiFactory}
-import com.waz.media.manager.MediaManager
 import com.waz.service.{MediaManagerService, PreferenceService, ZMessaging}
-import com.waz.threading.Threading
 import com.waz.utils.events.{EventContext, Signal, Subscription}
-import com.waz.zclient.calling.{CallPermissionsController, CallingActivity, CurrentCallController}
+import com.waz.zclient.calling.{CallPermissionsController, CurrentCallController}
 import com.waz.zclient.camera.CameraPreviewController
 
 object WireApplication {
-  var APP_INSTANCE: WireApplication = null
+  var APP_INSTANCE: WireApplication = _
 
   lazy val Global = new Module {
     bind[Signal[Option[ZMessaging]]] to ZMessaging.currentUi.currentZms
@@ -68,11 +66,6 @@ class WireApplication extends MultiDexApplication with WireContext with Injectab
   override def eventContext: EventContext = EventContext.Global
 
   lazy val module: Injector = Global :: AppModule
-  lazy val callingController = inject[GlobalCallingController]
-
-  override def onCreate(): Unit = {
-    callingController.onCallStarted.on(Threading.Ui) { _ => CallingActivity.start(this) }(EventContext.Global)
-  }
 
   def contextModule(ctx: WireContext): Injector = controllers(ctx) :: services(ctx) :: ContextModule(ctx)
 }

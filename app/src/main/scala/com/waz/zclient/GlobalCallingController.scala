@@ -21,7 +21,9 @@ import android.os.PowerManager
 import _root_.com.waz.api.VoiceChannelState._
 import _root_.com.waz.model.VoiceChannelData
 import _root_.com.waz.service.ZMessaging
-import _root_.com.waz.utils.events.Signal
+import _root_.com.waz.utils.events.{EventContext, Signal}
+import com.waz.threading.Threading
+import com.waz.zclient.calling.CallingActivity
 
 class GlobalCallingController(cxt: WireContext)(implicit inj: Injector) extends Injectable {
 
@@ -77,6 +79,10 @@ class GlobalCallingController(cxt: WireContext)(implicit inj: Injector) extends 
     wasUiActiveOnCallStart = active
     active
   }
+
+  onCallStarted.on(Threading.Ui) { _ =>
+    CallingActivity.start(cxt)
+  }(EventContext.Global)
 
   videoCall.zip(callState) {
     case (true, _) => screenManager.setStayAwake()

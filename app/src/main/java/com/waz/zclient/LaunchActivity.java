@@ -22,6 +22,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import com.waz.api.InitListener;
 import com.waz.api.Self;
+import com.waz.zclient.utils.BackendPicker;
+import com.waz.zclient.utils.Callback;
 import com.waz.zclient.utils.IntentUtils;
 
 public class LaunchActivity extends BaseActivity implements InitListener {
@@ -40,11 +42,17 @@ public class LaunchActivity extends BaseActivity implements InitListener {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onBaseActivityStart() {
         persistInviteToken();
         getControllerFactory().getTrackingController().appLaunched(getIntent());
-        getStoreFactory().getZMessagingApiStore().getApi().onInit(this);
+
+        new BackendPicker(getApplicationContext()).withBackend(this, new Callback<Void>() {
+            @Override
+            public void callback(Void aVoid) {
+                LaunchActivity.super.onBaseActivityStart();
+                getStoreFactory().getZMessagingApiStore().getApi().onInit(LaunchActivity.this);
+            }
+        });
     }
 
     @Override
@@ -77,9 +85,6 @@ public class LaunchActivity extends BaseActivity implements InitListener {
             }
 
             startMain();
-        } else if (BuildConfig.SHOW_BACKEND_PICKER) {
-            startActivity(new Intent(this, BackendPickerActivity.class));
-            finish();
         } else {
             startSignUp();
         }
