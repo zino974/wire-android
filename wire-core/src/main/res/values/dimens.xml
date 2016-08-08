@@ -364,6 +364,8 @@
     <dimen name="conversation_list__action_view__height">56dp</dimen>
     <dimen name="conversation_list__hint__margin_top">-20dp</dimen>
     <dimen name="conversation_list__hint__marker_size">16dp</dimen>
+    <dimen name="conversation_list__new_device_indicator_size">8dp</dimen>
+    <dimen name="conversation_list__new_device_indicator_offset">6dp</dimen>
 
     <dimen name="framework__wrap_content">2dp</dimen>
     <dimen name="framework__general__left_padding">24dp</dimen>
