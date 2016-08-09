@@ -182,6 +182,11 @@ public class MockMessagesList extends MockObservable implements MessagesList {
         }
 
         @Override
+        public Instant getEditTime() {
+            return null;
+        }
+
+        @Override
         public boolean isDeleted() {
             return false;
         }
@@ -193,6 +198,11 @@ public class MockMessagesList extends MockObservable implements MessagesList {
 
         @Override
         public boolean isHotKnock() {
+            return false;
+        }
+
+        @Override
+        public boolean isEdited() {
             return false;
         }
 
@@ -253,6 +263,16 @@ public class MockMessagesList extends MockObservable implements MessagesList {
 
         @Override
         public void delete() {
+
+        }
+
+        @Override
+        public void recall() {
+
+        }
+
+        @Override
+        public void update(MessageContent.Text content) {
 
         }
 

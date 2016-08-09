@@ -89,6 +89,8 @@
     <color name="draw_light_grey">#A3A3A3</color>
     <color name="draw_disabled">@color/light_graphite</color>
 
+    <color name="yorgos">#FF4A4A4A</color>
+
     <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Component colors  -->
     <!--

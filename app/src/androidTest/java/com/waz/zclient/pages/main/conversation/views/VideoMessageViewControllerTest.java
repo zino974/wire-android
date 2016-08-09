@@ -67,7 +67,7 @@ public class VideoMessageViewControllerTest extends ViewTest<MainTestActivity> {
 
         viewController.setMessage(message, mock(Separator.class));
 
-        setView(viewController.getView().getLayout());
+        setView(viewController.getView());
 
         onView(withId(R.id.gpv__row_conversation__video_button)).check(isVisible());
         onView(withText(activity.getString(R.string.glyph__close))).perform(click());
@@ -90,7 +90,7 @@ public class VideoMessageViewControllerTest extends ViewTest<MainTestActivity> {
 
         viewController.setMessage(message, mock(Separator.class));
 
-        setView(viewController.getView().getLayout());
+        setView(viewController.getView());
 
         onView(withId(R.id.gpv__row_conversation__video_button)).check(isVisible());
         onView(withText(activity.getString(R.string.glyph__redo))).check(isVisible());
@@ -116,7 +116,7 @@ public class VideoMessageViewControllerTest extends ViewTest<MainTestActivity> {
 
         viewController.setMessage(message, mock(Separator.class));
 
-        setView(viewController.getView().getLayout());
+        setView(viewController.getView());
 
         onView(withId(R.id.gpv__row_conversation__video_button)).check(isVisible());
         GlyphProgressView glyphProgressView = ViewUtils.getView(activity, R.id.gpv__row_conversation__video_button);
@@ -140,7 +140,7 @@ public class VideoMessageViewControllerTest extends ViewTest<MainTestActivity> {
 
         viewController.setMessage(message, mock(Separator.class));
 
-        setView(viewController.getView().getLayout());
+        setView(viewController.getView());
 
         onView(withId(R.id.gpv__row_conversation__video_button)).check(isVisible());
         GlyphProgressView glyphProgressView = ViewUtils.getView(activity, R.id.gpv__row_conversation__video_button);
@@ -164,7 +164,7 @@ public class VideoMessageViewControllerTest extends ViewTest<MainTestActivity> {
 
         viewController.setMessage(message, mock(Separator.class));
 
-        setView(viewController.getView().getLayout());
+        setView(viewController.getView());
 
         onView(withId(R.id.gpv__row_conversation__video_button)).check(isGone());
     }
