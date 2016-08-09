@@ -45,8 +45,8 @@ import com.waz.zclient.controllers.camera.CameraActionObserver;
 import com.waz.zclient.controllers.drawing.IDrawingController;
 import com.waz.zclient.controllers.orientation.OrientationControllerObserver;
 import com.waz.zclient.pages.BaseFragment;
-import com.waz.zclient.pages.extendedcursor.image.CursorImagesPreviewLayout;
 import com.waz.zclient.pages.main.conversation.AssetIntentsManager;
+import com.waz.zclient.pages.extendedcursor.image.ImagePreviewLayout;
 import com.waz.zclient.pages.main.profile.camera.controls.CameraBottomControl;
 import com.waz.zclient.pages.main.profile.camera.controls.CameraTopControl;
 import com.waz.zclient.ui.animation.interpolators.penner.Expo;
@@ -59,7 +59,7 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
                                                                                       OrientationControllerObserver,
                                                                                       AccentColorObserver,
                                                                                       OnBackPressedListener,
-                                                                                      CursorImagesPreviewLayout.Callback,
+                                                                                      ImagePreviewLayout.Callback,
                                                                                       CameraTopControl.CameraTopControlCallback,
                                                                                       CameraBottomControl.CameraBottomControlCallback {
     public static final String TAG = CameraFragment.class.getName();
@@ -377,13 +377,13 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
     }
 
     @Override
-    public void onSketchPictureFromPreview(ImageAsset imageAsset, CursorImagesPreviewLayout.Source source) {
+    public void onSketchPictureFromPreview(ImageAsset imageAsset, ImagePreviewLayout.Source source) {
         getControllerFactory().getDrawingController().showDrawing(imageAsset,
                                                                   IDrawingController.DrawingDestination.CAMERA_PREVIEW_VIEW);
     }
 
     @Override
-    public void onSendPictureFromPreview(ImageAsset imageAsset, CursorImagesPreviewLayout.Source source) {
+    public void onSendPictureFromPreview(ImageAsset imageAsset, ImagePreviewLayout.Source source) {
         getControllerFactory().getCameraController().onBitmapSelected(imageAsset, pictureFromCamera, cameraContext);
     }
 
@@ -393,21 +393,21 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
 
         previewProgressBar.setVisibility(View.GONE);
 
-        CursorImagesPreviewLayout cursorImagesPreviewLayout = (CursorImagesPreviewLayout) LayoutInflater.from(getContext()).inflate(
+        ImagePreviewLayout imagePreviewLayout = (ImagePreviewLayout) LayoutInflater.from(getContext()).inflate(
             R.layout.fragment_cursor_images_preview,
             imagePreviewContainer,
             false);
-        cursorImagesPreviewLayout.showSketch(cameraContext == CameraContext.MESSAGE);
+        imagePreviewLayout.showSketch(cameraContext == CameraContext.MESSAGE);
         String previewTitle = cameraContext == CameraContext.MESSAGE ?
-                              getStoreFactory().getConversationStore().getCurrentConversation().getName() :
-                              "";
-        cursorImagesPreviewLayout.setImageAsset(imageAsset,
-                                                CursorImagesPreviewLayout.Source.CAMERA,
-                                                this,
-                                                getControllerFactory().getAccentColorController().getAccentColor().getColor(),
-                                                previewTitle);
+                                  getStoreFactory().getConversationStore().getCurrentConversation().getName() :
+                                  "";
+        imagePreviewLayout.setImageAsset(imageAsset,
+                                         ImagePreviewLayout.Source.CAMERA,
+                                         this);
+        imagePreviewLayout.setAccentColor(getControllerFactory().getAccentColorController().getAccentColor().getColor());
+        imagePreviewLayout.setTitle(previewTitle);
 
-        imagePreviewContainer.addView(cursorImagesPreviewLayout);
+        imagePreviewContainer.addView(imagePreviewLayout);
         imagePreviewContainer.setVisibility(View.VISIBLE);
         ObjectAnimator.ofFloat(imagePreviewContainer,
                                View.ALPHA,

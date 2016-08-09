@@ -17,9 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<com.waz.zclient.pages.extendedcursor.image.CursorImagesPreviewLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.waz.zclient.pages.extendedcursor.image.ImagePreviewLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                                                       xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                                      xmlns:text="http://schemas.android.com/tools"
                                                                       android:layout_width="match_parent"
                                                                       android:layout_height="match_parent"
                                                                       android:background="@color/background_dark"
@@ -33,7 +32,7 @@
         />
 
     <FrameLayout
-        android:id="@+id/ttv__camera__conversation__container"
+        android:id="@+id/ttv__image_preview__title__container"
         android:layout_width="match_parent"
         android:layout_gravity="top"
         android:background="@color/camera__control__color"
@@ -41,14 +40,14 @@
         >
 
         <com.waz.zclient.ui.text.TypefaceTextView
-            android:id="@+id/ttv__camera__conversation"
+            android:id="@+id/ttv__image_preview__title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/sharing__image_preview__title__height"
             android:layout_gravity="center"
             android:padding="@dimen/wire__padding__small"
             android:inputType="none"
             android:clickable="false"
-            text:font="@string/conversation__header__font"
+            app:font="@string/wire__typeface__light"
             style="@style/message_stream__header__text__dark"
             />
 
@@ -100,4 +99,4 @@
         android:layout_gravity="bottom"
         />
 
-</com.waz.zclient.pages.extendedcursor.image.CursorImagesPreviewLayout>
+</com.waz.zclient.pages.extendedcursor.image.ImagePreviewLayout>

@@ -55,7 +55,6 @@
     <string translatable="false" name="onboarding_hint__app_map__subtitle__font">@string/wire__typeface__medium</string>
     <string translatable="false" name="option_menu__font_name">@string/wire__typeface__light</string>
     <string translatable="false" name="sharing_indicator__font">@string/wire__typeface__bold</string>
-    <string translatable="false" name="sharing__image_preview__title__font">@string/wire__typeface__light</string>
     <string translatable="false" name="single_image_message__name__font">@string/wire__typeface__bold</string>
     <string translatable="false" name="single_image_message__date__font">@string/wire__typeface__light</string>
 

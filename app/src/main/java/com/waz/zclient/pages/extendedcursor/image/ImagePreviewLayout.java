@@ -19,6 +19,7 @@ package com.waz.zclient.pages.extendedcursor.image;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
@@ -30,11 +31,12 @@ import com.waz.zclient.pages.main.profile.views.ConfirmationMenu;
 import com.waz.zclient.pages.main.profile.views.ConfirmationMenuListener;
 import com.waz.zclient.ui.theme.OptionsDarkTheme;
 import com.waz.zclient.ui.utils.ColorUtils;
+import com.waz.zclient.ui.utils.TextViewUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.images.ImageAssetView;
 
 
-public class CursorImagesPreviewLayout extends FrameLayout implements
+public class ImagePreviewLayout extends FrameLayout implements
                                                             ConfirmationMenuListener,
                                                             View.OnClickListener {
 
@@ -46,8 +48,8 @@ public class CursorImagesPreviewLayout extends FrameLayout implements
 
     private ConfirmationMenu approveImageSelectionMenu;
     private ImageAssetView imageView;
-    private FrameLayout conversationNameViewContainer;
-    private TextView conversationNameView;
+    private FrameLayout titleTextViewContainer;
+    private TextView titleTextView;
     private View sketchButton;
     private boolean sketchShouldBeVisible;
 
@@ -55,15 +57,15 @@ public class CursorImagesPreviewLayout extends FrameLayout implements
     private ImageAsset imageAsset;
     private Source source;
 
-    public CursorImagesPreviewLayout(Context context) {
+    public ImagePreviewLayout(Context context) {
         this(context, null);
     }
 
-    public CursorImagesPreviewLayout(Context context, AttributeSet attrs) {
+    public ImagePreviewLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CursorImagesPreviewLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ImagePreviewLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -76,8 +78,8 @@ public class CursorImagesPreviewLayout extends FrameLayout implements
         imageView = ViewUtils.getView(this, R.id.iv__conversation__preview);
         approveImageSelectionMenu = ViewUtils.getView(this, R.id.cm__cursor_preview);
         sketchButton = ViewUtils.getView(this, R.id.ll__preview__sketch);
-        conversationNameView = ViewUtils.getView(this, R.id.ttv__camera__conversation);
-        conversationNameViewContainer = ViewUtils.getView(this, R.id.ttv__camera__conversation__container);
+        titleTextView = ViewUtils.getView(this, R.id.ttv__image_preview__title);
+        titleTextViewContainer = ViewUtils.getView(this, R.id.ttv__image_preview__title__container);
 
         imageView.setOnClickListener(this);
 
@@ -103,23 +105,11 @@ public class CursorImagesPreviewLayout extends FrameLayout implements
 
     public void setImageAsset(final ImageAsset imageAsset,
                               Source source,
-                              Callback callback,
-                              int color,
-                              String conversationName) {
+                              Callback callback) {
         this.source = source;
         this.imageAsset = imageAsset;
         this.callback = callback;
-        approveImageSelectionMenu.setAccentColor(color);
-
         imageView.setImageAsset(imageAsset);
-
-        sketchButton.setBackground(ColorUtils.getButtonBackground(Color.TRANSPARENT,
-                                                                  color,
-                                                                  0,
-                                                                  getResources().getDimensionPixelSize(R.dimen.camera__sketch_button__corner_radius)));
-
-        conversationNameView.setText(conversationName);
-        conversationNameViewContainer.setVisibility(TextUtils.isEmpty(conversationNameView.getText()) ? GONE : VISIBLE);
     }
 
     @Override
@@ -132,8 +122,8 @@ public class CursorImagesPreviewLayout extends FrameLayout implements
                     }
                     ViewUtils.fadeOutView(approveImageSelectionMenu);
 
-                    if (!TextUtils.isEmpty(conversationNameView.getText())) {
-                        ViewUtils.fadeOutView(conversationNameViewContainer);
+                    if (!TextUtils.isEmpty(titleTextView.getText())) {
+                        ViewUtils.fadeOutView(titleTextViewContainer);
                     }
                 } else {
                     if (sketchShouldBeVisible) {
@@ -141,8 +131,8 @@ public class CursorImagesPreviewLayout extends FrameLayout implements
                     }
                     ViewUtils.fadeInView(approveImageSelectionMenu);
 
-                    if (!TextUtils.isEmpty(conversationNameView.getText())) {
-                        ViewUtils.fadeInView(conversationNameViewContainer);
+                    if (!TextUtils.isEmpty(titleTextView.getText())) {
+                        ViewUtils.fadeInView(titleTextViewContainer);
                     }
                 }
                 break;
@@ -154,10 +144,37 @@ public class CursorImagesPreviewLayout extends FrameLayout implements
         }
     }
 
+    public void setAccentColor(int color) {
+        approveImageSelectionMenu.setAccentColor(color);
+        if (sketchShouldBeVisible) {
+            sketchButton.setBackground(ColorUtils.getButtonBackground(Color.TRANSPARENT,
+                                                                      color,
+                                                                      0,
+                                                                      getResources().getDimensionPixelSize(R.dimen.camera__sketch_button__corner_radius)));
+        }
+    }
+
+
     public void showSketch(boolean show) {
         sketchShouldBeVisible = show;
         sketchButton.setVisibility(show ? VISIBLE : GONE);
     }
+
+    public void setTitle(String title) {
+        titleTextView.setText(title);
+        titleTextViewContainer.setVisibility(TextUtils.isEmpty(titleTextView.getText()) ? GONE : VISIBLE);
+    }
+
+    public void hightlightTitle() {
+        TextViewUtils.highlightAndBoldText(titleTextView,
+                                           ContextCompat.getColor(getContext(),
+                                                                  R.color.sharing__image_preview__title__color));
+    }
+
+    public void setTitleIsSingleLine(boolean isSingleLine) {
+        titleTextView.setSingleLine(isSingleLine);
+    }
+
 
     public interface Callback {
         void onCancelPreview();
