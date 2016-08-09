@@ -59,11 +59,22 @@ public class StringUtils {
         return formatTimeSeconds(totalSeconds);
     }
 
+    public static Uri normalizeUri(Uri uri) {
+        if (uri == null) {
+            return uri;
+        }
+        Uri normalized = uri.normalizeScheme()
+            .buildUpon()
+            .encodedAuthority(uri.getAuthority().toLowerCase(Locale.getDefault()))
+            .build();
+        return Uri.parse(trimLinkPreviewUrls(normalized));
+    }
+
     public static String trimLinkPreviewUrls(Uri uri) {
         if (uri == null) {
             return "";
         }
-        String str = uri.normalizeScheme().toString();
+        String str = uri.toString();
         str = stripPrefix(str, "http://");
         str = stripPrefix(str, "https://");
         str = stripPrefix(str, "www\\.");
