@@ -42,6 +42,8 @@ public class AppTrackingEventsHandler implements TrackingEventsHandler {
 
     private static final String UNDEFINED_ASSET_MIMETYPE = "";
     private static final int UNDEFINED_ASSET_SIZE = -1;
+    private static final String ASSET_MIME_TYPE_AUDIO = "audio";
+    private static final String ASSET_MIME_TYPE_VIDEO = "video";
 
     private ITrackingController trackingController;
 
@@ -60,7 +62,13 @@ public class AppTrackingEventsHandler implements TrackingEventsHandler {
                 String conversationType = trackingEvent.getConversationType().getOrElse(IConversation.Type.UNKNOWN).toString();
                 boolean withOtto = trackingEvent.isInConversationWithOtto().getOrElse(false);
                 trackingController.tagEvent(new InitiatedFileUploadEvent(assetMimeType, assetSize, conversationType));
-                trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.FILE,
+                CompletedMediaType mediaType = CompletedMediaType.FILE;
+                if (assetMimeType.contains(ASSET_MIME_TYPE_AUDIO)) {
+                    mediaType = CompletedMediaType.AUDIO;
+                } else if (assetMimeType.contains(ASSET_MIME_TYPE_VIDEO)) {
+                    mediaType = CompletedMediaType.VIDEO;
+                }
+                trackingController.tagEvent(new CompletedMediaActionEvent(mediaType,
                                                                           conversationType,
                                                                           withOtto));
                 break;
