@@ -26,7 +26,7 @@ import com.waz.media.manager.MediaManager
 import com.waz.service.{MediaManagerService, PreferenceService, ZMessaging}
 import com.waz.threading.Threading
 import com.waz.utils.events.{EventContext, Signal, Subscription}
-import com.waz.zclient.calling.{CallPermissionsController, CallingActivity, CurrentCallController}
+import com.waz.zclient.calling.{StartCallController, CallingActivity, CurrentCallController}
 import com.waz.zclient.camera.CameraPreviewController
 
 object WireApplication {
@@ -53,7 +53,7 @@ object WireApplication {
 
   def controllers(implicit ctx: WireContext) = new Module {
     bind[CurrentCallController] to new CurrentCallController()
-    bind[CallPermissionsController] to new CallPermissionsController()
+    bind[StartCallController] to new StartCallController()
 
     bind[PermissionActivity] to ctx.asInstanceOf[PermissionActivity]
     bind[PermissionsController] to new PermissionsController(new PermissionsWrapper)

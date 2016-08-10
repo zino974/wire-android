@@ -45,6 +45,7 @@ import com.waz.api.Self;
 import com.waz.api.SyncState;
 import com.waz.api.User;
 import com.waz.api.Verification;
+import com.waz.zclient.calling.StartCallController;
 import com.waz.zclient.controllers.accentcolor.AccentColorChangeRequester;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.navigation.NavigationControllerObserver;
@@ -431,7 +432,7 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
                     public void run() {
                         getStoreFactory().getConversationStore().setCurrentConversation(conversation, ConversationChangeRequester.NOTIFICATION);
                         if (startCallNotificationIntent) {
-                            startCall(conversation.getId(), false);
+                            injectJava(StartCallController.class).startCall(conversation.getId(), false);
                         }
                     }
                 }, LAUNCH_CONVERSATION_CHANGE_DELAY);

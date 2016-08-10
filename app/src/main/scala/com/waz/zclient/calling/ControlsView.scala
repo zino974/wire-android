@@ -134,7 +134,7 @@ private class IncomingControlsView(val context: Context, val attrs: AttributeSet
   def this(context: Context) = this(context, null)
 
   lazy val callController = inject[CurrentCallController]
-  lazy val callPermissionsController = inject[CallPermissionsController]
+  lazy val callPermissionsController = inject[StartCallController]
 
   private val glyphSize = getResources.getDimensionPixelSize(R.dimen.wire__icon_button__text_size)
   private val textColor = ContextCompat.getColor(getContext, R.color.text__primary_dark)

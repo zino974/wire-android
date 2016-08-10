@@ -37,7 +37,8 @@ import org.threeten.bp.Instant._
 import timber.log.Timber
 
 
-class CurrentCallController(implicit inj: Injector, cxt: WireContext) extends Injectable { self =>
+class CurrentCallController(implicit inj: Injector, cxt: WireContext) extends Injectable {
+  self =>
 
   Timber.d(s"CurrentCallController starting in context: $cxt")
 

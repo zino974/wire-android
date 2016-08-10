@@ -33,7 +33,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import com.waz.api.ActiveVoiceChannels;
+
 import com.waz.api.ConversationsList;
 import com.waz.api.CoreList;
 import com.waz.api.ErrorsList;
@@ -42,7 +42,6 @@ import com.waz.api.Message;
 import com.waz.api.SyncState;
 import com.waz.api.UpdateListener;
 import com.waz.api.Verification;
-import com.waz.api.VoiceChannel;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
@@ -74,6 +73,7 @@ import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.PebbleView;
+
 import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.ExceptionHandler;
 
@@ -90,18 +90,18 @@ public class ConversationListFragment extends BaseFragment<ConversationListFragm
                                                                                                View.OnClickListener,
                                                                                                AccentColorObserver,
                                                                                                ConversationListObserver,
-                                                                                               StreamMediaPlayerObserver,
-                                                                                               VoiceChannel.JoinCallback {
+                                                                                               StreamMediaPlayerObserver {
     public static final String TAG = ConversationListFragment.class.getName();
     private static final int LIST_VIEW_POSITION_OFFSET = 3;
     private static final String ARG_MODE = "arg_mode";
     private float maxSwipeAlpha;
-    private ActiveVoiceChannels activeVoiceChannels;
 
     public enum Mode {
         NORMAL, SHARING
     }
 
+    //FIXME have the individual views listen to the calling controller directly instead of passing down this update
+    //FIXME see the RightIndicatorView for where exactly
     private final UpdateListener callUpdateListener  = new UpdateListener() {
         public void updated() {
             conversationsListAdapter.onActiveCallStateHasChanged();
@@ -365,8 +365,6 @@ public class ConversationListFragment extends BaseFragment<ConversationListFragm
     @Override
     public void onStart() {
         super.onStart();
-        activeVoiceChannels = getStoreFactory().getZMessagingApiStore().getApi().getActiveVoiceChannels();
-        activeVoiceChannels.addUpdateListener(callUpdateListener);
         conversationsListAdapter.setStreamMediaPlayerController(getControllerFactory().getStreamMediaPlayerController());
         conversationsListAdapter.setNetworkStore(getStoreFactory().getNetworkStore());
         getControllerFactory().getAccentColorController().addAccentColorObserver(this);
@@ -401,7 +399,6 @@ public class ConversationListFragment extends BaseFragment<ConversationListFragm
 
     @Override
     public void onStop() {
-        activeVoiceChannels.removeUpdateListener(callUpdateListener);
         getControllerFactory().getConversationListController().removeConversationListObserver(this);
         getControllerFactory().getStreamMediaPlayerController().removeStreamMediaObserver(this);
         getStoreFactory().getConversationStore().removeConversationStoreObserver(this);
@@ -821,45 +818,6 @@ public class ConversationListFragment extends BaseFragment<ConversationListFragm
                 return;
             }
         }
-    }
-
-    @Override
-    public void onVoiceChannelFull(int maxJoined) {
-        ViewUtils.showAlertDialog(getActivity(),
-                                  getString(R.string.calling__voice_channel_full__title),
-                                  getResources().getQuantityString(R.plurals.calling__voice_channel_full__message,
-                                                                   maxJoined,
-                                                                   maxJoined),
-                                  getString(R.string.alert_dialog__confirmation),
-                                  null,
-                                  false);
-    }
-
-    @Override
-    public void onCallJoined() {
-
-    }
-
-    @Override
-    public void onAlreadyJoined() {
-
-    }
-
-    @Override
-    public void onCallJoinError(String message) {
-
-    }
-
-    @Override
-    public void onConversationTooBig(int memberCount, int maxMembers) {
-        ViewUtils.showAlertDialog(getActivity(),
-                                  getString(R.string.calling__conversation_full__title),
-                                  getResources().getQuantityString(R.plurals.calling__conversation_full__message,
-                                                                   maxMembers,
-                                                                   maxMembers),
-                                  getString(R.string.alert_dialog__confirmation),
-                                  null,
-                                  false);
     }
 
     @Override

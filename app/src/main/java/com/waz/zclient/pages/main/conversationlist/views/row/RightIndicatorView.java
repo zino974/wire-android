@@ -134,17 +134,18 @@ public class RightIndicatorView extends LinearLayout {
     }
 
     private boolean updateMuteIndicator() {
-        if (conversation.hasVoiceChannel()) {
-            if (conversation.getVoiceChannel().isSilenced() || conversation.hasUnjoinedCall()) {
-                muteButton.setVisibility(View.GONE);
-                return false;
-            } else {
-                muteButton.setVisibility(View.VISIBLE);
-                muteButton.setText(R.string.glyph__microphone_off);
-                muteButton.setSelected(conversation.isVoiceChannelMuted());
-                return true;
-            }
-        }
+        //FIXME need to hook this view back up to ActiveVoiceChannel
+//        if (conversation.hasVoiceChannel()) {
+//            if (conversation.getVoiceChannel().isSilenced() || conversation.hasUnjoinedCall()) {
+//                muteButton.setVisibility(View.GONE);
+//                return false;
+//            } else {
+//                muteButton.setVisibility(View.VISIBLE);
+//                muteButton.setText(R.string.glyph__microphone_off);
+//                muteButton.setSelected(conversation.isVoiceChannelMuted());
+//                return true;
+//            }
+//        }
 
         muteButton.setSelected(false);
         if (conversation.isMuted()) {

@@ -101,11 +101,6 @@ public class StubControllerFactory implements IControllerFactory {
     }
 
     @Override
-    public ICallingController getCallingController() {
-        return null;
-    }
-
-    @Override
     public ICameraController getCameraController() {
         return null;
     }

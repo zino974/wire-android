@@ -86,7 +86,7 @@ import com.waz.zclient.BaseScalaActivity;
 import com.waz.zclient.BuildConfig;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
-import com.waz.zclient.calling.CallPermissionsController;
+import com.waz.zclient.calling.StartCallController;
 import com.waz.zclient.controllers.IControllerFactory;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.confirmation.ConfirmationCallback;
@@ -588,7 +588,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     private void startCall(Boolean withVideo) {
         ((BaseScalaActivity) getActivity())
-            .injectJava(CallPermissionsController.class)
+            .injectJava(StartCallController.class)
             .startCall(getStoreFactory().getConversationStore().getCurrentConversation().getId(), withVideo);
     }
 
