@@ -31,7 +31,6 @@ import com.waz.api.MessagesList;
 import com.waz.api.UpdateListener;
 import com.waz.api.User;
 import com.waz.api.Verification;
-import com.waz.api.VoiceChannel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,11 +75,6 @@ public class InboxLinkConversation implements IConversation, UpdateListener {
 
     public int getSize() {
         return size;
-    }
-
-    @Override
-    public VoiceChannel getVoiceChannel() {
-        return null;
     }
 
     @Override

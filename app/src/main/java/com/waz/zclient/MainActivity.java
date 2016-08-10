@@ -18,7 +18,6 @@
 package com.waz.zclient;
 
 import android.app.NotificationManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -34,23 +33,20 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.Window;
 import android.view.WindowManager;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.localytics.android.Localytics;
-import com.waz.api.ActiveVoiceChannels;
 import com.waz.api.CommonConnections;
 import com.waz.api.ConversationsList;
 import com.waz.api.IConversation;
 import com.waz.api.MessagesList;
-import com.waz.api.NetworkMode;
 import com.waz.api.Self;
 import com.waz.api.SyncState;
 import com.waz.api.User;
 import com.waz.api.Verification;
-import com.waz.api.VoiceChannel;
 import com.waz.zclient.controllers.accentcolor.AccentColorChangeRequester;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
-import com.waz.zclient.controllers.calling.CallingObserver;
 import com.waz.zclient.controllers.navigation.NavigationControllerObserver;
 import com.waz.zclient.controllers.navigation.Page;
 import com.waz.zclient.controllers.notifications.NotificationsController;
@@ -60,16 +56,13 @@ import com.waz.zclient.controllers.tracking.events.otr.VerifiedConversationEvent
 import com.waz.zclient.controllers.tracking.events.profile.SignOut;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
 import com.waz.zclient.core.api.scala.AppEntryStore;
-import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
-import com.waz.zclient.core.controllers.tracking.events.media.OpenedMediaActionEvent;
 import com.waz.zclient.core.controllers.tracking.events.session.LoggedOutEvent;
 import com.waz.zclient.core.stores.api.ZMessagingApiStoreObserver;
 import com.waz.zclient.core.stores.connect.ConnectStoreObserver;
 import com.waz.zclient.core.stores.connect.IConnectStore;
 import com.waz.zclient.core.stores.conversation.ConversationChangeRequester;
 import com.waz.zclient.core.stores.conversation.ConversationStoreObserver;
-import com.waz.zclient.core.stores.network.NetworkAction;
 import com.waz.zclient.core.stores.profile.ProfileStoreObserver;
 import com.waz.zclient.pages.main.MainPhoneFragment;
 import com.waz.zclient.pages.main.MainTabletFragment;
@@ -81,13 +74,12 @@ import com.waz.zclient.utils.BuildConfigUtils;
 import com.waz.zclient.utils.HockeyCrashReporting;
 import com.waz.zclient.utils.IntentUtils;
 import com.waz.zclient.utils.LayoutSpec;
-import com.waz.zclient.utils.PhoneUtils;
-import com.waz.zclient.utils.PhoneUtils.PhoneState;
 import com.waz.zclient.utils.ViewUtils;
-import timber.log.Timber;
 
 import java.util.List;
 import java.util.Locale;
+
+import timber.log.Timber;
 
 
 public class MainActivity extends BaseActivity implements MainPhoneFragment.Container,
@@ -99,7 +91,6 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
                                                           AccentColorObserver,
                                                           ConnectStoreObserver,
                                                           NavigationControllerObserver,
-                                                          CallingObserver,
                                                           OtrDeviceLimitFragment.Container,
                                                           ZMessagingApiStoreObserver,
                                                           ConversationStoreObserver {
@@ -200,7 +191,6 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         getStoreFactory().getConnectStore().addConnectRequestObserver(this);
         getControllerFactory().getAccentColorController().addAccentColorObserver(this);
         getControllerFactory().getNavigationController().addNavigationControllerObserver(this);
-        getControllerFactory().getCallingController().addCallingObserver(this);
         getStoreFactory().getConversationStore().addConversationStoreObserver(this);
         dismissAndroidNotifications();
         handleInvite();
@@ -260,7 +250,6 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         Timber.i("onStop");
         super.onStop();
         getStoreFactory().getConversationStore().removeConversationStoreObserver(this);
-        getControllerFactory().getCallingController().removeCallingObserver(this);
         getStoreFactory().getZMessagingApiStore().removeApiObserver(this);
         getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         getStoreFactory().getConnectStore().removeConnectRequestObserver(this);
@@ -442,7 +431,7 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
                     public void run() {
                         getStoreFactory().getConversationStore().setCurrentConversation(conversation, ConversationChangeRequester.NOTIFICATION);
                         if (startCallNotificationIntent) {
-                            startCall(false);
+                            startCall(conversation.getId(), false);
                         }
                     }
                 }, LAUNCH_CONVERSATION_CHANGE_DELAY);
@@ -731,158 +720,6 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
     @Override
     public void onInitialized(Self self) {
         enterApplication(self);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  Cursor callback
-    //
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onStartCall(boolean withVideo) {
-        handleOnStartCall(withVideo);
-        boolean isGroupConversation = getStoreFactory().getConversationStore().getCurrentConversation().getType() == IConversation.Type.GROUP;
-        if (withVideo) {
-            getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.videocall(isGroupConversation));
-        } else {
-            getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.audiocall(isGroupConversation));
-        }
-    }
-
-    private void handleOnStartCall(final boolean withVideo) {
-        if (PhoneUtils.getPhoneState(this) == PhoneState.IDLE && getActiveVoiceChannels().hasOngoingCall()) {
-            cannotStartAlreadyHaveVoiceActive(withVideo);
-        } else if (PhoneUtils.getPhoneState(this) != PhoneState.IDLE) {
-            cannotStartGSM();
-        } else {
-            startCallIfInternet(withVideo);
-        }
-    }
-
-    private ActiveVoiceChannels getActiveVoiceChannels() {
-        return getStoreFactory().getZMessagingApiStore().getApi().getActiveVoiceChannels();
-    }
-
-    private void startCall(boolean withVideo) {
-        final IConversation currentConversation = getStoreFactory().getConversationStore().getCurrentConversation();
-        if (currentConversation == null) {
-            return;
-        }
-        final VoiceChannel voiceChannel = currentConversation.getVoiceChannel();
-        if (currentConversation.hasUnjoinedCall() && voiceChannel.isVideoCall() != withVideo) {
-            ViewUtils.showAlertDialog(this,
-                                      getString(R.string.calling__cannot_start__ongoing_different_kind__title, currentConversation.getName()),
-                                      getString(R.string.calling__cannot_start__ongoing_different_kind__message),
-                                      getString(R.string.calling__cannot_start__button),
-                                      null,
-                                      true);
-            return;
-        }
-        startCall(voiceChannel.getConversation().getId(), withVideo);
-    }
-
-
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  VoiceChannel.JoinCallback
-    //
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    private void cannotStartAlreadyHaveVoiceActive(final boolean withVideo) {
-        ViewUtils.showAlertDialog(this,
-                                  R.string.calling__cannot_start__ongoing_voice__title,
-                                  R.string.calling__cannot_start__ongoing_voice__message,
-                                  R.string.calling__cannot_start__ongoing_voice__button_positive,
-                                  R.string.calling__cannot_start__ongoing_voice__button_negative,
-                                  new DialogInterface.OnClickListener() {
-                                      @Override
-                                      public void onClick(DialogInterface dialog, int which) {
-                                          if (getStoreFactory() == null ||
-                                              getStoreFactory().isTornDown()) {
-                                              return;
-                                          }
-                                          final ActiveVoiceChannels activeVoiceChannels = getActiveVoiceChannels();
-                                          if (activeVoiceChannels.getOngoingCall() == null) {
-                                              return;
-                                          }
-                                          activeVoiceChannels.getOngoingCall().leave();
-                                          new Handler().postDelayed(new Runnable() {
-                                                                        @Override
-                                                                        public void run() {
-                                                                            if (getStoreFactory() == null ||
-                                                                                getStoreFactory().isTornDown()) {
-                                                                                return;
-                                                                            }
-                                                                            startCall(withVideo);
-                                                                            getControllerFactory().getTrackingController()
-                                                                                                  .updateSessionAggregates(RangedAttribute.VOICE_CALLS_INITIATED);
-                                                                        }
-                                                                    },
-                                                                    getResources().getInteger(R.integer.calling__new_outgoing_call__delay_after_hangup));
-                                      }
-                                  },
-                                  null);
-    }
-
-    private void cannotStartGSM() {
-        ViewUtils.showAlertDialog(this,
-                                  R.string.calling__cannot_start__title,
-                                  R.string.calling__cannot_start__message,
-                                  R.string.calling__cannot_start__button,
-                                  null,
-                                  true);
-    }
-
-    private void startCallIfInternet(final boolean withVideo) {
-        getStoreFactory().getNetworkStore().doIfHasInternetOrNotifyUser(new NetworkAction() {
-            @Override
-            public void execute(NetworkMode networkMode) {
-                switch (networkMode) {
-                    case _2G:
-                        ViewUtils.showAlertDialog(MainActivity.this,
-                                                  R.string.calling__slow_connection__title,
-                                                  R.string.calling__slow_connection__message,
-                                                  R.string.calling__slow_connection__button,
-                                                  null,
-                                                  true);
-                        break;
-                    case EDGE:
-                        if (withVideo) {
-                            ViewUtils.showAlertDialog(MainActivity.this,
-                                                      R.string.calling__slow_connection__title,
-                                                      R.string.calling__video_call__slow_connection__message,
-                                                      R.string.calling__slow_connection__button,
-                                                      new DialogInterface.OnClickListener() {
-                                                          @Override
-                                                          public void onClick(DialogInterface dialogInterface, int i) {
-                                                              startCall(true);
-                                                          }
-                                                      },
-                                                      true);
-                            break;
-                        }
-                    case _3G:
-                    case _4G:
-                    case WIFI:
-                        startCall(withVideo);
-                        break;
-                }
-            }
-
-            @Override
-            public void onNoNetwork() {
-                ViewUtils.showAlertDialog(MainActivity.this,
-                                          R.string.alert_dialog__no_network__header,
-                                          R.string.calling__call_drop__message,
-                                          R.string.alert_dialog__confirmation,
-                                          new DialogInterface.OnClickListener() {
-                                              @Override
-                                              public void onClick(DialogInterface dialog, int which) {
-                                              }
-                                          }, false);
-            }
-        });
     }
 
     @Override

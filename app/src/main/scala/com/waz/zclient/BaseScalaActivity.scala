@@ -28,6 +28,8 @@ class BaseScalaActivity extends AppCompatActivity with PermissionActivity {
   //TODO all this stuff here is ugly and creates extra controllers in Activities that don't need them. Move all this
   //TODO to a java friendly method in a controller that we can inject into a Java class
   lazy val callPermissionsController = inject[CallPermissionsController]
+  
+  def injectJava[T](cls: Class[T]) = inject[T](reflect.Manifest.classType(cls), injector)
 
   override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)

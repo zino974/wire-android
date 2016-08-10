@@ -22,9 +22,7 @@ import com.waz.api.IConversation;
 import com.waz.api.MessagesList;
 import com.waz.api.Self;
 import com.waz.api.User;
-import com.waz.api.VoiceChannel;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
-import com.waz.zclient.controllers.calling.CallingObserver;
 import com.waz.zclient.controllers.navigation.NavigationControllerObserver;
 import com.waz.zclient.controllers.navigation.Page;
 import com.waz.zclient.core.stores.api.ZMessagingApiStoreObserver;
@@ -46,18 +44,11 @@ public class MainTestActivity extends TestActivity implements MainPhoneFragment.
                                                               AccentColorObserver,
                                                               ConnectStoreObserver,
                                                               NavigationControllerObserver,
-                                                              CallingObserver,
-                                                              VoiceChannel.JoinCallback,
                                                               OtrDeviceLimitFragment.Container,
                                                               ZMessagingApiStoreObserver {
 
     @Override
     public void onAccentColorHasChanged(Object sender, int color) {
-
-    }
-
-    @Override
-    public void onStartCall(boolean withVideo) {
 
     }
 
@@ -98,31 +89,6 @@ public class MainTestActivity extends TestActivity implements MainPhoneFragment.
 
     @Override
     public void onOpenUrl(String url) {
-
-    }
-
-    @Override
-    public void onCallJoined() {
-
-    }
-
-    @Override
-    public void onAlreadyJoined() {
-
-    }
-
-    @Override
-    public void onCallJoinError(String s) {
-
-    }
-
-    @Override
-    public void onConversationTooBig(int i, int i1) {
-
-    }
-
-    @Override
-    public void onVoiceChannelFull(int i) {
 
     }
 

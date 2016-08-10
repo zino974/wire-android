@@ -23,7 +23,6 @@ import com.waz.zclient.controllers.IControllerFactory;
 import com.waz.zclient.controllers.accentcolor.IAccentColorController;
 import com.waz.zclient.controllers.background.IBackgroundController;
 import com.waz.zclient.controllers.background.IDialogBackgroundImageController;
-import com.waz.zclient.controllers.calling.ICallingController;
 import com.waz.zclient.controllers.camera.ICameraController;
 import com.waz.zclient.controllers.confirmation.IConfirmationController;
 import com.waz.zclient.controllers.conversationlist.IConversationListController;

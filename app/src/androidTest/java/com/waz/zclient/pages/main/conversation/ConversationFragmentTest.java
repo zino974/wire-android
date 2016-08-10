@@ -29,7 +29,6 @@ import com.waz.api.IConversation;
 import com.waz.zclient.MainTestActivity;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.IAccentColorController;
-import com.waz.zclient.controllers.calling.ICallingController;
 import com.waz.zclient.pages.main.conversation.controller.IConversationScreenController;
 import com.waz.zclient.testutils.CustomViewAssertions;
 import com.waz.zclient.testutils.FragmentTest;

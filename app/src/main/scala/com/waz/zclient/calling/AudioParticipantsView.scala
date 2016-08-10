@@ -145,7 +145,7 @@ protected class AudioParticipantChatheadView(val context: Context, val attrs: At
   (for {
     (vcs, convId) <- controller.voiceServiceAndCurrentConvId
     userId <- userId
-    volume <- vcs.volumeChanged(convId, userId)
+    volume <- vcs.content.volumeChanged(convId, userId)
   } yield volume).on(Threading.Ui)(gainView.onGainHasChanged(_))
 
   def setSize(size: Int, isFirst: Boolean, isLast: Boolean): Unit = {

@@ -58,6 +58,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.waz.api.Asset;
 import com.waz.api.AssetFactory;
 import com.waz.api.AssetForUpload;
@@ -81,12 +82,13 @@ import com.waz.api.UpdateListener;
 import com.waz.api.User;
 import com.waz.api.UsersList;
 import com.waz.api.Verification;
+import com.waz.zclient.BaseScalaActivity;
 import com.waz.zclient.BuildConfig;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
+import com.waz.zclient.calling.CallPermissionsController;
 import com.waz.zclient.controllers.IControllerFactory;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
-import com.waz.zclient.controllers.calling.CallingObserver;
 import com.waz.zclient.controllers.confirmation.ConfirmationCallback;
 import com.waz.zclient.controllers.confirmation.ConfirmationRequest;
 import com.waz.zclient.controllers.confirmation.IConfirmationController;
@@ -166,7 +168,6 @@ import com.waz.zclient.utils.TrackingUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.LoadingIndicatorView;
 import com.waz.zclient.views.MentioningFragment;
-import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -175,8 +176,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import timber.log.Timber;
+
 public class ConversationFragment extends BaseFragment<ConversationFragment.Container> implements ConversationStoreObserver,
-                                                                                                  CallingObserver,
                                                                                                   OnBoardingHintFragment.Container,
                                                                                                   ConversationScrollListener.ScrolledToBottomListener,
                                                                                                   ConversationScrollListener.VisibleMessagesChangesListener,
@@ -473,10 +475,10 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_audio_call:
-                        getControllerFactory().getCallingController().startCall(false);
+                        startCall(true);
                         return true;
                     case R.id.action_video_call:
-                        getControllerFactory().getCallingController().startCall(true);
+                        startCall(false);
                         return true;
                 }
                 return false;
@@ -582,6 +584,12 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         }
 
         return view;
+    }
+
+    private void startCall(Boolean withVideo) {
+        ((BaseScalaActivity) getActivity())
+            .injectJava(CallPermissionsController.class)
+            .startCall(getStoreFactory().getConversationStore().getCurrentConversation().getId(), withVideo);
     }
 
     @Override
@@ -944,10 +952,10 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
                 switch (conversationChangeRequester) {
                     case START_CONVERSATION_FOR_VIDEO_CALL:
-                        controllerFactory.getCallingController().startCall(true);
+                        startCall(true);
                         break;
                     case START_CONVERSATION_FOR_CALL:
-                        controllerFactory.getCallingController().startCall(false);
+                        startCall(false);
                         break;
                     case START_CONVERSATION_FOR_CAMERA:
                         controllerFactory.getCameraController().openCamera(CameraContext.MESSAGE);
@@ -1247,17 +1255,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public void onPageStateHasChanged(Page page) {
-
-    }
-
-    //////////////////////////////////////////////////////////////////////////////
-    //
-    //  GroupCallingStoreObserver
-    //
-    //////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onStartCall(boolean withVideo) {
 
     }
 

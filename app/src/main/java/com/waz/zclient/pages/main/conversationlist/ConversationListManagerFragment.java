@@ -38,9 +38,11 @@ import com.waz.api.OtrClient;
 import com.waz.api.SyncState;
 import com.waz.api.User;
 import com.waz.api.Verification;
+import com.waz.zclient.BaseScalaActivity;
 import com.waz.zclient.LaunchActivity;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
+import com.waz.zclient.calling.CallPermissionsController;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.confirmation.ConfirmationCallback;
 import com.waz.zclient.controllers.confirmation.ConfirmationObserver;
@@ -1112,7 +1114,7 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
 
     public void callConversation(final IConversation conversation) {
         getStoreFactory().getConversationStore().setCurrentConversation(conversation, ConversationChangeRequester.CONVERSATION_LIST);
-        getControllerFactory().getCallingController().startCall(false);
+        ((BaseScalaActivity) getActivity()).injectJava(CallPermissionsController.class).startCall(conversation.getId(), false);
     }
 
     public void sendPictureToConversation(final IConversation conversation) {

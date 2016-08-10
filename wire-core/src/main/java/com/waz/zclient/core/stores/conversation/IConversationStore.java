@@ -139,10 +139,6 @@ public interface IConversationStore extends IStore {
 
     int getNumberOfActiveConversations();
 
-    boolean hasOngoingCallInCurrentConversation();
-
-    String getCurrentConversationId();
-
     SyncState getConversationSyncingState();
 
     void onLogout();

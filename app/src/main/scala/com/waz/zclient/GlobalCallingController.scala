@@ -17,11 +17,12 @@
  */
 package com.waz.zclient
 
-import android.os.PowerManager
 import _root_.com.waz.api.VoiceChannelState._
-import _root_.com.waz.model.VoiceChannelData
 import _root_.com.waz.service.ZMessaging
+import _root_.com.waz.utils.RichSignalOpt
 import _root_.com.waz.utils.events.Signal
+import android.os.PowerManager
+import com.waz.service.call.VoiceChannelService
 
 class GlobalCallingController(cxt: WireContext)(implicit inj: Injector) extends Injectable {
 
@@ -31,33 +32,17 @@ class GlobalCallingController(cxt: WireContext)(implicit inj: Injector) extends 
 
   private val screenManager = new ScreenManager
 
-  val channels = zms.flatMap(_.fold(Signal.const[(Option[VoiceChannelData], Option[VoiceChannelData])]((None, None)))(_.voiceContent.ongoingAndTopIncomingChannel))
+  val voiceService = zms.map(_.fold(Option.empty[VoiceChannelService])(zms => Some(zms.voice)))
 
-  val callExists = channels map {
-    case (None, None) => false
-    case _ => true
-  }
+  val callExists = voiceService.flatMapSome(_.callExists)
+  val convId = voiceService.flatMapSome(_.convId)
+  val currentChannel = voiceService.flatMapSome(_.currentChannel)
+  val videoCall = voiceService.flatMapSome(_.videoCall)
 
-  val voiceService = zms map (_.map(_.voice))
-
-  //Note, we can't rely on the channels from ongoingAndTopIncoming directly, as they only update the presence of a channel, not their internal state
-  val convId = channels map {
-    case (ongoing, incoming) => ongoing.orElse(incoming).map(_.id)
-  }
-
-  val currentChannel: Signal[Option[VoiceChannelData]] = voiceService.zip(convId) flatMap {
-    case (Some(voiceService), Some(convId)) => voiceService.voiceChannelSignal(convId) map (Some(_))
-    case _ => Signal.const[Option[VoiceChannelData]](None)
-  }
 
   val voiceServiceAndCurrentConvId = voiceService.zip(currentChannel) map {
     case (Some(vcs), vd) => vd.map(data => (vcs, data.id))
     case _ => None
-  }
-
-  val videoCall = currentChannel flatMap  {
-    case (Some(data)) => Signal.const(data.video.isVideoCall)
-    case _ => Signal.empty[Boolean] //empty signal to prevent 'empty' UI state on call tear-down
   }
 
   val callState = currentChannel map {
@@ -98,7 +83,7 @@ private class ScreenManager(implicit injector: Injector) extends Injectable {
   def setStayAwake() = {
     (stayAwake, wakeLock) match {
       case (_, None) | (false, Some(_)) =>
-        this.stayAwake = true;
+        this.stayAwake = true
         createWakeLock();
       case _ => //already set
     }
@@ -107,18 +92,18 @@ private class ScreenManager(implicit injector: Injector) extends Injectable {
   def setProximitySensorEnabled() = {
     (stayAwake, wakeLock) match {
       case (_, None) | (true, Some(_)) =>
-        this.stayAwake = false;
+        this.stayAwake = false
         createWakeLock();
       case _ => //already set
     }
   }
 
   private def createWakeLock() = {
-    var flags = if (stayAwake)
+    val flags = if (stayAwake)
       PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
-    else PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK;
-    releaseWakeLock();
-    wakeLock = powerManager.map(_.newWakeLock(flags, TAG));
+    else PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK
+    releaseWakeLock()
+    wakeLock = powerManager.map(_.newWakeLock(flags, TAG))
     wakeLock.foreach(_.acquire())
   }
 

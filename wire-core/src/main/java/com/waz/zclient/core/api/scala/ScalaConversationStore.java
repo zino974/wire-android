@@ -18,6 +18,7 @@
 package com.waz.zclient.core.api.scala;
 
 import android.os.Handler;
+
 import com.waz.api.AssetForUpload;
 import com.waz.api.AudioAssetForUpload;
 import com.waz.api.ConversationsList;
@@ -33,8 +34,6 @@ import com.waz.api.UiSignal;
 import com.waz.api.UpdateListener;
 import com.waz.api.User;
 import com.waz.api.Verification;
-import com.waz.api.VoiceChannel;
-import com.waz.api.VoiceChannelState;
 import com.waz.api.ZMessagingApi;
 import com.waz.zclient.core.stores.connect.InboxLinkConversation;
 import com.waz.zclient.core.stores.conversation.ConversationChangeRequester;
@@ -43,13 +42,14 @@ import com.waz.zclient.core.stores.conversation.IConversationStore;
 import com.waz.zclient.core.stores.conversation.InboxLoadRequester;
 import com.waz.zclient.core.stores.conversation.OnConversationLoadedListener;
 import com.waz.zclient.core.stores.conversation.OnInboxLoadedListener;
-import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import timber.log.Timber;
 
 public class ScalaConversationStore implements IConversationStore {
     public static final String TAG = ScalaConversationStore.class.getName();
@@ -249,11 +249,6 @@ public class ScalaConversationStore implements IConversationStore {
     }
 
     @Override
-    public String getCurrentConversationId() {
-        return (selectedConversation == null) ? null : selectedConversation.getId();
-    }
-
-    @Override
     public void loadCurrentConversation(OnConversationLoadedListener onConversationLoadedListener) {
         if (conversationsList != null && selectedConversation != null) {
             onConversationLoadedListener.onConversationLoaded(selectedConversation);
@@ -315,20 +310,6 @@ public class ScalaConversationStore implements IConversationStore {
             return 0;
         }
         return establishedConversationsList.size();
-    }
-
-    @Override
-    public boolean hasOngoingCallInCurrentConversation() {
-        if (selectedConversation == null) {
-            return false;
-        }
-        VoiceChannel voiceChannel = selectedConversation.getVoiceChannel();
-        if (voiceChannel == null) {
-            return false;
-        }
-        VoiceChannelState state = voiceChannel.getState();
-        return state != VoiceChannelState.NO_ACTIVE_USERS &&
-               state != VoiceChannelState.UNKNOWN;
     }
 
     @Override
