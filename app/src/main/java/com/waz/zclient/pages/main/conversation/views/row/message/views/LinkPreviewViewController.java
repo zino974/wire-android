@@ -69,7 +69,7 @@ public class LinkPreviewViewController extends MessageViewController implements 
                 linkPrevieContainerView.setVisibility(View.VISIBLE);
             }
             titleTextView.setText(Html.fromHtml(linkPart.getTitle()));
-            urlTextView.setText(StringUtils.trimLinkPreviewUrls(linkPart.getContentUri()));
+            urlTextView.setText(StringUtils.normalizeUri(linkPart.getContentUri()).toString());
             if (linkPart.getImage() == null ||
                 linkPart.getImage().isEmpty()) {
                 return;
