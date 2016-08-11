@@ -34,7 +34,7 @@ object WireApplication {
     bind[Signal[Option[ZMessaging]]] to ZMessaging.currentUi.currentZms
     bind[PreferenceService] to new PreferenceService(inject[Context])
     bind[GlobalCallingController] to new GlobalCallingController(inject[Context])
-    bind[CameraPreviewController] to new CameraPreviewController()(EventContext.Global)
+    bind[CameraPreviewController] to new CameraPreviewController(inject[Context])(EventContext.Global)
     bind[MediaManagerService] to ZMessaging.currentGlobal.mediaManager
 
     //Global android services
