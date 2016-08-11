@@ -17,6 +17,8 @@
  */
 package com.waz.zclient.utils;
 
+import android.net.Uri;
+
 import java.util.Locale;
 
 public class StringUtils {
@@ -56,4 +58,35 @@ public class StringUtils {
         long totalSeconds = totalMilliSeconds / 1000;
         return formatTimeSeconds(totalSeconds);
     }
+
+    public static String trimLinkPreviewUrls(Uri uri) {
+        if (uri == null) {
+            return "";
+        }
+        String str = uri.normalizeScheme().toString();
+        str = stripPrefix(str, "http://");
+        str = stripPrefix(str, "https://");
+        str = stripPrefix(str, "www\\.");
+        str = stripSuffix(str, "/");
+        return str;
+    }
+
+    public static String stripPrefix(String str, String prefixRegularExpression) {
+        String regex = "^" + prefixRegularExpression;
+        String[] matches = str.split(regex);
+        if (matches.length >= 2) {
+            return matches[1];
+        }
+        return str;
+    }
+
+    public static String stripSuffix(String str, String suffixRegularExpression) {
+        String regex = suffixRegularExpression + "$";
+        String[] matches = str.split(regex);
+        if (matches.length > 0) {
+            return matches[0];
+        }
+        return str;
+    }
+
 }

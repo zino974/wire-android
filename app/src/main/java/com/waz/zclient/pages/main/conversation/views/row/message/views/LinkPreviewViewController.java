@@ -18,7 +18,6 @@
 package com.waz.zclient.pages.main.conversation.views.row.message.views;
 
 import android.content.Context;
-import android.net.Uri;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
@@ -34,6 +33,7 @@ import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewCont
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.views.TouchFilterableLayout;
 import com.waz.zclient.utils.MessageUtils;
+import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.images.ImageAssetView;
 
@@ -69,13 +69,12 @@ public class LinkPreviewViewController extends MessageViewController implements 
                 linkPrevieContainerView.setVisibility(View.VISIBLE);
             }
             titleTextView.setText(Html.fromHtml(linkPart.getTitle()));
-            urlTextView.setText(Uri.parse(linkPart.getBody()).normalizeScheme().toString());
+            urlTextView.setText(StringUtils.trimLinkPreviewUrls(linkPart.getContentUri()));
             if (linkPart.getImage() == null ||
                 linkPart.getImage().isEmpty()) {
                 return;
             }
             previewImageContainerView.setVisibility(View.VISIBLE);
-
             imageAssetModelObserver.addAndUpdate(linkPart.getImage());
         }
     };
