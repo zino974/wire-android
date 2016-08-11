@@ -21,17 +21,17 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import com.waz.zclient.BuildConfig;
 import com.waz.zclient.utils.PermissionUtils;
-import com.waz.zclient.utils.TestingGalleryUtils;
+import timber.log.Timber;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -43,100 +43,74 @@ public class AssetIntentsManager {
     private static final String[] CAMERA_PERMISSIONS = new String[] {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     private static final String INTENT_GALLERY_TYPE = "image/*";
-    private static final String INTENT_VIDEO_TYPE = "video/*";
+    private final PackageManager pm;
 
     @TargetApi(19)
     private static String openDocumentAction() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_GET_CONTENT;
     }
 
-    private Callback callback;
     private Uri pendingFileUri;
-    private boolean shouldUseCustomGallery;
+    private Callback callback;
 
     public AssetIntentsManager(Activity activity, Callback callback, Bundle savedInstanceState) {
-        shouldUseCustomGallery = BuildConfig.IS_TEST_GALLERY_ALLOWED && TestingGalleryUtils.isCustomGalleryInstalled(
-            activity.getPackageManager());
         setCallback(callback);
 
         if (savedInstanceState != null) {
             pendingFileUri = savedInstanceState.getParcelable(SAVED_STATE_PENDING_URI);
         }
+        pm = activity.getPackageManager();
     }
 
     public void setCallback(Callback callback) {
         this.callback = callback;
     }
 
-    public void maybeOpenFileSharing() {
-        Intent intent = new Intent();
-        if (shouldUseCustomGallery) {
-            intent = new Intent("com.wire.testing.GET_DOCUMENT");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-        } else {
-            intent.setAction(openDocumentAction());
+    private void openDocument(String mimeType, IntentType tpe) {
+        if (BuildConfig.IS_TEST_GALLERY_ALLOWED) {
+            // trying to load file from testing gallery,
+            // this is needed because we are not able to override DocumentsUI on some android versions.
+            Intent intent = new Intent("com.wire.testing.GET_DOCUMENT").setType(mimeType);
+            if (!pm.queryIntentActivities(intent, PackageManager.MATCH_ALL).isEmpty()) {
+                callback.openIntent(intent, tpe);
+                return;
+            }
+            Timber.i("Did not resolve testing gallery for intent: %s", intent.toString());
         }
-        intent.setType("*/*");
-        callback.openIntent(intent, IntentType.FILE_SHARING);
+        callback.openIntent(new Intent(openDocumentAction()).setType(mimeType).addCategory(Intent.CATEGORY_OPENABLE), tpe);
     }
 
-    private void openCamera() {
-        Intent intent;
-        if (shouldUseCustomGallery) {
-            intent = new Intent("com.wire.testing.GET_PICTURE");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.setType(INTENT_GALLERY_TYPE);
-        } else {
-            intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            pendingFileUri = getOutputMediaFileUri(IntentType.CAMERA);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, pendingFileUri);
-        }
+    public void openFileSharing() {
+        openDocument("*/*", IntentType.FILE_SHARING);
+    }
 
+    private void captureImage() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        pendingFileUri = getOutputMediaFileUri(IntentType.CAMERA);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, pendingFileUri);
         callback.openIntent(intent, IntentType.CAMERA);
     }
 
-    public void maybeOpenVideo(Activity activity, IntentType type) {
+    public void maybeCaptureVideo(Activity activity, IntentType type) {
         if (PermissionUtils.hasSelfPermissions(activity, CAMERA_PERMISSIONS)) {
-            openVideo(type);
+            captureVideo(type);
         } else {
             ActivityCompat.requestPermissions(activity, CAMERA_PERMISSIONS, type.permissionCode);
         }
     }
 
-
-    private void openVideo(IntentType type) {
-        Intent intent;
-        if (shouldUseCustomGallery) {
-            intent = new Intent("com.wire.testing.GET_VIDEO");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.setType(INTENT_VIDEO_TYPE);
-        } else {
-            intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-            pendingFileUri = getOutputMediaFileUri(IntentType.VIDEO);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, pendingFileUri);
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-            }
+    private void captureVideo(IntentType type) {
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        pendingFileUri = getOutputMediaFileUri(IntentType.VIDEO);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, pendingFileUri);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
         }
-        callback.openIntent(intent, type);
     }
 
-
-    public void openGallery(FragmentActivity activity) {
-        Intent intent;
-        if (BuildConfig.IS_TEST_GALLERY_ALLOWED &&
-            TestingGalleryUtils.isCustomGalleryInstalled(activity.getPackageManager())) {
-            intent = new Intent("com.wire.testing.GET_PICTURE");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.setType(INTENT_GALLERY_TYPE);
-        } else {
-            intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType(INTENT_GALLERY_TYPE);
-        }
-        callback.openIntent(intent, IntentType.GALLERY);
+    public void openGallery() {
+        openDocument(INTENT_GALLERY_TYPE, IntentType.GALLERY);
     }
-
 
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -199,8 +173,7 @@ public class AssetIntentsManager {
      * @param type
      */
     private static File getOutputMediaFile(IntentType type) {
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                                        "WIRE_MEDIA");
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "WIRE_MEDIA");
         if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             return null;
         }
@@ -235,10 +208,10 @@ public class AssetIntentsManager {
                 return true;
             case VIDEO_CURSOR_BUTTON:
             case VIDEO:
-                openVideo(type);
+                captureVideo(type);
                 return true;
             case CAMERA:
-                openCamera();
+                captureImage();
                 return true;
             default:
                 return false;

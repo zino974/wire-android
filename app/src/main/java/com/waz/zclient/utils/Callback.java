@@ -15,18 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient
+package com.waz.zclient.utils;
 
-import android.support.v7.app.AppCompatActivity
-
-class BaseScalaActivity extends AppCompatActivity with PermissionActivity {
-
-  def injectJava[T](cls: Class[T]) = inject[T](reflect.Manifest.classType(cls), injector)
-
-  override def onStart(): Unit = {
-    super.onStart()
-    onBaseActivityStart()
-  }
-
-  def onBaseActivityStart(): Unit = ()
+public interface Callback<T> {
+    void callback(T t);
 }

@@ -15,18 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient
+package com.wire.testinggallery;
 
-import android.support.v7.app.AppCompatActivity
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
-class BaseScalaActivity extends AppCompatActivity with PermissionActivity {
+public class CaptureImageActivity extends AppCompatActivity {
 
-  def injectJava[T](cls: Class[T]) = inject[T](reflect.Manifest.classType(cls), injector)
-
-  override def onStart(): Unit = {
-    super.onStart()
-    onBaseActivityStart()
-  }
-
-  def onBaseActivityStart(): Unit = ()
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setResult(Activity.RESULT_OK, new Intent().setData(new DocumentResolver(getContentResolver()).getImagePath()));
+        finish();
+    }
 }

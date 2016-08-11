@@ -15,18 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.utils;
+package com.wire.testinggallery;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
-import android.content.pm.PackageManager;
+public class CaptureVideoActivity extends AppCompatActivity {
 
-public class TestingGalleryUtils {
-    public static boolean isCustomGalleryInstalled(PackageManager pm) {
-        try {
-            pm.getPackageInfo("com.wire.testinggallery", PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setResult(Activity.RESULT_OK, new Intent().setData(new DocumentResolver(getContentResolver()).getVideoPath()));
+        finish();
     }
 }

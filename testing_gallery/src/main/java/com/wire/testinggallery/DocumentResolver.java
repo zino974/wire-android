@@ -17,38 +17,38 @@
  */
 package com.wire.testinggallery;
 
-import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 
+public class DocumentResolver {
 
-public class DocumentReceiverActivity extends AppCompatActivity {
+    private static final String[] ID_COLUMNS = new String[] {
+        MediaStore.Files.FileColumns._ID
+    };
+    private final ContentResolver contentResolver;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setResult(Activity.RESULT_OK,
-                getResultIntent());
-        finish();
-    }
-
-    private Intent getResultIntent() {
-        return new Intent().setData(getDocumentPath());
+    public DocumentResolver(ContentResolver contentResolver) {
+        this.contentResolver = contentResolver;
     }
 
     public Uri getDocumentPath() {
-        ContentResolver contentResolver = getContentResolver();
+        return query(MediaStore.Files.getContentUri("external"), ID_COLUMNS);
+    }
+
+    public Uri getVideoPath() {
+        return query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null);
+    }
+
+    public Uri getImagePath() {
+        return query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null);
+    }
+
+    private Uri query(Uri baseUri, String[] projection) {
         Cursor cursor = null;
-        Uri baseUri = MediaStore.Files.getContentUri("external");
-        String sortOrder = MediaStore.Files.FileColumns.DATE_ADDED + " DESC";
-        String[] projection = new String[] {MediaStore.Files.FileColumns._ID};
         try {
-            cursor = contentResolver.query(baseUri, projection, null, null, sortOrder);
+            cursor = contentResolver.query(baseUri, projection, null, null, MediaStore.Files.FileColumns.DATE_ADDED + " DESC");
 
             final int columnFileIdIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
             if (cursor.moveToNext()) {

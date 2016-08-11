@@ -86,6 +86,8 @@ public class WelcomeEmailFragment extends BaseFragment<WelcomeEmailFragment.Cont
 
         signInZetaButton.setOnClickListener(this);
         createAccountZetaButton.setOnClickListener(this);
+
+        getStoreFactory().getNetworkStore(); // pre-initialize network store, to ensure that internet connection check works on button press
     }
 
     @Override

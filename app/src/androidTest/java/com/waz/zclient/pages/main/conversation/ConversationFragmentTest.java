@@ -17,11 +17,13 @@
  */
 package com.waz.zclient.pages.main.conversation;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 import com.waz.api.AccentColor;
@@ -292,6 +294,7 @@ public class ConversationFragmentTest extends FragmentTest<MainTestActivity> {
         // wait for camera changes
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Test
     public void assertCursorImagesGalleryButton() throws Exception {
         IConversation mockConversation = mock(IConversation.class);
@@ -303,7 +306,7 @@ public class ConversationFragmentTest extends FragmentTest<MainTestActivity> {
         when(mockAccentColor.getColor()).thenReturn(Color.RED);
         when(mockAccentColorController.getAccentColor()).thenReturn(mockAccentColor);
 
-        String action = Intent.ACTION_GET_CONTENT;
+        String action = Intent.ACTION_OPEN_DOCUMENT;
         Matcher<Intent> expectedIntent = allOf(hasAction(action), hasType("image/*"));
         Intent intent = new Intent();
         intent.setData(Uri.parse("file:///tmp/whatever.txt"));

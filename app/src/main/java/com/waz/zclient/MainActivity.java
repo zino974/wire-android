@@ -48,6 +48,9 @@ import com.waz.api.SyncState;
 import com.waz.api.User;
 import com.waz.api.Verification;
 import com.waz.api.VoiceChannel;
+import com.waz.model.ConvId;
+import com.waz.zclient.calling.CallPermissionsController;
+import com.waz.zclient.calling.CallingActivity;
 import com.waz.zclient.controllers.accentcolor.AccentColorChangeRequester;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.calling.CallingObserver;
@@ -207,6 +210,9 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         handleReferral();
 
         super.onStart();
+
+        //This is needed to drag the user back to the calling activity if they open the app again during a call
+        CallingActivity.startIfCallIsActive(this);
     }
 
     @Override
@@ -779,7 +785,7 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
                                       true);
             return;
         }
-        startCall(voiceChannel.getConversation().getId(), withVideo);
+        injectJava(CallPermissionsController.class).startCall(new ConvId(voiceChannel.getConversation().getId()), withVideo);
     }
 
 
