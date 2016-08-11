@@ -54,12 +54,12 @@ public class FragmentTest<A extends TestActivity> {
     public void setup() throws InterruptedException {
         //Thread.sleep(CATCH_DEBUG_DELAY); // very useful for being able to catch with the debugger :)
         instrumentation = InstrumentationRegistry.getInstrumentation();
+        Intents.init();
         activityTestRule.launchActivity(new Intent(instrumentation.getContext(), activityType));
 
         activity = activityTestRule.getActivity();
         activity.setMockStoreFactory(new MockStoreFactory());
         activity.setMockControllerFactory(new MockControllerFactory());
-        Intents.init();
     }
 
     protected void attachFragment(Fragment fragment, String TAG) {
