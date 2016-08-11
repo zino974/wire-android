@@ -81,9 +81,11 @@ import com.waz.api.UpdateListener;
 import com.waz.api.User;
 import com.waz.api.UsersList;
 import com.waz.api.Verification;
+import com.waz.zclient.BaseScalaActivity;
 import com.waz.zclient.BuildConfig;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
+import com.waz.zclient.camera.GlobalCameraController;
 import com.waz.zclient.controllers.IControllerFactory;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.calling.CallingObserver;
@@ -159,6 +161,7 @@ import com.waz.zclient.ui.cursor.CursorMenuItem;
 import com.waz.zclient.ui.theme.ThemeUtils;
 import com.waz.zclient.ui.utils.KeyboardUtils;
 import com.waz.zclient.utils.AssetUtils;
+import com.waz.zclient.utils.Callback;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.OtrDestination;
 import com.waz.zclient.utils.PermissionUtils;
@@ -202,7 +205,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                                                                   AssetIntentsManager.Callback,
                                                                                                   PagerControllerObserver,
                                                                                                   CursorImagesLayout.Callback,
-                                                                                                  VoiceFilterLayout.Callback, ExtendedCursorContainer.Callback {
+                                                                                                  VoiceFilterLayout.Callback,
+                                                                                                  ExtendedCursorContainer.Callback {
     public static final String TAG = ConversationFragment.class.getName();
     private static final String SAVED_STATE_PREVIEW = "SAVED_STATE_PREVIEW";
     private static final int REQUEST_FILE_CODE = 9412;
@@ -247,6 +251,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     private AssetIntentsManager assetIntentsManager;
     private ViewGroup containerPreview;
     private boolean isPreviewShown;
+    private boolean isVideoMessageButtonClicked;
 
     public static ConversationFragment newInstance() {
         return new ConversationFragment();
@@ -1531,10 +1536,18 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.file(isGroupConversation));
                 break;
             case VIDEO_MESSAGE:
-                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.videomessage(
-                    isGroupConversation));
-                extendedCursorContainer.close(false);
-                assetIntentsManager.maybeCaptureVideo(getActivity(), AssetIntentsManager.IntentType.VIDEO_CURSOR_BUTTON);
+                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.videomessage(isGroupConversation));
+                isVideoMessageButtonClicked = true;
+                getCameraController().releaseCamera(new Callback<Void>() {
+                    @Override
+                    public void callback(Void v) {
+                        if (!isVideoMessageButtonClicked || assetIntentsManager == null) {
+                            return;
+                        }
+                        isVideoMessageButtonClicked = false;
+                        assetIntentsManager.maybeCaptureVideo(getActivity(), AssetIntentsManager.IntentType.VIDEO_CURSOR_BUTTON);
+                    }
+                });
                 break;
             case LOCATION:
                 getControllerFactory().getLocationController().showShareLocation();
@@ -1547,6 +1560,10 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     getConversationTypeString()));
                 break;
         }
+    }
+
+    private GlobalCameraController getCameraController() {
+        return ((BaseScalaActivity) getActivity()).injectJava(GlobalCameraController.class);
     }
 
     private void openExtendedCursor(ExtendedCursorContainer.Type type) {

@@ -29,20 +29,21 @@ import com.waz.ZLog
 import com.waz.threading.{CancellableFuture, Threading}
 import com.waz.utils.events.{EventContext, Signal}
 import com.waz.zclient.WireContext
+import com.waz.zclient.utils.Callback
 import timber.log.Timber
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
-class CameraPreviewController(cxt: WireContext)(implicit eventContext: EventContext) {
+class GlobalCameraController(cxt: WireContext)(implicit eventContext: EventContext) {
 
-  import CameraPreviewController._
+  import GlobalCameraController._
 
-  implicit val logTag = ZLog.logTagFor[CameraPreviewController]
+  implicit val logTag = ZLog.logTagFor[GlobalCameraController]
 
   implicit val cameraExecutionContext = new ExecutionContext {
     private val cameraHandler = {
-      val cameraThread = new HandlerThread(CameraPreviewController.CAMERA_THREAD_ID)
+      val cameraThread = new HandlerThread(GlobalCameraController.CAMERA_THREAD_ID)
       cameraThread.start()
       new Handler(cameraThread.getLooper)
     }
@@ -62,7 +63,6 @@ class CameraPreviewController(cxt: WireContext)(implicit eventContext: EventCont
       Seq.empty
   }
 
-  //TODO tidy this up
   @volatile private var currentCamera = Option.empty[Camera]
 
   private var loadFuture = CancellableFuture.cancelled[PreviewSize]()
@@ -139,9 +139,7 @@ class CameraPreviewController(cxt: WireContext)(implicit eventContext: EventCont
           previewSize
         }
       } catch {
-        case e: Throwable =>
-          Timber.w(e, "Failed to open camera - camera is likely unavailable")
-          CancellableFuture.cancelled[PreviewSize]()
+        case e: Throwable => CancellableFuture.failed(e)
       }
     }
     loadFuture
@@ -166,7 +164,11 @@ class CameraPreviewController(cxt: WireContext)(implicit eventContext: EventCont
     promise.future
   }
 
-  def releaseCamera() = {
+  def releaseCamera(callback: Callback[Void]): Future[Unit] = releaseCamera().andThen {
+    case _ => Option(callback).foreach(_.callback(null))
+  }(Threading.Ui)
+
+  def releaseCamera(): Future[Unit] = {
     loadFuture.cancel()
     Future {
       currentCamera.foreach { c =>
@@ -238,7 +240,7 @@ class CameraPreviewController(cxt: WireContext)(implicit eventContext: EventCont
 
     def byHeight(s: Camera#Size) = Math.abs(s.height - targetHeight)
 
-    val filteredSizes = sizes.filterNot(s => Math.abs(s.width.toDouble / s.height.toDouble - targetRatio) > CameraPreviewController.ASPECT_TOLERANCE)
+    val filteredSizes = sizes.filterNot(s => Math.abs(s.width.toDouble / s.height.toDouble - targetRatio) > GlobalCameraController.ASPECT_TOLERANCE)
     val optimalSize = if (filteredSizes.isEmpty) sizes.minBy(byHeight) else filteredSizes.minBy(byHeight)
 
     val (w, h) = (optimalSize.width, optimalSize.height)
@@ -304,7 +306,7 @@ protected[camera] case class PreviewSize(w: Float, h: Float) {
   def hasSize = w != 0 && h != 0
 }
 
-object CameraPreviewController {
+object GlobalCameraController {
 
   private val FOCUS_MODE_AUTO = null.asInstanceOf[Camera].Parameters.FOCUS_MODE_AUTO
   private val FOCUS_MODE_CONTINUOUS_PICTURE = null.asInstanceOf[Camera].Parameters.FOCUS_MODE_CONTINUOUS_PICTURE

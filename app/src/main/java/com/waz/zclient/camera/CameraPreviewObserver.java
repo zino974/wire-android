@@ -26,16 +26,11 @@ public interface CameraPreviewObserver {
 
     void onCameraLoadingFailed();
 
-    /**
-     * This method needs to be overriden if the view using the CameraPreview wants to leave the app (and potentially
-     * let another app use the camera). Only when this callback method returns can we be sure that the camera is closed
-     * and that it's safe for other apps to attempt to open it.
-     */
-    void onCameraReleased();
-
     void onPictureTaken(ImageAsset imageAsset);
 
     void onFocusBegin(Rect focusArea);
 
     void onFocusComplete();
+
+    void onCameraReleased();
 }
