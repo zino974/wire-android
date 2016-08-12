@@ -133,7 +133,7 @@ import com.waz.zclient.core.stores.participants.ParticipantsStoreObserver;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.pages.extendedcursor.ExtendedCursorContainer;
 import com.waz.zclient.pages.extendedcursor.image.CursorImagesLayout;
-import com.waz.zclient.pages.extendedcursor.image.CursorImagesPreviewLayout;
+import com.waz.zclient.pages.extendedcursor.image.ImagePreviewLayout;
 import com.waz.zclient.pages.extendedcursor.voicefilter.VoiceFilterLayout;
 import com.waz.zclient.pages.main.calling.enums.VoiceBarAppearance;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
@@ -201,7 +201,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                                                                   AudioMessageRecordingView.Callback,
                                                                                                   MessageActionModeObserver,
                                                                                                   RequestPermissionsObserver,
-                                                                                                  CursorImagesPreviewLayout.Callback,
+                                                                                                  ImagePreviewLayout.Callback,
                                                                                                   AssetIntentsManager.Callback,
                                                                                                   PagerControllerObserver,
                                                                                                   CursorImagesLayout.Callback,
@@ -1985,30 +1985,29 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public void onPictureTaken(ImageAsset imageAsset) {
-        showImagePreview(imageAsset, CursorImagesPreviewLayout.Source.CAMERA);
+        showImagePreview(imageAsset, ImagePreviewLayout.Source.CAMERA);
     }
 
     @Override
     public void onGalleryPictureSelected(ImageAsset asset) {
         isPreviewShown = true;
-        showImagePreview(asset, CursorImagesPreviewLayout.Source.IN_APP_GALLERY);
+        showImagePreview(asset, ImagePreviewLayout.Source.IN_APP_GALLERY);
     }
 
-    private void showImagePreview(ImageAsset asset, CursorImagesPreviewLayout.Source source) {
-        CursorImagesPreviewLayout cursorImagesPreviewLayout = createPreviewLayout();
-        cursorImagesPreviewLayout.setImageAsset(asset,
-                                                source,
-                                                this,
-                                                getControllerFactory().getAccentColorController().getAccentColor().getColor(),
-                                                getStoreFactory().getConversationStore().getCurrentConversation().getName());
+    private void showImagePreview(ImageAsset asset, ImagePreviewLayout.Source source) {
+        ImagePreviewLayout imagePreviewLayout = createPreviewLayout();
+        imagePreviewLayout.setImageAsset(asset,
+                                         source,
+                                         this);
+        imagePreviewLayout.setAccentColor(getControllerFactory().getAccentColorController().getAccentColor().getColor());
+        imagePreviewLayout.setTitle(getStoreFactory().getConversationStore().getCurrentConversation().getName());
 
-
-        containerPreview.addView(cursorImagesPreviewLayout);
+        containerPreview.addView(imagePreviewLayout);
         openPreview(containerPreview);
     }
 
-    private CursorImagesPreviewLayout createPreviewLayout() {
-        return (CursorImagesPreviewLayout) LayoutInflater.from(getContext()).inflate(
+    private ImagePreviewLayout createPreviewLayout() {
+        return (ImagePreviewLayout) LayoutInflater.from(getContext()).inflate(
             R.layout.fragment_cursor_images_preview,
             containerPreview,
             false);
@@ -2045,14 +2044,14 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     @Override
-    public void onSketchPictureFromPreview(ImageAsset imageAsset, CursorImagesPreviewLayout.Source source) {
+    public void onSketchPictureFromPreview(ImageAsset imageAsset, ImagePreviewLayout.Source source) {
         getControllerFactory().getDrawingController().showDrawing(imageAsset,
                                                                   IDrawingController.DrawingDestination.CAMERA_PREVIEW_VIEW);
         extendedCursorContainer.close(true);
     }
 
     @Override
-    public void onSendPictureFromPreview(ImageAsset imageAsset, CursorImagesPreviewLayout.Source source) {
+    public void onSendPictureFromPreview(ImageAsset imageAsset, ImagePreviewLayout.Source source) {
         getStoreFactory().getConversationStore().sendMessage(imageAsset);
         TrackingUtils.onSentPhotoMessage(getControllerFactory().getTrackingController(),
                                          getStoreFactory().getConversationStore().getCurrentConversation(),
@@ -2079,7 +2078,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 break;
             case GALLERY:
                 showImagePreview(ImageAssetFactory.getImageAsset(uri),
-                                 CursorImagesPreviewLayout.Source.DEVICE_GALLERY);
+                                 ImagePreviewLayout.Source.DEVICE_GALLERY);
                 break;
             case VIDEO_CURSOR_BUTTON:
                 sendVideo(uri);

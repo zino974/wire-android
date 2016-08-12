@@ -43,7 +43,7 @@ import com.waz.zclient.core.controllers.tracking.events.media.SentTextMessageEve
 import com.waz.zclient.core.controllers.tracking.events.settings.ChangedContactsPermissionEvent;
 import com.waz.zclient.core.controllers.tracking.events.settings.ChangedSoundNotificationLevelEvent;
 import com.waz.zclient.core.stores.connect.IConnectStore;
-import com.waz.zclient.pages.extendedcursor.image.CursorImagesPreviewLayout;
+import com.waz.zclient.pages.extendedcursor.image.ImagePreviewLayout;
 import com.waz.zclient.ui.optionsmenu.OptionsMenuItem;
 
 import java.util.Locale;
@@ -332,8 +332,8 @@ public class TrackingUtils {
 
     public static void onSentPhotoMessage(ITrackingController trackingController,
                                           IConversation conversation,
-                                          CursorImagesPreviewLayout.Source source) {
-        SentPictureEvent.Source eventSource = source == CursorImagesPreviewLayout.Source.CAMERA ?
+                                          ImagePreviewLayout.Source source) {
+        SentPictureEvent.Source eventSource = source == ImagePreviewLayout.Source.CAMERA ?
                                               SentPictureEvent.Source.CAMERA :
                                               SentPictureEvent.Source.GALLERY;
         SentPictureEvent.Method eventMethod = SentPictureEvent.Method.DEFAULT;
