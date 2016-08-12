@@ -36,7 +36,7 @@ import static junit.framework.Assert.assertTrue;
 public class FragmentTest<A extends TestActivity> {
 
     public static final int CATCH_DEBUG_DELAY = 3000;
-    public static final int WAIT_FOR_TRANSACTION_COMMIT_DELAY = 10;
+    public static final int WAIT_FOR_TRANSACTION_COMMIT_DELAY = 100;
     @Rule
     public ActivityTestRule<A> activityTestRule;
 
