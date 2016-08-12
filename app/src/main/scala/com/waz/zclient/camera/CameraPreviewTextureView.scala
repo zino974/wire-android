@@ -18,7 +18,6 @@
 package com.waz.zclient.camera
 
 import android.content.Context
-import android.content.res.Configuration
 import android.graphics.{Matrix, Rect, SurfaceTexture}
 import android.os.Vibrator
 import android.util.AttributeSet
@@ -30,6 +29,7 @@ import com.waz.threading.CancellableFuture.CancelException
 import com.waz.threading.Threading
 import com.waz.utils.returning
 import com.waz.zclient.{CameraPermission, PermissionsController, R, ViewHelper}
+import timber.log.Timber
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success}
@@ -42,7 +42,7 @@ class CameraPreviewTextureView(val context: Context, val attrs: AttributeSet, va
 
   def this(context: Context) = this(context, null)
 
-  private val controller = inject[CameraPreviewController]
+  private val controller = inject[GlobalCameraController]
   private val vibrator = Option(inject[Vibrator])
   private val mediaManager = Option(inject[MediaManagerService]).flatMap(_.mediaManager)
   private val permissionsController = Option(inject[PermissionsController])
@@ -90,11 +90,9 @@ class CameraPreviewTextureView(val context: Context, val attrs: AttributeSet, va
     }
   }
 
-  def closeCamera() = {
-    controller.releaseCamera().andThen {
-      case _ => observer.foreach(_.onCameraReleased())
-    }(Threading.Ui)
-  }
+  def closeCamera() = controller.releaseCamera().andThen {
+    case _ => observer.foreach(_.onCameraReleased())
+  }(Threading.Ui)
 
   private def startLoading(texture: SurfaceTexture, width: Int, height: Int) = {
     controller.openCamera(texture, width, height).onComplete {
@@ -102,7 +100,9 @@ class CameraPreviewTextureView(val context: Context, val attrs: AttributeSet, va
         updateTextureMatrix((getWidth, getHeight), previewSize)
         observer.foreach(_.onCameraLoaded())
       case Failure(ex : CancelException) =>
-      case Failure(_) => observer.foreach(_.onCameraLoadingFailed())
+      case Failure(ex) =>
+        Timber.w(ex, "Failed to open camera - camera is likely unavailable")
+        observer.foreach(_.onCameraLoadingFailed())
     } (Threading.Ui)
   }
 
