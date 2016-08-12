@@ -1550,9 +1550,9 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 });
                 break;
             case LOCATION:
+                KeyboardUtils.hideKeyboard(getActivity());
                 getControllerFactory().getLocationController().showShareLocation();
-                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.location(
-                    isGroupConversation));
+                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.location(isGroupConversation));
                 break;
             case MORE:
             case LESS:
