@@ -106,6 +106,7 @@ public class AssetIntentsManager {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
         }
+        callback.openIntent(intent, type);
     }
 
     public void openGallery() {
