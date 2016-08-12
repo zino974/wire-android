@@ -18,15 +18,18 @@
 package com.waz.zclient.camera
 
 
+import java.util.concurrent.{Executors, ThreadFactory}
+
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.{Rect, SurfaceTexture}
 import android.hardware.Camera
 import android.hardware.Camera.{AutoFocusCallback, PictureCallback, ShutterCallback}
-import android.os.{Build, Handler, HandlerThread}
+import android.os.Build
 import android.view.{OrientationEventListener, Surface, WindowManager}
 import com.waz.ZLog
 import com.waz.threading.{CancellableFuture, Threading}
+import com.waz.utils.RichFuture
 import com.waz.utils.events.{EventContext, Signal}
 import com.waz.zclient.WireContext
 import com.waz.zclient.utils.Callback
@@ -35,23 +38,100 @@ import timber.log.Timber
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
-class GlobalCameraController(cxt: WireContext)(implicit eventContext: EventContext) {
-
-  import GlobalCameraController._
+class GlobalCameraController(cxt: WireContext, cameraFactory: CameraFactory)(implicit eventContext: EventContext) {
 
   implicit val logTag = ZLog.logTagFor[GlobalCameraController]
 
   implicit val cameraExecutionContext = new ExecutionContext {
-    private val cameraHandler = {
-      val cameraThread = new HandlerThread(GlobalCameraController.CAMERA_THREAD_ID)
-      cameraThread.start()
-      new Handler(cameraThread.getLooper)
-    }
+    private val executor = Executors.newSingleThreadExecutor(new ThreadFactory {
+      override def newThread(r: Runnable): Thread = new Thread(r, "CAMERA")
+    })
+
+
     override def reportFailure(cause: Throwable): Unit = Timber.e(cause, "Problem executing on Camera Thread.")
-    override def execute(runnable: Runnable): Unit = cameraHandler.post(runnable)
+
+    override def execute(runnable: Runnable): Unit = executor.submit(runnable)
   }
 
-  protected[camera] val camInfos = try {
+  //values protected for testing
+  protected[camera] val camInfos = cameraFactory.getCameraInfos
+  protected[camera] var currentCamera = Option.empty[WireCamera]
+  protected[camera] var loadFuture = CancellableFuture.cancelled[(PreviewSize, Set[FlashMode])]()
+  protected[camera] var currentCamInfo = camInfos.headOption //save this in global controller for consistency during the life of the app
+
+  val currentFlashMode = Signal(FlashMode.OFF)
+
+  val deviceOrientation = Signal(Orientation(0))
+
+  def getCurrentCameraFacing = currentCamInfo.map(_.cameraFacing)
+
+  /**
+    * Cycles the currentCameraInfo to point to the next camera in the list of camera devices. This does NOT, however,
+    * start the camera. The previos camera should be released and then openCamera() should be called again
+    */
+  def setNextCamera() = currentCamInfo.foreach(c => currentCamInfo = camInfos.lift((c.id + 1) % camInfos.size))
+
+  /**
+    * Returns a Future of a PreviewSize object representing the preview size that the camera preview will draw to.
+    * This should be used to calculate the aspect ratio for re-sizing the texture
+    */
+  def openCamera(texture: SurfaceTexture, w: Int, h: Int) = {
+    loadFuture.cancel()
+    loadFuture = currentCamInfo.fold(CancellableFuture.cancelled[(PreviewSize, Set[FlashMode])]()) { info =>
+      CancellableFuture {
+        currentCamera = Some(cameraFactory(info, texture, w, h, cxt, deviceOrientation.currentValue.getOrElse(Orientation(0)), currentFlashMode.currentValue.getOrElse(FlashMode.OFF)))
+        val previewSize = currentCamera.map(_.getPreviewSize).getOrElse(PreviewSize(0, 0))
+        val flashModes = currentCamera.map(_.getSupportedFlashModes).getOrElse(Set.empty)
+        (previewSize, flashModes)
+      }
+    }
+    loadFuture
+  }
+
+  def takePicture(onShutter: => Unit) = Future {
+    currentCamera match {
+      case Some(c) => c.takePicture(onShutter)
+      case _ => Future.failed(new RuntimeException("Take picture cannot be called while the camera is closed"))
+    }
+  }.flatten
+
+  def releaseCamera(callback: Callback[Void]): Unit = releaseCamera().andThen {
+    case _ => Option(callback).foreach(_.callback(null))
+  }(Threading.Ui)
+
+  def releaseCamera(): Future[Unit] = {
+    loadFuture.cancel()
+    Future {
+      currentCamera.foreach { c =>
+        c.release()
+        currentCamera = None
+      }
+    }
+  }
+
+  def setFocusArea(touchRect: Rect, w: Int, h: Int) = Future {
+    currentCamera match {
+      case Some(c) => c.setFocusArea(touchRect, w, h)
+      case _ => Future.failed(new RuntimeException("Can't set focus when camera is closed"))
+    }
+  }.flatten
+
+  currentFlashMode.on(cameraExecutionContext)(fm => currentCamera.foreach(_.setFlashMode(fm)))
+
+  deviceOrientation.on(cameraExecutionContext)(o => currentCamera.foreach(_.setOrientation(o)))
+
+}
+
+trait CameraFactory {
+  def getCameraInfos: Seq[CameraInfo]
+  def apply(info: CameraInfo, texture: SurfaceTexture, w: Int, h: Int, cxt: Context, devOrientation: Orientation, flashMode: FlashMode): WireCamera
+}
+
+class AndroidCameraFactory extends CameraFactory {
+  override def apply(info: CameraInfo, texture: SurfaceTexture, w: Int, h: Int, cxt: Context, devOrientation: Orientation, flashMode: FlashMode) =
+    new AndroidCamera(info, texture, w, h, cxt, devOrientation, flashMode)
+
+  override def getCameraInfos = try {
     val info = new Camera.CameraInfo
     Seq.tabulate(Camera.getNumberOfCameras) { i =>
       Camera.getCameraInfo(i, info)
@@ -62,16 +142,31 @@ class GlobalCameraController(cxt: WireContext)(implicit eventContext: EventConte
       Timber.w(e, "Failed to retrieve camera info - camera is likely unavailable")
       Seq.empty
   }
+}
 
-  @volatile private var currentCamera = Option.empty[Camera]
+trait WireCamera {
+  def getPreviewSize: PreviewSize
 
-  private var loadFuture = CancellableFuture.cancelled[PreviewSize]()
+  def takePicture(shutter: => Unit): Future[Array[Byte]]
 
-  private var currentCamInfo = camInfos.headOption //save this in global controller for consistency during the life of the app
+  def release(): Unit
 
-  val currentFlashMode = Signal(FlashMode.OFF)
+  def setOrientation(o: Orientation): Unit
 
-  val deviceOrientation = Signal(Orientation(0))
+  def setFocusArea(touchRect: Rect, w: Int, h: Int): Future[Unit]
+
+  def setFlashMode(fm: FlashMode): Unit
+
+  def getSupportedFlashModes: Set[FlashMode]
+}
+
+class AndroidCamera(info: CameraInfo, texture: SurfaceTexture, w: Int, h: Int, cxt: Context, devOrientation: Orientation, flashMode: FlashMode) extends WireCamera {
+
+  import WireCamera._
+
+  private var camera = Option(Camera.open(info.id))
+  private var previewSize: Option[PreviewSize] = None
+  private var supportedFlashModes = Set.empty[FlashMode]
 
   /*
    * This part of the Wire software is heavily based on code posted in this Stack Overflow answer.
@@ -98,159 +193,121 @@ class GlobalCameraController(cxt: WireContext)(implicit eventContext: EventConte
     }
   }
 
-  def getCurrentCameraFacing = currentCamInfo.map(_.cameraFacing)
+  camera.foreach { c =>
+    val pms = c.getParameters
+    c.setPreviewTexture(texture)
+    val ps = getPreviewSize(pms, w, h)
+    pms.setPreviewSize(ps.w.toInt, ps.h.toInt)
+    previewSize = Some(ps)
 
-  /**
-    * Cycles the currentCameraInfo to point to the next camera in the list of camera devices. This does NOT, however,
-    * start the camera. The previos camera should be released and then openCamera() should be called again
-    */
-  def setNextCamera() = {
-    currentCamInfo.foreach(c => currentCamInfo = camInfos.lift((c.id + 1) % camInfos.size))
+    val pictureSize = getPictureSize(pms, info.cameraFacing)
+    pms.setPictureSize(pictureSize.width, pictureSize.height)
+
+    pms.setRotation(getCameraRotation(devOrientation.orientation, info))
+    c.setDisplayOrientation(getPreviewOrientation(naturalOrientation, info))
+
+    supportedFlashModes = getSupportedFlashModesFromCamera
+    if (supportedFlashModes.contains(flashMode)) pms.setFlashMode(flashMode.mode)
+    else pms.setFlashMode(FlashMode.OFF.mode)
+
+    if (clickToFocusSupported) setFocusMode(pms, FOCUS_MODE_AUTO)
+    else setFocusMode(pms, FOCUS_MODE_CONTINUOUS_PICTURE)
+
+    c.setParameters(pms)
+    c.startPreview()
   }
 
-  /**
-    * Returns a Future of a PreviewSize object representing the preview size that the camera preview will draw to.
-    * This should be used to calculate the aspect ratio for re-sizing the texture
-    */
-  def openCamera(texture: SurfaceTexture, w: Int, h: Int) = {
-    loadFuture.cancel()
-    loadFuture = currentCamInfo.fold(CancellableFuture.cancelled[PreviewSize]()) { info =>
-      try {
-        CancellableFuture {
-          val c = Camera.open(info.id)
-          currentCamera = Some(c)
-          c.setPreviewTexture(texture)
-
-          var previewSize: PreviewSize = PreviewSize(0, 0)
-          setParams(c) { pms =>
-            previewSize = getPreviewSize(pms, w, h)
-            pms.setPreviewSize(previewSize.w.toInt, previewSize.h.toInt)
-            setPictureSize(pms, info.cameraFacing)
-            deviceOrientation.currentValue.foreach { o =>
-              pms.setRotation(getCameraRotation(o.orientation, info))
-              c.setDisplayOrientation(getPreviewOrientation(naturalOrientation, info))
-            }
-            currentFlashMode.currentValue.foreach { fm =>
-              if (getSupportedFlashModes.contains(fm)) pms.setFlashMode(fm.mode) else pms.setFlashMode(FlashMode.OFF.mode)
-            }
-            if (clickToFocusSupported) setFocusMode(pms, FOCUS_MODE_AUTO) else setFocusMode(pms, FOCUS_MODE_CONTINUOUS_PICTURE)
-          }
-          c.startPreview()
-          previewSize
-        }
-      } catch {
-        case e: Throwable => CancellableFuture.failed(e)
-      }
-    }
-    loadFuture
-  }
-
-  def takePicture(onShutter: => Unit) = {
+  override def takePicture(shutter: => Unit) = {
     val promise = Promise[Array[Byte]]()
-    Future {
-      currentCamera match {
-        case Some(c) =>
-          c.takePicture(new ShutterCallback {
-            override def onShutter(): Unit = Future(onShutter())(Threading.Ui)
-          }, null, new PictureCallback {
-            override def onPictureTaken(data: Array[Byte], camera: Camera): Unit = {
-              camera.startPreview() //restarts the preview as it gets stopped by camera.takePicture()
+    camera match {
+      case Some(c) => try {
+        c.takePicture(
+          new ShutterCallback {
+            override def onShutter(): Unit = Future(shutter)(Threading.Ui)
+          },
+          null,
+          new PictureCallback {
+            override def onPictureTaken(data: Array[Byte], camera: Camera) = {
+              c.startPreview() //restarts the preview as it gets stopped by camera.takePicture()
               promise.success(data)
             }
           })
-        case _ => promise.failure(new RuntimeException("Take picture cannot be called while the camera is closed"))
+      } catch {
+        case e: Throwable => promise.failure(e)
       }
+      case _ => promise.failure(new RuntimeException("Camera not available"))
     }
     promise.future
   }
 
-  def releaseCamera(callback: Callback[Void]): Future[Unit] = releaseCamera().andThen {
-    case _ => Option(callback).foreach(_.callback(null))
-  }(Threading.Ui)
+  override def getPreviewSize = previewSize.getOrElse(PreviewSize(0, 0))
 
-  def releaseCamera(): Future[Unit] = {
-    loadFuture.cancel()
-    Future {
-      currentCamera.foreach { c =>
-        c.stopPreview()
-        c.release()
-        currentCamera = None
-      }
-    }
+  override def release() = camera.foreach { c =>
+    c.stopPreview()
+    c.release()
+    camera = None
   }
 
-  def setFocusArea(touchRect: Rect, w: Int, h: Int) = {
+  override def setOrientation(o: Orientation) = setParams(_.setRotation(getCameraRotation(o.orientation, info)))
+
+  override def getSupportedFlashModes = supportedFlashModes
+
+  //volatile because the camera will use the main thread to post callbacks to (since I'm using an executor and not a handler thread)
+  @volatile private var settingFocus = false
+
+  override def setFocusArea(touchRect: Rect, w: Int, h: Int) = {
     val promise = Promise[Unit]()
-    Future {
-      if (touchRect.width == 0 || touchRect.height == 0) promise.success(())
-      else {
-        currentCamera match {
-          case Some(c) if clickToFocusSupported =>
+    camera match {
+      case Some(c) =>
+        if (touchRect.width == 0 || touchRect.height == 0) promise.success(())
+        else if (clickToFocusSupported) {
+          val focusArea = new Camera.Area(new Rect(
+            touchRect.left * camCoordsRange / w - camCoordsOffset,
+            touchRect.top * camCoordsRange / h - camCoordsOffset,
+            touchRect.right * camCoordsRange / w - camCoordsOffset,
+            touchRect.bottom * camCoordsRange / h - camCoordsOffset
+          ), focusWeight)
 
-            val focusArea = new Camera.Area(new Rect(
-              touchRect.left * camCoordsRange / w - camCoordsOffset,
-              touchRect.top * camCoordsRange / h - camCoordsOffset,
-              touchRect.right * camCoordsRange / w - camCoordsOffset,
-              touchRect.bottom * camCoordsRange / h - camCoordsOffset
-            ), focusWeight)
-
-            setParams(c)(_.setFocusAreas(List(focusArea).asJava))
+          setParams(_.setFocusAreas(List(focusArea).asJava))
+          if (!settingFocus) try {
+            settingFocus = true
             c.autoFocus(new AutoFocusCallback {
               override def onAutoFocus(s: Boolean, cam: Camera) = {
                 if (!s) Timber.w("Focus was unsuccessful - ignoring")
                 promise.success(())
+                settingFocus = false
               }
             })
-          case _ => promise.success(())
+          } catch {
+            case e: Throwable => promise.failure(e)
+          }
         }
-      }
+        else promise.success(())
+      case None => promise.success(())
     }
     promise.future
   }
 
-  def getSupportedFlashModes = currentCamera.fold(Set.empty[String]) { c =>
-    Option(c.getParameters.getSupportedFlashModes).fold(Set.empty[String])(_.asScala.toSet)
-  }.map(FlashMode.get)
+  override def setFlashMode(fm: FlashMode) = setParams(_.setFlashMode(fm.mode))
 
-  currentFlashMode.on(cameraExecutionContext) { fm =>
-    currentCamera.foreach(setParams(_)(_.setFlashMode(fm.mode)))
-  }
-
-  deviceOrientation.on(cameraExecutionContext) { o =>
-    currentCamInfo.foreach { info =>
-      currentCamera.foreach { c =>
-        setParams(c)(_.setRotation(getCameraRotation(o.orientation, info)))
-      }
-    }
-  }
-
-  private def clickToFocusSupported = currentCamera.fold(false) { c =>
-    c.getParameters.getMaxNumFocusAreas > 0 && supportsFocusMode(c.getParameters, FOCUS_MODE_AUTO)
-  }
-
-  private def supportsFocusMode(pms: Camera#Parameters, mode: String) =
-    Option(pms.getSupportedFlashModes).fold(false)(_.contains(mode))
-
-  private def setFocusMode(pms: Camera#Parameters, mode: String) = if (supportsFocusMode(pms, mode)) pms.setFocusMode(mode)
-
-  private def getPreviewSize(pms: Camera#Parameters, viewWidth: Int, viewHeight: Int) = {
-    val targetRatio = pms.getPictureSize.width.toDouble / pms.getPictureSize.height.toDouble
+  private def getPreviewSize(params: Camera#Parameters, viewWidth: Int, viewHeight: Int) = {
+    val targetRatio = params.getPictureSize.width.toDouble / params.getPictureSize.height.toDouble
     val targetHeight = Math.min(viewHeight, viewWidth)
-    val sizes = pms.getSupportedPreviewSizes.asScala.toVector
+    val sizes = params.getSupportedPreviewSizes.asScala.toVector
 
     def byHeight(s: Camera#Size) = Math.abs(s.height - targetHeight)
 
-    val filteredSizes = sizes.filterNot(s => Math.abs(s.width.toDouble / s.height.toDouble - targetRatio) > GlobalCameraController.ASPECT_TOLERANCE)
+    val filteredSizes = sizes.filterNot(s => Math.abs(s.width.toDouble / s.height.toDouble - targetRatio) > ASPECT_TOLERANCE)
     val optimalSize = if (filteredSizes.isEmpty) sizes.minBy(byHeight) else filteredSizes.minBy(byHeight)
 
     val (w, h) = (optimalSize.width, optimalSize.height)
     PreviewSize(w, h)
   }
 
-  private def setPictureSize(pms: Camera#Parameters, facing: CameraFacing) = {
+  private def getPictureSize(pms: Camera#Parameters, facing: CameraFacing) = {
     val sizes = pms.getSupportedPictureSizes
     val size = if (facing == CameraFacing.FRONT && ("Nexus 4" == Build.MODEL)) sizes.get(1) else sizes.get(0)
-    pms.setPictureSize(size.width, size.height)
+    size
   }
 
   /**
@@ -266,11 +323,30 @@ class GlobalCameraController(cxt: WireContext)(implicit eventContext: EventConte
     if (info.cameraFacing == CameraFacing.FRONT) (info.fixedOrientation - deviceRotationDegrees + 360) % 360
     else (info.fixedOrientation + deviceRotationDegrees) % 360
 
-  private def setParams(c: Camera)(f: Camera#Parameters => Unit): Unit = {
+  private def getSupportedFlashModesFromCamera = camera.fold(Set.empty[FlashMode]) { c =>
+    Option(c.getParameters.getSupportedFlashModes).fold(Set.empty[FlashMode])(_.asScala.toSet.map(FlashMode.get))
+  }
+
+  private def clickToFocusSupported = camera.fold(false)(c => c.getParameters.getMaxNumFocusAreas > 0 && supportsFocusMode(c.getParameters, FOCUS_MODE_AUTO))
+
+  private def supportsFocusMode(pms: Camera#Parameters, mode: String) = Option(pms.getSupportedFocusModes).fold(false)(_.contains(mode))
+
+  private def setFocusMode(pms: Camera#Parameters, mode: String) = if (supportsFocusMode(pms, mode)) pms.setFocusMode(mode)
+
+  private def setParams(f: Camera#Parameters => Unit) = camera.foreach { c =>
     val params = c.getParameters
     f(params)
     c.setParameters(params)
   }
+}
+
+object WireCamera {
+  val FOCUS_MODE_AUTO = null.asInstanceOf[Camera].Parameters.FOCUS_MODE_AUTO
+  val FOCUS_MODE_CONTINUOUS_PICTURE = null.asInstanceOf[Camera].Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
+  val ASPECT_TOLERANCE: Double = 0.1
+  val camCoordsRange = 2000
+  val camCoordsOffset = 1000
+  val focusWeight = 1000
 }
 
 /**
@@ -301,23 +377,11 @@ case object Portrait_180 extends Orientation { override val orientation: Int = 1
 case object Landscape_270 extends Orientation { override val orientation: Int = 270 }
 
 //CameraInfo.orientation is fixed for any given device, so we only need to store it once.
-private case class CameraInfo(id: Int, cameraFacing: CameraFacing, fixedOrientation: Int)
+case class CameraInfo(id: Int, cameraFacing: CameraFacing, fixedOrientation: Int)
 protected[camera] case class PreviewSize(w: Float, h: Float) {
   def hasSize = w != 0 && h != 0
 }
 
-object GlobalCameraController {
-
-  private val FOCUS_MODE_AUTO = null.asInstanceOf[Camera].Parameters.FOCUS_MODE_AUTO
-  private val FOCUS_MODE_CONTINUOUS_PICTURE = null.asInstanceOf[Camera].Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
-
-  private val camCoordsRange = 2000
-  private val camCoordsOffset = 1000
-  private val focusWeight = 1000
-
-  private val CAMERA_THREAD_ID: String = "CAMERA"
-  private val ASPECT_TOLERANCE: Double = 0.1
-}
 
 
 
