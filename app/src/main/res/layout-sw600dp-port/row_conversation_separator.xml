@@ -120,7 +120,7 @@
             android:layout_width="@dimen/content__separator__label_container__width"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="start"
+            android:gravity="start|center_horizontal"
             >
 
             <com.waz.zclient.ui.text.TypefaceTextView
@@ -134,6 +134,15 @@
                 android:textAllCaps="true"
                 app:font="@string/wire__typeface__light"
                 style="?wireBackground"
+                />
+
+            <com.waz.zclient.ui.text.GlyphTextView
+                android:id="@+id/gtv__message_recalled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/glyph__trash"
+                android:visibility="gone"
+                style="?messageStreamSeparatorRecalled"
                 />
 
         </LinearLayout>
