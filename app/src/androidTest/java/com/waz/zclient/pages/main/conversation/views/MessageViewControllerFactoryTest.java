@@ -63,6 +63,7 @@ public class MessageViewControllerFactoryTest extends ViewTest<MainTestActivity>
         for (Message.Type type : Message.Type.values()) {
             if (type == Message.Type.CONNECT_ACCEPTED ||
                 type == Message.Type.INCOMING_CALL ||
+                type == Message.Type.RECALLED ||
                 type == Message.Type.UNKNOWN) {
                 continue;
             }

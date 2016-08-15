@@ -19,23 +19,12 @@
 
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_gravity="center_horizontal"
-              android:gravity="center"
               android:orientation="vertical"
-    >
-
-    <include layout="@layout/row_conversation_text_message" />
-
-    <com.waz.zclient.views.media.MediaPlayerView
-        android:id="@+id/mpv__row_conversation__message_media_player"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/row_conversation__message_media_player_margin_top"
-        android:layout_marginBottom="@dimen/row_conversation__message_media_player_margin_bottom"
-        android:gravity="center_horizontal"
-        />
+              android:paddingStart="@dimen/wire__padding__regular"
+              android:paddingEnd="@dimen/wire__padding__regular"
+              android:paddingTop="@dimen/wire__padding__small"
+              android:paddingBottom="@dimen/wire__padding__small"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
 
 </LinearLayout>

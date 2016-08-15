@@ -761,4 +761,5 @@
     <dimen name="wave_graph_bin_space_width">1dp</dimen>
     <dimen name="cursor_strip_width">48dp</dimen>
     <dimen name="fake_icon_diameter">31dp</dimen>
+    <dimen name="message__bottom_menu__icon_view_size">24dp</dimen>
 </resources>

@@ -34,5 +34,11 @@
     <item name="cursor_menu_item_less" type="id" />
     <item name="cursor_menu_item_dummy" type="id" />
 
+    <item name="message_bottom_menu_item_forward" type="id" />
+    <item name="message_bottom_menu_item_copy" type="id" />
+    <item name="message_bottom_menu_item_delete_local" type="id" />
+    <item name="message_bottom_menu_item_delete_global" type="id" />
+    <item name="message_bottom_menu_item_edit" type="id" />
+
     <item name="video_calling_view" type="id" />
 </resources>

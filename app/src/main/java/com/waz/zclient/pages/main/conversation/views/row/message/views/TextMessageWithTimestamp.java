@@ -21,14 +21,12 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.support.v4.view.GestureDetectorCompat;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
-import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -46,9 +44,7 @@ import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.ZTimeFormatter;
 import org.threeten.bp.DateTimeUtils;
 
-public class TextMessageWithTimestamp extends LinearLayout implements AccentColorObserver,
-                                                                      GestureDetector.OnGestureListener {
-
+public class TextMessageWithTimestamp extends LinearLayout implements AccentColorObserver {
 
     private final float textSizeRegular;
     private final float textSizeEmoji;
@@ -56,6 +52,7 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
     private LinkTextView messageTextView;
     private TypefaceTextView timestampTextView;
     private MessageViewsContainer messageViewContainer;
+    private boolean isLongClick;
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
         public void updated(Message message) {
@@ -98,10 +95,8 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
             });
         }
     };
-    private GestureDetectorCompat gestureDetector;
     private int animationDuration;
-    private String messageId;
-    private OnLongClickListener longClickListener;
+    private Message message;
 
     public TextMessageWithTimestamp(Context context) {
         this(context, null);
@@ -127,26 +122,44 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
         messageTextView.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
+                if (event.getAction() == MotionEvent.ACTION_UP && isLongClick) {
+                    isLongClick = false;
+                    return true;
+                } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    isLongClick = false;
+                }
+                return v.onTouchEvent(event);
             }
         });
 
-        gestureDetector = new GestureDetectorCompat(context, this);
-    }
+        messageTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timestampTextView.clearAnimation();
+                if (timestampTextView.getVisibility() == GONE) {
+                    expandTimestamp();
+                } else {
+                    collapseTimestamp();
+                }
+            }
+        });
 
-    @Override
-    public void setOnLongClickListener(OnLongClickListener l) {
-        if (!gestureDetector.isLongpressEnabled()) {
-            gestureDetector.setIsLongpressEnabled(l != null);
-        }
-        this.longClickListener = l;
+        messageTextView.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                isLongClick = true;
+                messageViewContainer.onItemLongClick(message);
+                performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                return true;
+            }
+        });
     }
 
     public void setMessage(final Message message) {
         messageModelObserver.setAndUpdate(message);
         messageTextView.setVisibility(View.VISIBLE);
-        messageId = message.getId();
-        if (messageViewContainer.getTimestampShownSet().contains(messageId)) {
+        this.message = message;
+        if (messageViewContainer.getTimestampShownSet().contains(message.getId())) {
             messageViewContainer.setShownTimestampView(this);
             timestampTextView.setVisibility(VISIBLE);
         } else {
@@ -159,7 +172,7 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
             messageViewContainer.getShownTimestampView() != this) {
             messageViewContainer.getShownTimestampView().collapseTimestamp();
         }
-        messageViewContainer.getTimestampShownSet().add(messageId);
+        messageViewContainer.getTimestampShownSet().add(message.getId());
         messageViewContainer.setShownTimestampView(this);
         timestampTextView.setVisibility(VISIBLE);
 
@@ -175,7 +188,7 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
     }
 
     private void collapseTimestamp() {
-        messageViewContainer.getTimestampShownSet().remove(messageId);
+        messageViewContainer.getTimestampShownSet().remove(message.getId());
         int origHeight = timestampTextView.getHeight();
 
         ValueAnimator animator = createHeightAnimator(timestampTextView, origHeight, 0);
@@ -243,45 +256,6 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
             messageViewContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
         messageModelObserver.pauseListening();
-    }
-
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent event) {
-        if (isClickInsideLink(event)) {
-            return false;
-        }
-        timestampTextView.clearAnimation();
-        if (timestampTextView.getVisibility() == GONE) {
-            expandTimestamp();
-        } else {
-            collapseTimestamp();
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-        longClickListener.onLongClick(this);
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        return false;
     }
 
     private void resizeIfEmoji(Message message) {

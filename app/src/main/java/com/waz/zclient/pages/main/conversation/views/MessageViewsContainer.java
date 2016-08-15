@@ -19,6 +19,7 @@ package com.waz.zclient.pages.main.conversation.views;
 
 import android.view.View;
 import com.waz.api.IConversation;
+import com.waz.api.Message;
 import com.waz.zclient.ServiceContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.views.TextMessageWithTimestamp;
 import com.waz.zclient.utils.OtrDestination;
@@ -49,4 +50,6 @@ public interface MessageViewsContainer extends ServiceContainer {
     void openSettings();
 
     void openDevicesPage(OtrDestination otrDestination, View anchorView);
+
+    boolean onItemLongClick(Message message);
 }
