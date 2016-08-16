@@ -46,7 +46,9 @@
 */
 package net.hockeyapp.android;
 
+import android.content.Context;
 import com.waz.api.HockeyCrashReporter;
+import com.waz.threading.Threading;
 import timber.log.Timber;
 
 import java.io.BufferedWriter;
@@ -70,6 +72,25 @@ public class NativeCrashManager {
             }
         }
         return filenames.length > 0;
+    }
+
+    public static void deleteDumpFiles(final Context context) {
+        Threading.IO().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String[] filenames = searchForDumpFiles();
+                    if (filenames == null) {
+                        return;
+                    }
+                    for (String dumpFilename : filenames) {
+                        context.deleteFile(dumpFilename);
+                    }
+                } catch (Throwable t) {
+                    // ignore
+                }
+            }
+        });
     }
 
     public static String createLogFile() {
