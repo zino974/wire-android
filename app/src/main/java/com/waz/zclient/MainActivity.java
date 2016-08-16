@@ -18,6 +18,7 @@
 package com.waz.zclient;
 
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -62,6 +63,7 @@ import com.waz.zclient.controllers.tracking.events.exception.ExceptionEvent;
 import com.waz.zclient.controllers.tracking.events.otr.VerifiedConversationEvent;
 import com.waz.zclient.controllers.tracking.events.profile.SignOut;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
+import com.waz.zclient.controllers.userpreferences.UserPreferencesController;
 import com.waz.zclient.core.api.scala.AppEntryStore;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
@@ -87,6 +89,7 @@ import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.PhoneUtils;
 import com.waz.zclient.utils.PhoneUtils.PhoneState;
 import com.waz.zclient.utils.ViewUtils;
+import net.hockeyapp.android.NativeCrashManager;
 import timber.log.Timber;
 
 import java.util.List;
@@ -220,9 +223,17 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         Timber.i("onResume");
         super.onResume();
         verifyGooglePlayServicesStatus();
-        HockeyCrashReporting.checkForCrashes(getApplicationContext(),
-                                             getControllerFactory().getUserPreferencesController().getDeviceId(),
-                                             getControllerFactory().getTrackingController());
+        final boolean trackingEnabled = getSharedPreferences(UserPreferencesController.USER_PREFS_TAG, Context.MODE_PRIVATE)
+            .getBoolean(getString(R.string.pref_advanced_analytics_enabled_key), true);
+
+        if (trackingEnabled) {
+            HockeyCrashReporting.checkForCrashes(getApplicationContext(),
+                                                 getControllerFactory().getUserPreferencesController().getDeviceId(),
+                                                 getControllerFactory().getTrackingController());
+        } else {
+            HockeyCrashReporting.deleteCrashReports(getApplicationContext());
+            NativeCrashManager.deleteDumpFiles(getApplicationContext());
+        }
         getControllerFactory().getTrackingController().appResumed();
         Localytics.setInAppMessageDisplayActivity(this);
         Localytics.handleTestMode(getIntent());
