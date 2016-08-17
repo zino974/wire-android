@@ -34,7 +34,6 @@
         />
 
     <com.waz.zclient.ui.text.TypefaceTextView
-        android:id="@+id/ttv__network_indicator__error_message"
         android:layout_width="match_parent"
         android:layout_height="@dimen/network_indicator__visible_height"
         android:gravity="center"
