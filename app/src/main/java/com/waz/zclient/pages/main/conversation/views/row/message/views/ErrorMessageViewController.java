@@ -47,8 +47,8 @@ public class ErrorMessageViewController extends MessageViewController {
             view.addView(errorView);
         }
         final Resources res = context.getResources();
-        ViewUtils.setPaddingLeft(errorView, res.getDimensionPixelSize(R.dimen.content__padding_left));
-        ViewUtils.setPaddingRight(errorView, res.getDimensionPixelSize(R.dimen.content__padding_right));
+        ViewUtils.setPaddingStart(errorView, res.getDimensionPixelSize(R.dimen.content__padding_left));
+        ViewUtils.setPaddingEnd(errorView, res.getDimensionPixelSize(R.dimen.content__padding_right));
     }
 
     @Override

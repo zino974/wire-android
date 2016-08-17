@@ -50,8 +50,8 @@
                     android:id="@+id/iv__row_conversation__unread_dot"
                     android:layout_width="@dimen/content__separator__chathead__size"
                     android:layout_height="@dimen/content__separator__chathead__size"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_marginRight="@dimen/chathead__margin"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="@dimen/chathead__margin"
                     android:scaleType="center"
                     android:visibility="gone"
                     />
@@ -88,6 +88,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
+        android:baselineAligned="false"
         >
 
         <FrameLayout
@@ -99,21 +100,29 @@
                 android:id="@+id/civ__row_conversation__separator_chathead"
                 android:layout_width="@dimen/content__separator__chathead__size"
                 android:layout_height="@dimen/content__separator__chathead__size"
-                android:layout_gravity="right"
-                android:layout_marginRight="@dimen/chathead__margin"
+                android:layout_gravity="end"
+                android:layout_marginEnd="@dimen/chathead__margin"
                 />
 
         </FrameLayout>
 
-        <com.waz.zclient.ui.text.TypefaceTextView
-            android:id="@+id/ttv__row_conversation__separator__name"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="center"
-            android:visibility="gone"
-            style="?messageStreamSeparatorName"
-            />
+            android:gravity="start"
+            >
+
+            <com.waz.zclient.ui.text.TypefaceTextView
+                android:id="@+id/ttv__row_conversation__separator__name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                style="?messageStreamSeparatorName"
+                />
+
+        </LinearLayout>
 
         <!-- Dummy vie to center text label -->
         <FrameLayout
