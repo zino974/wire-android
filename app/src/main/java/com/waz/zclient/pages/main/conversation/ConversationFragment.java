@@ -100,6 +100,9 @@ import com.waz.zclient.controllers.navigation.PagerControllerObserver;
 import com.waz.zclient.controllers.permission.RequestPermissionsObserver;
 import com.waz.zclient.controllers.singleimage.SingleImageObserver;
 import com.waz.zclient.controllers.streammediaplayer.StreamMediaBarObserver;
+import com.waz.zclient.controllers.tracking.events.conversation.CopiedMessageEvent;
+import com.waz.zclient.controllers.tracking.events.conversation.DeletedMessageEvent;
+import com.waz.zclient.controllers.tracking.events.conversation.EditedMessageEvent;
 import com.waz.zclient.controllers.tracking.events.conversation.ForwardedMessageEvent;
 import com.waz.zclient.controllers.tracking.events.conversation.OpenedMessageActionEvent;
 import com.waz.zclient.controllers.tracking.events.navigation.OpenedMoreActionsEvent;
@@ -373,22 +376,27 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             switch (action) {
                 case COPY:
                     copyMessage(message);
+                    getControllerFactory().getTrackingController().tagEvent(OpenedMessageActionEvent.copy(message.getMessageType().name()));
                     break;
 
                 case DELETE_GLOBAL:
                     deleteMessage(message, true);
+                    getControllerFactory().getTrackingController().tagEvent(OpenedMessageActionEvent.deleteForEveryone(message.getMessageType().name()));
                     break;
 
                 case DELETE_LOCAL:
                     deleteMessage(message, false);
+                    getControllerFactory().getTrackingController().tagEvent(OpenedMessageActionEvent.deleteForMe(message.getMessageType().name()));
                     break;
 
                 case EDIT:
-                    // AN-SHUMENG
+                    editMessage(message);
+                    getControllerFactory().getTrackingController().tagEvent(OpenedMessageActionEvent.edit(message.getMessageType().name()));
                     break;
 
                 case FORWARD:
                     forwardMessage(message);
+                    getControllerFactory().getTrackingController().tagEvent(OpenedMessageActionEvent.forward(message.getMessageType().name()));
                     break;
 
                 default:
@@ -503,9 +511,11 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 switch (item.getItemId()) {
                     case R.id.action_audio_call:
                         getControllerFactory().getCallingController().startCall(false);
+                        cursorLayout.closeEditMessage(false);
                         return true;
                     case R.id.action_video_call:
                         getControllerFactory().getCallingController().startCall(true);
+                        cursorLayout.closeEditMessage(false);
                         return true;
                 }
                 return false;
@@ -517,6 +527,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 if (LayoutSpec.isTablet(getContext()) && ViewUtils.isInLandscape(getContext())) {
                     return;
                 }
+                cursorLayout.closeEditMessage(false);
                 getActivity().onBackPressed();
                 KeyboardUtils.closeKeyboardIfShown(getActivity());
             }
@@ -575,6 +586,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         cursorLayout.getTypingIndicatorContainer().addTypingIndicatorView(typingIndicatorView);
         // Only show Giphy button when text field has input
         cursorLayout.enableGiphyButton(false);
+
         timestampShown = new HashSet<>();
 
         typingListener = new UpdateListener() {
@@ -700,8 +712,11 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         getControllerFactory().getGiphyController().removeObserver(this);
         getStoreFactory().getNetworkStore().removeNetworkStoreObserver(this);
         getControllerFactory().getSingleImageController().removeSingleImageObserver(this);
-        getStoreFactory().getDraftStore().setDraft(getStoreFactory().getConversationStore().getCurrentConversation(),
-                                                   cursorLayout.getText().trim());
+
+        if (!cursorLayout.isEditingMessage()) {
+            getStoreFactory().getDraftStore().setDraft(getStoreFactory().getConversationStore().getCurrentConversation(),
+                                                       cursorLayout.getText().trim());
+        }
         getStoreFactory().getInAppNotificationStore().removeInAppNotificationObserver(this);
         getStoreFactory().getParticipantsStore().removeParticipantsStoreObserver(this);
         getControllerFactory().getStreamMediaPlayerController().removeStreamMediaBarObserver(this);
@@ -868,7 +883,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
 
                 // handle draft
-                if (fromConversation != null && changeToDifferentConversation) {
+                if (fromConversation != null && changeToDifferentConversation &&
+                    !cursorLayout.isEditingMessage()) {
                     getStoreFactory().getDraftStore().setDraft(fromConversation, cursorLayout.getText().trim());
                 }
 
@@ -1068,7 +1084,9 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     public void onKeyboardVisibilityChanged(boolean keyboardIsVisible, int keyboardHeight, View currentFocus) {
         cursorLayout.notifyKeyboardVisibilityChanged(keyboardIsVisible, currentFocus);
 
-        if (keyboardIsVisible && getControllerFactory().getFocusController().getCurrentFocus() == IFocusController.CONVERSATION_CURSOR) {
+        if (keyboardIsVisible &&
+            getControllerFactory().getFocusController().getCurrentFocus() == IFocusController.CONVERSATION_CURSOR &&
+            !cursorLayout.isEditingMessage()) {
             messageStreamManager.onCursorStateEdit();
             getControllerFactory().getNavigationController().setMessageStreamState(VoiceBarAppearance.MINI);
         }
@@ -1099,7 +1117,9 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         }
         // this is needed to make sure that text is scrolled to bottom - on some devices
         // the keyboard height changes while text is being entered
-        messageStreamManager.onCursorStateEdit();
+        if (!cursorLayout.isEditingMessage()) {
+            messageStreamManager.onCursorStateEdit();
+        }
 
         if (inputStateIndicator != null) {
             if (text.isEmpty()) {
@@ -1361,6 +1381,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public boolean onItemLongClick(final Message message) {
+        final boolean isMemberOfConversation = getStoreFactory().getConversationStore().getCurrentConversation().isMemberOfConversation();
         if (KeyboardUtils.isKeyboardVisible(getContext())) {
             KeyboardUtils.hideKeyboard(getActivity());
             new Handler().postDelayed(new Runnable() {
@@ -1369,11 +1390,11 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     if (getActivity() == null) {
                         return;
                     }
-                    new MessageBottomSheetDialog(getContext(), message, messageBottomSheetDialogCallback).show();
+                    new MessageBottomSheetDialog(getContext(), message, isMemberOfConversation, messageBottomSheetDialogCallback).show();
                 }
             }, BOTTOM_MENU_DISPLAY_DELAY_MS);
         } else {
-            new MessageBottomSheetDialog(getContext(), message, messageBottomSheetDialogCallback).show();
+            new MessageBottomSheetDialog(getContext(), message, isMemberOfConversation, messageBottomSheetDialogCallback).show();
         }
         return true;
     }
@@ -1702,13 +1723,21 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public void onCursorClicked() {
-        listView.scrollToBottom();
+        if (!cursorLayout.isEditingMessage()) {
+            listView.scrollToBottom();
+        }
     }
 
     @Override
     public void onShowedActionHint(CursorMenuItem item) {
         getControllerFactory().getTrackingController().tagEvent(new OpenedActionHintEvent(item.name(),
                                                                                           getConversationTypeString()));
+    }
+
+    @Override
+    public void onApprovedMessageEditing(Message message) {
+        KeyboardUtils.hideKeyboard(getActivity());
+        getControllerFactory().getTrackingController().tagEvent(new EditedMessageEvent(message));
     }
 
     @Override
@@ -1735,6 +1764,12 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             extendedCursorContainer.close(false);
             return true;
         }
+
+        if (cursorLayout.isEditingMessage()) {
+            cursorLayout.closeEditMessage(true);
+            return true;
+        }
+
         return false;
     }
 
@@ -2170,6 +2205,21 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         cursorLayout.onExtendedCursorClosed();
     }
 
+    private void editMessage(final Message message) {
+        if (cursorLayout == null) {
+            return;
+        }
+        cursorLayout.editMessage(message);
+
+        // Add small delay so triggering keyboard works
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                KeyboardUtils.showKeyboard(getActivity());
+            }
+        }, 200);
+    }
+
     private void deleteMessage(final Message message, final boolean forEveryone) {
         Dialog dialog = new AlertDialog.Builder(getContext())
             .setTitle(forEveryone ? R.string.conversation__message_action__delete_for_everyone : R.string.conversation__message_action__delete_for_me)
@@ -2185,8 +2235,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                        } else {
                                            message.delete();
                                        }
-                                       getControllerFactory().getTrackingController().tagEvent(OpenedMessageActionEvent.delete());
                                        Toast.makeText(getContext(), R.string.conversation__message_action__delete__confirmation, Toast.LENGTH_SHORT).show();
+                                       getControllerFactory().getTrackingController().tagEvent(new DeletedMessageEvent(message, forEveryone));
                                    }
                                })
             .create();
@@ -2194,6 +2244,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     private void copyMessage(Message message) {
+        getControllerFactory().getTrackingController().tagEvent(new CopiedMessageEvent(message.getMessageType().name()));
+
         ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(getContext().getString(R.string.conversation__action_mode__copy__description,
                                                                      message.getUser().getDisplayName()),
@@ -2203,8 +2255,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     private void forwardMessage(final Message message) {
-        getControllerFactory().getTrackingController().tagEvent(OpenedMessageActionEvent.forward());
-        getControllerFactory().getTrackingController().tagEvent(new ForwardedMessageEvent(message.getMessageType().toString()));
+        getControllerFactory().getTrackingController().tagEvent(new ForwardedMessageEvent(message.getMessageType().name()));
 
         final ShareCompat.IntentBuilder intentBuilder = ShareCompat.IntentBuilder.from(getActivity());
         intentBuilder.setChooserTitle(R.string.conversation__action_mode__fwd__chooser__title);

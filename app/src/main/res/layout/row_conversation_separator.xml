@@ -111,7 +111,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="center"
-            android:gravity="start"
+            android:gravity="start|center_horizontal"
             >
 
             <com.waz.zclient.ui.text.TypefaceTextView
@@ -120,6 +120,24 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 style="?messageStreamSeparatorName"
+                />
+
+            <com.waz.zclient.ui.text.GlyphTextView
+                android:id="@+id/gtv__message_recalled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/glyph__trash"
+                android:visibility="gone"
+                style="?messageStreamSeparatorRecalled"
+                />
+
+            <com.waz.zclient.ui.text.GlyphTextView
+                android:id="@+id/gtv__message_edited"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/glyph__edit"
+                android:visibility="gone"
+                style="?messageStreamSeparatorRecalled"
                 />
 
         </LinearLayout>

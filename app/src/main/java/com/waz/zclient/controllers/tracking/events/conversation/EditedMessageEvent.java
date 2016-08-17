@@ -17,23 +17,26 @@
  */
 package com.waz.zclient.controllers.tracking.events.conversation;
 
-
 import android.support.annotation.NonNull;
+import com.waz.api.Message;
 import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
+import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
-import com.waz.zclient.utils.TrackingUtils;
+import org.threeten.bp.Instant;
 
-public class SelectedMessageEvent extends Event {
+public class EditedMessageEvent extends Event {
 
-    public SelectedMessageEvent(String messageType, boolean multipleMessagesSelected, String conversationType) {
-        attributes.put(Attribute.CONVERSATION_TYPE, conversationType);
-        attributes.put(Attribute.TYPE, messageType);
-        attributes.put(Attribute.CONTEXT, TrackingUtils.getMessageSelectionMode(multipleMessagesSelected));
+    public EditedMessageEvent(Message message) {
+        attributes.put(Attribute.TYPE, message.getMessageType().name());
+
+        // message.getEditTime() is not immediately available for tracking purpose
+        int timeElapsed = (int) (Instant.now().getEpochSecond() - message.getLocalTime().getEpochSecond());
+        rangedAttributes.put(RangedAttribute.MESSAGE_ACTION_TIME_ELAPSED, timeElapsed);
     }
 
     @NonNull
     @Override
     public String getName() {
-        return "conversation.selected_message";
+        return "conversation.edited_message";
     }
 }

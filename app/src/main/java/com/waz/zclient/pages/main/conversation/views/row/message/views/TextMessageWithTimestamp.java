@@ -43,6 +43,7 @@ import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.ZTimeFormatter;
 import org.threeten.bp.DateTimeUtils;
+import org.threeten.bp.Instant;
 
 public class TextMessageWithTimestamp extends LinearLayout implements AccentColorObserver {
 
@@ -67,14 +68,19 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
 
             String messageText;
             if (message.isDeleted()) {
-                messageText = getResources().getString(R.string.content__system__message_deleted);
+                messageText = "";
             } else {
                 messageText = message.getBody();
                 messageText = messageText.replaceAll("\u2028", "\n");
             }
 
-            messageTextView.setLinkTextColor(messageViewContainer.getControllerFactory().getAccentColorController().getColor());
-            messageTextView.setTextLink(messageText);
+            if (message.getMessageType() == Message.Type.RECALLED) {
+                messageTextView.setVisibility(GONE);
+            } else {
+                messageTextView.setVisibility(VISIBLE);
+                messageTextView.setLinkTextColor(messageViewContainer.getControllerFactory().getAccentColorController().getColor());
+                messageTextView.setTextLink(messageText);
+            }
 
             String timestamp;
             Message.Status messageStatus = message.getMessageStatus();
@@ -83,7 +89,14 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
             } else if (messageStatus == Message.Status.FAILED) {
                 timestamp = getResources().getString(R.string.content_system_message_timestamp_failure);
             } else {
-                timestamp = ZTimeFormatter.getSingleMessageTime(getContext(), DateTimeUtils.toDate(message.getTime()));
+                Instant messageTime = message.isEdited() ?
+                                      message.getEditTime() :
+                                      message.getTime();
+                timestamp = ZTimeFormatter.getSingleMessageTime(getContext(), DateTimeUtils.toDate(messageTime));
+            }
+
+            if (message.getMessageType() == Message.Type.RECALLED) {
+                timestamp = getContext().getString(R.string.content_system_message_timestamp_deleted, timestamp);
             }
 
             timestampTextView.setTransformedText(timestamp);
@@ -135,12 +148,7 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
         messageTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                timestampTextView.clearAnimation();
-                if (timestampTextView.getVisibility() == GONE) {
-                    expandTimestamp();
-                } else {
-                    collapseTimestamp();
-                }
+                toggleTimestamp();
             }
         });
 
@@ -157,7 +165,11 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
 
     public void setMessage(final Message message) {
         messageModelObserver.setAndUpdate(message);
-        messageTextView.setVisibility(View.VISIBLE);
+        if (message.getMessageType() == Message.Type.RECALLED) {
+            messageTextView.setVisibility(GONE);
+        } else {
+            messageTextView.setVisibility(VISIBLE);
+        }
         this.message = message;
         if (messageViewContainer.getTimestampShownSet().contains(message.getId())) {
             messageViewContainer.setShownTimestampView(this);
@@ -244,6 +256,15 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
     public void setMessageViewsContainer(MessageViewsContainer messageViewContainer) {
         this.messageViewContainer = messageViewContainer;
         messageViewContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(this);
+    }
+
+    public void toggleTimestamp() {
+        timestampTextView.clearAnimation();
+        if (timestampTextView.getVisibility() == GONE) {
+            expandTimestamp();
+        } else {
+            collapseTimestamp();
+        }
     }
 
     @Override

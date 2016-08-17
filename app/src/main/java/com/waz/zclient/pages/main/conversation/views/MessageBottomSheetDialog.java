@@ -53,15 +53,15 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         }
     }
 
-    public MessageBottomSheetDialog(@NonNull Context context, Message message, Callback callback) {
+    public MessageBottomSheetDialog(@NonNull Context context, Message message, boolean isMemberOfConversation, Callback callback) {
         super(context);
         this.message = message;
         this.callback = callback;
-        init();
+        init(isMemberOfConversation);
     }
 
     @SuppressLint("InflateParams")
-    private void init() {
+    private void init(boolean isMemberOfConversation) {
         LinearLayout view = (LinearLayout) getLayoutInflater().inflate(R.layout.message__bottom__menu, null);
         if (isCopyAllowed()) {
             addAction(view, MessageAction.COPY);
@@ -69,11 +69,11 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         if (isForwardAllowed()) {
             addAction(view, MessageAction.FORWARD);
         }
-        if (isEditAllowed()) {
+        if (isEditAllowed(isMemberOfConversation)) {
             addAction(view, MessageAction.EDIT);
         }
         addAction(view, MessageAction.DELETE_LOCAL);
-        if (isDeleteForEveryoneAllowed()) {
+        if (isDeleteForEveryoneAllowed(isMemberOfConversation)) {
             addAction(view, MessageAction.DELETE_GLOBAL);
         }
         setContentView(view);
@@ -103,6 +103,7 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
     private boolean isCopyAllowed() {
         switch (message.getMessageType()) {
             case TEXT:
+            case TEXT_EMOJI_ONLY:
             case RICH_MEDIA:
                 return true;
             default:
@@ -113,6 +114,7 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
     private boolean isForwardAllowed() {
         switch (message.getMessageType()) {
             case TEXT:
+            case TEXT_EMOJI_ONLY:
             case RICH_MEDIA:
                 return true;
             case ANY_ASSET:
@@ -131,8 +133,13 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         }
     }
 
-    private boolean isEditAllowed() {
+    private boolean isEditAllowed(boolean isMemberOfConversation) {
+        if (!isMemberOfConversation ||
+            !message.getUser().isMe()) {
+            return false;
+        }
         switch (message.getMessageType()) {
+            case TEXT_EMOJI_ONLY:
             case TEXT:
             case RICH_MEDIA:
                 return true;
@@ -141,8 +148,9 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         }
     }
 
-    private boolean isDeleteForEveryoneAllowed() {
-        if (!message.getUser().isMe()) {
+    private boolean isDeleteForEveryoneAllowed(boolean isMemberOfConversation) {
+        if (!isMemberOfConversation ||
+            !message.getUser().isMe()) {
             return false;
         }
         switch (message.getMessageType()) {
