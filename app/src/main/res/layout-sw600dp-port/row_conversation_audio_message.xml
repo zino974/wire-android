@@ -25,7 +25,7 @@
               android:layout_height="match_parent"
               android:orientation="horizontal"
               android:gravity="center"
-              android:paddingRight="@dimen/content__row__padding_right"
+              android:paddingEnd="@dimen/content__row__padding_right"
               android:baselineAligned="false"
     >
 
@@ -61,7 +61,7 @@
             android:id="@+id/ttv__row_conversation__audio_duration"
             android:layout_width="@dimen/content__audio_message__duration_width"
             android:layout_height="match_parent"
-            android:gravity="center_vertical|left"
+            android:gravity="center_vertical|start"
             app:font="@string/wire__typeface__light"
             style="?audioMessageDuration"
             />

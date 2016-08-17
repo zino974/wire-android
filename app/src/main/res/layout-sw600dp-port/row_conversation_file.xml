@@ -25,7 +25,7 @@
               android:layout_height="match_parent"
               android:orientation="horizontal"
               android:gravity="center"
-              android:paddingRight="@dimen/content__row__padding_right"
+              android:paddingEnd="@dimen/content__row__padding_right"
               android:baselineAligned="false"
     >
 
@@ -68,7 +68,7 @@
                 android:layout_width="@dimen/content__audio_message__download_done_indicator__size"
                 android:layout_height="@dimen/content__audio_message__download_done_indicator__size"
                 android:layout_marginTop="@dimen/content__audio_message__download_done_indicator__offset_top"
-                android:layout_marginLeft="@dimen/content__audio_message__download_done_indicator__offset_left"
+                android:layout_marginStart="@dimen/content__audio_message__download_done_indicator__offset_left"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textSize="@dimen/wire__text_size__tiny"
@@ -90,10 +90,9 @@
             <com.waz.zclient.ui.text.TypefaceTextView
                 android:id="@+id/ttv__row_conversation__file__filename"
                 style="?attr/messageStreamSubtitleStrong"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="middle"
-                android:gravity="left"
                 android:singleLine="true"
                 app:font="@string/wire__typeface__light"
                 />
@@ -101,9 +100,8 @@
             <com.waz.zclient.ui.text.TypefaceTextView
                 android:id="@+id/ttv__row_conversation__file__fileinfo"
                 style="?messageStreamSubtitleNoColor"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left"
                 app:font="@string/wire__typeface__light"
                 />
 
