@@ -22,14 +22,11 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import com.waz.zclient.R;
-import com.waz.zclient.utils.ViewUtils;
 
 public class ConnectivityIndicatorView extends FrameLayout {
 
     private View contentView;
-    private TextView errorMessageView;
     private float removedPosition;
     private float collapsedPosition;
 
@@ -57,8 +54,6 @@ public class ConnectivityIndicatorView extends FrameLayout {
     private void init() {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         contentView = inflater.inflate(R.layout.connectivity_indicator, this, true);
-        errorMessageView = ViewUtils.getView(contentView, R.id.ttv__network_indicator__error_message);
-
         removedPosition = -getContext().getResources().getDimension(R.dimen.network_indicator__expanded_height);
         collapsedPosition = -getContext().getResources().getDimension(R.dimen.network_indicator__collapse_position);
 
@@ -82,14 +77,6 @@ public class ConnectivityIndicatorView extends FrameLayout {
                        }
                    })
                    .start();
-    }
-
-    public void setIsServerError(boolean isServerError) {
-        if (isServerError) {
-            errorMessageView.setText(R.string.system_status__no_server_connection);
-        } else {
-            errorMessageView.setText(R.string.system_status__no_internet);
-        }
     }
 
     public void hide() {
