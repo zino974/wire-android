@@ -68,13 +68,15 @@ class CameraPreviewTextureView(val context: Context, val attrs: AttributeSet, va
     val disableRepeat = -1
     vibrator.foreach(_.vibrate(context.getResources.getIntArray(R.array.camera).map(_.toLong), disableRepeat))
     mediaManager.foreach(_.playMedia(context.getResources.getResourceEntryName(R.raw.camera)))
-  }.onSuccess {
-    case data => observer.foreach {
+  }.onComplete {
+    case Success(data) => observer.foreach {
       _.onPictureTaken {
         if (getCameraFacing == CameraFacing.FRONT) ImageAssetFactory.getMirroredImageAsset(data)
         else ImageAssetFactory.getImageAsset(data)
       }
     }
+    case Failure(_) =>
+      observer.foreach(_.onCameraLoadingFailed())
   } (Threading.Ui)
 
   def getCameraFacing = controller.getCurrentCameraFacing.getOrElse(CameraFacing.BACK)
@@ -96,9 +98,9 @@ class CameraPreviewTextureView(val context: Context, val attrs: AttributeSet, va
 
   private def startLoading(texture: SurfaceTexture, width: Int, height: Int) = {
     controller.openCamera(texture, width, height).onComplete {
-      case Success(previewSize) =>
+      case Success((previewSize, flashModes)) =>
         updateTextureMatrix((getWidth, getHeight), previewSize)
-        observer.foreach(_.onCameraLoaded())
+        observer.foreach(_.onCameraLoaded(flashModes.asJava))
       case Failure(ex : CancelException) =>
       case Failure(ex) =>
         Timber.w(ex, "Failed to open camera - camera is likely unavailable")
@@ -118,7 +120,7 @@ class CameraPreviewTextureView(val context: Context, val attrs: AttributeSet, va
   override def onSurfaceTextureSizeChanged(surfaceTexture: SurfaceTexture, width: Int, height: Int) = {
     controller.releaseCamera()
     controller.openCamera(surfaceTexture, width, height).onSuccess {
-      case previewSize => updateTextureMatrix((getWidth, getHeight), previewSize)
+      case (previewSize, _) => updateTextureMatrix((getWidth, getHeight), previewSize)
     }(Threading.Ui)
   }
 
@@ -131,8 +133,6 @@ class CameraPreviewTextureView(val context: Context, val attrs: AttributeSet, va
   }
 
   override def onSurfaceTextureUpdated(surfaceTexture: SurfaceTexture) = {}
-
-  def getSupportedFlashModes = controller.getSupportedFlashModes.asJava
 
   def setFlashMode(fm: FlashMode) = controller.currentFlashMode ! fm
 
@@ -169,7 +169,7 @@ class CameraPreviewTextureView(val context: Context, val attrs: AttributeSet, va
           }(Threading.Ui)
       }
     }
-    return true
+    true
   }
 
   /*

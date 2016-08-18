@@ -20,9 +20,11 @@ package com.waz.zclient.camera;
 import android.graphics.Rect;
 import com.waz.api.ImageAsset;
 
+import java.util.Set;
+
 public interface CameraPreviewObserver {
 
-    void onCameraLoaded();
+    void onCameraLoaded(Set<FlashMode> flashModes);
 
     void onCameraLoadingFailed();
 

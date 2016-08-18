@@ -31,6 +31,8 @@ import com.waz.zclient.camera.CameraPreviewTextureView;
 import com.waz.zclient.camera.FlashMode;
 import com.waz.zclient.utils.ViewUtils;
 
+import java.util.Set;
+
 public class CursorCameraLayout extends FrameLayout implements View.OnClickListener, CameraPreviewObserver {
 
     private CameraPreviewTextureView cameraPreview;
@@ -156,7 +158,7 @@ public class CursorCameraLayout extends FrameLayout implements View.OnClickListe
     }
 
     @Override
-    public void onCameraLoaded() {
+    public void onCameraLoaded(Set<FlashMode> flashModes) {
         showProgress(false);
         cameraNotAvailableTextView.setVisibility(GONE);
 

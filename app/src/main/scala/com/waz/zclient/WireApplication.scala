@@ -25,7 +25,7 @@ import com.waz.api.{NetworkMode, ZMessagingApi, ZMessagingApiFactory}
 import com.waz.service.{MediaManagerService, PreferenceService, ZMessaging}
 import com.waz.utils.events.{EventContext, Signal, Subscription}
 import com.waz.zclient.calling.{CallPermissionsController, CurrentCallController}
-import com.waz.zclient.camera.GlobalCameraController
+import com.waz.zclient.camera.{AndroidCameraFactory, GlobalCameraController}
 
 object WireApplication {
   var APP_INSTANCE: WireApplication = _
@@ -34,7 +34,7 @@ object WireApplication {
     bind[Signal[Option[ZMessaging]]] to ZMessaging.currentUi.currentZms
     bind[PreferenceService] to new PreferenceService(inject[Context])
     bind[GlobalCallingController] to new GlobalCallingController(inject[Context])
-    bind[GlobalCameraController] to new GlobalCameraController(inject[Context])(EventContext.Global)
+    bind[GlobalCameraController] to new GlobalCameraController(inject[Context], new AndroidCameraFactory)(EventContext.Global)
     bind[MediaManagerService] to ZMessaging.currentGlobal.mediaManager
 
     //Global android services

@@ -32,7 +32,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
 import com.waz.api.ImageAsset;
 import com.waz.api.ImageAssetFactory;
 import com.waz.zclient.OnBackPressedListener;
@@ -54,6 +53,8 @@ import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.SquareOrientation;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.ProgressView;
+
+import java.util.Set;
 
 public class CameraFragment extends BaseFragment<CameraFragment.Container> implements CameraPreviewObserver,
                                                                                       OrientationControllerObserver,
@@ -264,8 +265,8 @@ public class CameraFragment extends BaseFragment<CameraFragment.Container> imple
     }
 
     @Override
-    public void onCameraLoaded() {
-        cameraTopControl.setFlashStates(cameraPreview.getSupportedFlashModes(), cameraPreview.getCurrentFlashMode());
+    public void onCameraLoaded(Set<FlashMode> flashModes) {
+        cameraTopControl.setFlashStates(flashModes, cameraPreview.getCurrentFlashMode());
         cameraTopControl.enableCameraSwitchButtion(cameraPreview.getNumberOfCameras() > 1);
         showCameraFeed();
 
