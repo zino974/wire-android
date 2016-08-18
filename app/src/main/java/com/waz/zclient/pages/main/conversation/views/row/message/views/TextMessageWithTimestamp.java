@@ -88,15 +88,14 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
                 timestamp = getResources().getString(R.string.content_system_message_timestamp_pending);
             } else if (messageStatus == Message.Status.FAILED) {
                 timestamp = getResources().getString(R.string.content_system_message_timestamp_failure);
+            } else if (message.getMessageType() == Message.Type.RECALLED) {
+                String time = ZTimeFormatter.getSingleMessageTime(getContext(), DateTimeUtils.toDate(message.getEditTime()));
+                timestamp = getContext().getString(R.string.content_system_message_timestamp_deleted, time);
             } else {
                 Instant messageTime = message.isEdited() ?
                                       message.getEditTime() :
                                       message.getTime();
                 timestamp = ZTimeFormatter.getSingleMessageTime(getContext(), DateTimeUtils.toDate(messageTime));
-            }
-
-            if (message.getMessageType() == Message.Type.RECALLED) {
-                timestamp = getContext().getString(R.string.content_system_message_timestamp_deleted, timestamp);
             }
 
             timestampTextView.setTransformedText(timestamp);
