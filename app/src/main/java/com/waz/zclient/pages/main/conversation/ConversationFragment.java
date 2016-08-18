@@ -1741,6 +1741,12 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     @Override
+    public void onClosedMessageEditing() {
+        getControllerFactory().getConversationScreenController().setMessageBeingEdited(null);
+        messageAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onCursorGiphyButtonClicked() {
         getControllerFactory().getGiphyController().handleInput(cursorLayout.getText(), false);
         final IConversation conversation = getStoreFactory().getConversationStore().getCurrentConversation();
@@ -2210,6 +2216,9 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             return;
         }
         cursorLayout.editMessage(message);
+
+        getControllerFactory().getConversationScreenController().setMessageBeingEdited(message);
+        messageAdapter.notifyDataSetChanged();
 
         // Add small delay so triggering keyboard works
         new Handler().postDelayed(new Runnable() {

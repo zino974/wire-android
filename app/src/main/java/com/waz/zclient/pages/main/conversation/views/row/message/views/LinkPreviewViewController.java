@@ -30,6 +30,7 @@ import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
+import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.MessageUtils;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
@@ -101,11 +102,21 @@ public class LinkPreviewViewController extends MessageViewController implements 
         linkPrevieContainerView.setOnLongClickListener(this);
 
         textMessageWithTimestamp.setMessageViewsContainer(messageViewsContainer);
+
     }
 
     @Override
     protected void onSetMessage(Separator separator) {
         messageObserver.setAndUpdate(message);
+    }
+
+    @Override
+    protected void updateMessageEditingStatus() {
+        super.updateMessageEditingStatus();
+        float opacity = messageViewsContainer.getControllerFactory().getConversationScreenController().isMessageBeingEdited(message) ?
+                        ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay) :
+                        1f;
+        textMessageWithTimestamp.setAlpha(opacity);
     }
 
     @Override

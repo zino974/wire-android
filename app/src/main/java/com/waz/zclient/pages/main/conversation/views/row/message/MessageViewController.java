@@ -60,6 +60,7 @@ public abstract class MessageViewController implements ConversationItemViewContr
     @CallSuper
     public void setMessage(@NonNull Message message, @NonNull Separator separator) {
         final Message oldMessage = this.message;
+        updateMessageEditingStatus();
         if (oldMessage != null &&
             message.getId().equals(oldMessage.getId())) {
             return;
@@ -68,6 +69,11 @@ public abstract class MessageViewController implements ConversationItemViewContr
         beforeSetMessage(oldMessage, message);
         this.message = message;
         onSetMessage(separator);
+        updateMessageEditingStatus();
+    }
+
+    protected void updateMessageEditingStatus() {
+
     }
 
     protected void beforeSetMessage(@Nullable Message oldMessage, Message newMessage) {}

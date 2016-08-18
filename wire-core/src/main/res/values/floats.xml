@@ -32,6 +32,7 @@
     <item name="content__progress__touch_scaling" type="dimen" format="float">2</item>
     <item name="content__system_message__user_name__alpha" format="float" type="dimen">0.64</item>
     <item name="content__youtube__alpha_overlay" type="dimen" format="float">0.48</item>
+    <item name="content__message_being_edited__opacitu" format="float" type="dimen">0.48</item>
 
     <item name="list__swipe_max_alpha" format="float" type="dimen">0.4</item>
 

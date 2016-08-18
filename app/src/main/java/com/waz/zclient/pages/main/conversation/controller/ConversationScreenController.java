@@ -19,6 +19,7 @@ package com.waz.zclient.pages.main.conversation.controller;
 
 import android.view.View;
 import com.waz.api.IConversation;
+import com.waz.api.Message;
 import com.waz.api.OtrClient;
 import com.waz.api.User;
 import com.waz.zclient.pages.main.participants.dialog.DialogLaunchMode;
@@ -38,6 +39,7 @@ public class ConversationScreenController implements IConversationScreenControll
     private boolean conversationStreamUiReady;
     private DialogLaunchMode launchMode;
     private User showDevicesTabForUser;
+    private Message messageBeingEdited;
 
     @Override
     public void addConversationControllerObservers(ConversationScreenControllerObserver conversationScreenControllerObserver) {
@@ -283,5 +285,19 @@ public class ConversationScreenController implements IConversationScreenControll
         for (ConversationScreenControllerObserver observer : conversationScreenControllerObservers) {
             observer.onHideOtrClient();
         }
+    }
+
+    @Override
+    public void setMessageBeingEdited(Message message) {
+        messageBeingEdited = message;
+    }
+
+    @Override
+    public boolean isMessageBeingEdited(Message message) {
+        if (messageBeingEdited == null ||
+            message == null) {
+            return false;
+        }
+        return messageBeingEdited.getId().equals(message.getId());
     }
 }
