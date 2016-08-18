@@ -40,7 +40,7 @@
         android:layout_height="@dimen/content__audio_message__view_height"
         android:layout_marginStart="@dimen/content__padding_left"
         android:layout_marginEnd="@dimen/content__padding_right"
-        android:paddingRight="@dimen/wire__padding__12"
+        android:paddingEnd="@dimen/wire__padding__12"
         android:orientation="horizontal"
         android:background="@drawable/shape_audio_message_background"
         android:baselineAligned="false"
