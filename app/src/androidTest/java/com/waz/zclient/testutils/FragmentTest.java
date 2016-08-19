@@ -19,6 +19,7 @@ package com.waz.zclient.testutils;
 
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.Intents;
 import android.support.test.rule.ActivityTestRule;
@@ -48,6 +49,9 @@ public class FragmentTest<A extends TestActivity> {
     public FragmentTest(Class<A> activityType) {
         this.activityType = activityType;
         activityTestRule = new ActivityTestRule<>(activityType, false, false);
+        if (Looper.myLooper() == null) {
+            Looper.prepare();
+        }
     }
 
     @Before
