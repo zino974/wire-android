@@ -289,10 +289,10 @@ public class CursorLayout extends FrameLayout implements
             return;
         }
         giphyEnabled = enable;
-        if (isEditingMessage()) {
-            return;
-        }
         if (enable) {
+            if (isEditingMessage()) {
+                return;
+            }
             int duration = getResources().getInteger(R.integer.animation_duration_medium);
             giphyButton.setVisibility(View.VISIBLE);
             giphyButton.setAlpha(0);
@@ -505,7 +505,7 @@ public class CursorLayout extends FrameLayout implements
         newCursorEditText.setSelection(newCursorEditText.getText().length());
 
         if (giphyEnabled) {
-            giphyButton.setVisibility(GONE);
+            enableGiphyButton(false);
         }
         setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         ViewUtils.fadeInView(editMessageBackgroundView);
@@ -531,9 +531,6 @@ public class CursorLayout extends FrameLayout implements
             editMessageCursorToolbar.setVisibility(GONE);
             editMessageBackgroundView.setVisibility(GONE);
             resetMainAndSecondaryToolbars();
-        }
-        if (giphyEnabled) {
-            giphyButton.setVisibility(VISIBLE);
         }
 
         setBackgroundColor(ContextCompat.getColor(getContext(), R.color.transparent));
