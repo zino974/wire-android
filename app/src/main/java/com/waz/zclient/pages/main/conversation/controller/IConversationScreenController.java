@@ -21,6 +21,7 @@ import android.support.annotation.IntDef;
 import android.view.View;
 import com.waz.annotations.Controller;
 import com.waz.api.IConversation;
+import com.waz.api.Message;
 import com.waz.api.OtrClient;
 import com.waz.api.User;
 import com.waz.zclient.pages.main.participants.dialog.DialogLaunchMode;
@@ -106,4 +107,8 @@ public interface IConversationScreenController {
     void showCurrentOtrClient();
 
     void hideOtrClient();
+
+    void setMessageBeingEdited(Message message);
+
+    boolean isMessageBeingEdited(Message message);
 }

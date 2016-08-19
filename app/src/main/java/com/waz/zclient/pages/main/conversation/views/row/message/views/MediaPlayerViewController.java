@@ -47,6 +47,7 @@ import com.waz.zclient.core.stores.network.NetworkStoreObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.RetryMessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
+import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.MessageUtils;
 import com.waz.zclient.utils.ThreadUtils;
 import com.waz.zclient.utils.ViewUtils;
@@ -141,6 +142,15 @@ public abstract class MediaPlayerViewController extends RetryMessageViewControll
         mediaPlayerView.setSourceImage(getSourceImage());
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(this);
         updated();
+    }
+
+    @Override
+    protected void updateMessageEditingStatus() {
+        super.updateMessageEditingStatus();
+        float opacity = messageViewsContainer.getControllerFactory().getConversationScreenController().isMessageBeingEdited(message) ?
+                        ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay) :
+                        1f;
+        textWithTimestamp.setAlpha(opacity);
     }
 
     @Override

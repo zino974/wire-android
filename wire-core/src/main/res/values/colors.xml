@@ -62,6 +62,7 @@
 
     <color name="graphite">#FF33373A</color>
     <color name="graphite_40">#6633373A</color>
+    <color name="graphite_48">#7B33373A</color>
     <color name="graphite_16">#2833373A</color>
 
     <!-- Accent Colors-->
@@ -131,6 +132,7 @@
     <color name="text__primary_light__40">@color/graphite_40</color>
     <color name="text__primary_light">@color/graphite</color>
     <color name="text__primary_light_16">@color/graphite_16</color>
+    <color name="text__primary_light_48">@color/graphite_48</color>
     <color name="text__secondary_light__40">@color/light_graphite_40</color>
     <color name="text__secondary_light">@color/light_graphite</color>
 

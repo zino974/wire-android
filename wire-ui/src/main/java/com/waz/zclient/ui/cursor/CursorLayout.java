@@ -539,6 +539,10 @@ public class CursorLayout extends FrameLayout implements
         setBackgroundColor(ContextCompat.getColor(getContext(), R.color.transparent));
         newCursorEditText.setTextColor(defaultEditTextColor);
         dividerView.setBackgroundColor(defaultDividerColor);
+
+        if (cursorCallback != null) {
+            cursorCallback.onClosedMessageEditing();
+        }
     }
 
     private void dismissToolbar() {

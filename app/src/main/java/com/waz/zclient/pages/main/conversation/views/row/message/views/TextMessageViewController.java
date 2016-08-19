@@ -26,8 +26,8 @@ import com.waz.zclient.R;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.RetryMessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
+import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.ViewUtils;
-
 
 public class TextMessageViewController extends RetryMessageViewController {
 
@@ -48,6 +48,15 @@ public class TextMessageViewController extends RetryMessageViewController {
     public void onSetMessage(Separator separator) {
         super.onSetMessage(separator);
         textWithTimestamp.setMessage(message);
+    }
+
+    @Override
+    protected void updateMessageEditingStatus() {
+        super.updateMessageEditingStatus();
+        float opacity = messageViewsContainer.getControllerFactory().getConversationScreenController().isMessageBeingEdited(message) ?
+                        ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay) :
+                        1f;
+        textWithTimestamp.setAlpha(opacity);
     }
 
     @Override

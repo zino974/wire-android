@@ -103,6 +103,15 @@ public class YouTubeMessageViewController extends RetryMessageViewController imp
     }
 
     @Override
+    protected void updateMessageEditingStatus() {
+        super.updateMessageEditingStatus();
+        float opacity = messageViewsContainer.getControllerFactory().getConversationScreenController().isMessageBeingEdited(message) ?
+                        ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay) :
+                        1f;
+        textWithTimestamp.setAlpha(opacity);
+    }
+
+    @Override
     public void updated() {
         super.updated();
         if (imageAsset != null) {

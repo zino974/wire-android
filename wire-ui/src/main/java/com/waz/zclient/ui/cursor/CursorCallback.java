@@ -40,4 +40,6 @@ public interface CursorCallback {
     void onShowedActionHint(CursorMenuItem item);
 
     void onApprovedMessageEditing(Message message);
+
+    void onClosedMessageEditing();
 }
