@@ -42,7 +42,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.Formatter;
-import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -237,7 +236,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     private String lastPingMessageId;
     private String lastHotPingMessageId;
     private Toolbar toolbar;
-    private ActionMode actionMode;
     private TextView toolbarTitle;
 
     private CursorLayout cursorLayout;
@@ -248,6 +246,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     private ViewGroup containerPreview;
     private boolean isPreviewShown;
     private boolean isVideoMessageButtonClicked;
+    private MessageBottomSheetDialog messageBottomSheetDialog;
 
     public static ConversationFragment newInstance() {
         return new ConversationFragment();
@@ -697,6 +696,12 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         super.onPause();
         KeyboardUtils.hideKeyboard(getActivity());
         hideAudioMessageRecording();
+        if (messageBottomSheetDialog != null) {
+            if (messageBottomSheetDialog.isShowing()) {
+                messageBottomSheetDialog.dismiss();
+            }
+            messageBottomSheetDialog = null;
+        }
     }
 
     @Override
@@ -1382,6 +1387,12 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     @Override
     public boolean onItemLongClick(final Message message) {
         final boolean isMemberOfConversation = getStoreFactory().getConversationStore().getCurrentConversation().isMemberOfConversation();
+        if (messageBottomSheetDialog != null) {
+            if (messageBottomSheetDialog.isShowing()) {
+                messageBottomSheetDialog.dismiss();
+            }
+            messageBottomSheetDialog = null;
+        }
         if (KeyboardUtils.isKeyboardVisible(getContext())) {
             KeyboardUtils.hideKeyboard(getActivity());
             new Handler().postDelayed(new Runnable() {
@@ -1390,7 +1401,14 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     if (getActivity() == null) {
                         return;
                     }
-                    new MessageBottomSheetDialog(getContext(), message, isMemberOfConversation, messageBottomSheetDialogCallback).show();
+                    messageBottomSheetDialog = new MessageBottomSheetDialog(getContext(), message, isMemberOfConversation, messageBottomSheetDialogCallback);
+                    messageBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            messageBottomSheetDialog = null;
+                        }
+                    });
+                    messageBottomSheetDialog.show();
                 }
             }, BOTTOM_MENU_DISPLAY_DELAY_MS);
         } else {
