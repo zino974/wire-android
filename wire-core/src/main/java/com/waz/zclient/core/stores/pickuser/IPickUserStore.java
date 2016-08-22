@@ -30,8 +30,6 @@ public interface IPickUserStore extends IStore {
 
     void loadTopUserList(int numberOfResults, boolean excludeUsers);
 
-    void loadRecommendedUsers(int numberOfResults);
-
     void loadSearchByFilter(String filter, int numberOfResults, boolean excludeUsers);
 
     void loadContacts();

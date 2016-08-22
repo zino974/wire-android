@@ -41,7 +41,7 @@ import com.waz.api.Contacts;
 import com.waz.api.IConversation;
 import com.waz.api.NetworkMode;
 import com.waz.api.User;
-import com.waz.api.UsersSearchResult;
+import com.waz.api.UserSearchResult;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
@@ -106,6 +106,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
 
     public static final int NUM_SEARCH_RESULTS_LIST = 30;
     public static final int NUM_SEARCH_RESULTS_TOP_USERS = 24;
+    public static final int NUM_SEARCH_RESULTS_ADD_TO_CONV = 1000;
 
     private static final int DEFAULT_SELECTED_INVITE_METHOD = 0;
     private static final int SHOW_KEYBOARD_THRETHOLD = 10;
@@ -169,13 +170,13 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         }
     };
 
-    private final ModelObserver<UsersSearchResult> usersSearchModelObserver = new ModelObserver<UsersSearchResult>() {
+    private final ModelObserver<UserSearchResult> usersSearchModelObserver = new ModelObserver<UserSearchResult>() {
         @Override
-        public void updated(UsersSearchResult model) {
+        public void updated(UserSearchResult model) {
             if (getContainer() != null) {
                 getContainer().getLoadingViewIndicator().hide();
             }
-            if (model.getContacts() == null || model.getContacts().length == 0) {
+            if (model.getAll().length == 0) {
                 PickUserDataState dataState = getDataState(getControllerFactory().getPickUserController().hasSelectedUsers());
                 if (dataState == PickUserDataState.SHOW_ALL_USERS_TO_ADD_TO_CONVERSATION) {
                     handleEmptySearchResult(getString(R.string.people_picker__error_message__no_users_to_add_to_conversation), "", false);
@@ -184,7 +185,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
                 }
             } else {
                 hideErrorMessage();
-                searchResultAdapter.setSearchResult(model.getContacts(), null, null);
+                searchResultAdapter.setSearchResult(model.getAll(), null, null);
             }
         }
     };
@@ -480,11 +481,6 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
                 getStoreFactory().getPickUserStore().loadContacts();
                 break;
         }
-    }
-
-    @Override
-    public void onRecommendedUsersUpdated(User[] users) {
-
     }
 
     @Override
@@ -928,10 +924,10 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
                 filter = "";
             case SHOW_SEARCH_RESULTS_TO_ADD_TO_CONVERSATION:
                 String[] excludedUsers = getStoreFactory().getPickUserStore().getExcludedUsers();
-                UsersSearchResult usersSearchResult = getStoreFactory().getZMessagingApiStore()
+                UserSearchResult usersSearchResult = getStoreFactory().getZMessagingApiStore()
                                                                        .getApi()
                                                                        .search()
-                                                                       .getConnections(filter, excludedUsers);
+                                                                       .getConnections(filter, NUM_SEARCH_RESULTS_ADD_TO_CONV, excludedUsers, false);
                 usersSearchModelObserver.setAndUpdate(usersSearchResult);
                 break;
             case SHOW_SEARCH_RESULTS:
