@@ -32,6 +32,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -1395,7 +1396,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         }
         if (KeyboardUtils.isKeyboardVisible(getContext())) {
             KeyboardUtils.hideKeyboard(getActivity());
-            new Handler().postDelayed(new Runnable() {
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     if (getActivity() == null) {
