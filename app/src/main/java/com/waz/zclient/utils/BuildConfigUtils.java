@@ -62,6 +62,9 @@ public class BuildConfigUtils {
     }
 
     public static LogLevel getLogLevelSE(Context context) {
+        if (BuildConfig.LOG_LEVEL_SE == context.getResources().getInteger(R.integer.log_level_supress)) {
+            return LogLevel.SUPPRESS;
+        }
         if (BuildConfig.LOG_LEVEL_SE == context.getResources().getInteger(R.integer.log_level_verbose)) {
             return LogLevel.VERBOSE;
         }
@@ -77,7 +80,8 @@ public class BuildConfigUtils {
         if (BuildConfig.LOG_LEVEL_SE == context.getResources().getInteger(R.integer.log_level_error)) {
             return LogLevel.ERROR;
         }
-        return LogLevel.SUPPRESS;
+        return LogLevel.ASSERT;
+
     }
 
     public static AvsLogLevel getLogLevelAVS(Context context) {
