@@ -64,6 +64,7 @@ public class MessageActionsTest extends FragmentTest<MainTestActivity> {
 
         ConversationFragment fragment = ConversationFragment.newInstance();
         attachFragment(fragment, ConversationFragment.TAG);
+        Thread.sleep(500);
         fragment.onItemLongClick(mockMessage);
 
         Thread.sleep(500);
