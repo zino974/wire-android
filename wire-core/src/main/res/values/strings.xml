@@ -847,6 +847,7 @@
     <string name="location_sharing__enable_system_location__message">Enable location in settings to show your current position</string>
     <string name="location_sharing__enable_system_location__confirm">Settings</string>
     <string name="location_sharing__enable_system_location__cancel">Cancel</string>
+    <string name="location_sharing__missing_play_services">Google Play Services is needed for location sharing</string>
 
     <!-- From SyncEngine -->
     <string name="zms_empty_conversation_name">Empty conversation</string>

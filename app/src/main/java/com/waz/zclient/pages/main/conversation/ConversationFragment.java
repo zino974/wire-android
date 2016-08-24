@@ -56,6 +56,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.waz.api.Asset;
 import com.waz.api.AssetFactory;
 import com.waz.api.AssetForUpload;
@@ -1626,9 +1628,13 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 });
                 break;
             case LOCATION:
-                KeyboardUtils.hideKeyboard(getActivity());
-                getControllerFactory().getLocationController().showShareLocation();
-                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.location(isGroupConversation));
+                if (ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext())) {
+                    KeyboardUtils.hideKeyboard(getActivity());
+                    getControllerFactory().getLocationController().showShareLocation();
+                    getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.location(isGroupConversation));
+                } else {
+                    Toast.makeText(getContext(), R.string.location_sharing__missing_play_services, Toast.LENGTH_LONG).show();
+                }
                 break;
             case MORE:
             case LESS:
