@@ -32,7 +32,6 @@ import android.view.View;
 import com.waz.zclient.utils.SquareOrientation;
 import net.hockeyapp.android.ExceptionHandler;
 import com.waz.zclient.ui.R;
-
 import java.util.LinkedList;
 
 public class DrawingCanvasView extends View {
@@ -160,7 +159,9 @@ public class DrawingCanvasView extends View {
             invalidate();
             return true;
         }
-        if (historyItems.isEmpty() && drawingPaint.getColor() == getResources().getColor(R.color.draw_white)) {
+        if (backgroundBitmap == null &&
+            historyItems.isEmpty() &&
+            drawingPaint.getColor() == getResources().getColor(R.color.draw_white)) {
             return true;
         }
         float x = event.getX();
@@ -329,7 +330,6 @@ public class DrawingCanvasView extends View {
         }
         includeBackgroundImage = true;
         canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), whitePaint);
-        
 
         RectF src;
         RectF dest;
