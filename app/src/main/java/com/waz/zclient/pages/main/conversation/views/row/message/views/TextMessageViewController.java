@@ -21,8 +21,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import com.waz.api.Message;
 import com.waz.zclient.R;
+import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.RetryMessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
@@ -32,22 +34,36 @@ import com.waz.zclient.utils.ViewUtils;
 public class TextMessageViewController extends RetryMessageViewController {
 
     private View view;
-    private TextMessageWithTimestamp textWithTimestamp;
+    private TextView textView;
+
+    private ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
+        @Override
+        public void updated(Message message) {
+            textView.setText(message.getBody());
+        }
+    };
 
     @SuppressLint("InflateParams")
     public TextMessageViewController(Context context, final MessageViewsContainer messageViewContainer) {
         super(context, messageViewContainer);
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.row_conversation_text_message, null);
-        textWithTimestamp = ViewUtils.getView(view, R.id.tmwt__message_and_timestamp);
-        textWithTimestamp.setMessageViewsContainer(messageViewContainer);
+        textView = ViewUtils.getView(view, R.id.ltv__row_conversation__message);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (footerActionCallback != null) {
+                    footerActionCallback.toggleVisibility();
+                }
+            }
+        });
         afterInit();
     }
 
     @Override
     public void onSetMessage(Separator separator) {
         super.onSetMessage(separator);
-        textWithTimestamp.setMessage(message);
+        messageModelObserver.setAndUpdate(message);
     }
 
     @Override
@@ -56,13 +72,13 @@ public class TextMessageViewController extends RetryMessageViewController {
         float opacity = messageViewsContainer.getControllerFactory().getConversationScreenController().isMessageBeingEdited(message) ?
                         ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay) :
                         1f;
-        textWithTimestamp.setAlpha(opacity);
+        textView.setAlpha(opacity);
     }
 
     @Override
     protected void onHeaderClick() {
-        if (message.getMessageType() == Message.Type.RECALLED) {
-            textWithTimestamp.toggleTimestamp();
+        if (message.getMessageType() == Message.Type.RECALLED && footerActionCallback != null) {
+            footerActionCallback.toggleVisibility();
         }
     }
 
@@ -73,7 +89,7 @@ public class TextMessageViewController extends RetryMessageViewController {
 
     @Override
     public void recycle() {
-        textWithTimestamp.recycle();
+        messageModelObserver.clear();
         super.recycle();
     }
 }
