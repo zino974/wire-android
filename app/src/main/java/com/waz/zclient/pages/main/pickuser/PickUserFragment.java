@@ -364,6 +364,8 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         }
 
         loadStartUi();
+        usersSearchModelObserver.resumeListening();
+        usersSearchModelObserver.forceUpdate();
     }
 
     @Override
@@ -408,6 +410,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         getControllerFactory().getGlobalLayoutController().removeKeyboardHeightObserver(this);
         getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         getControllerFactory().getPickUserController().removePickUserSearchControllerObserver(this);
+        usersSearchModelObserver.pauseListening();
         super.onStop();
     }
 
@@ -562,7 +565,6 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
             return;
         }
-        
 
         int inviteVisibility = keyboardIsVisible ||  getControllerFactory().getPickUserController().hasSelectedUsers() ? View.GONE : View.VISIBLE;
         genericInviteContainer.setVisibility(inviteVisibility);
