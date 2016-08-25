@@ -322,7 +322,7 @@ public class VideoMessageViewController extends MessageViewController implements
                                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(new PlayedVideoMessageEvent(
                                     (int) asset.getDuration().getSeconds(),
                                     !message.getUser().isMe(),
-                                    getConversationTypeString()));
+                                    messageViewsContainer.getStoreFactory().getConversationStore().getCurrentConversation()));
                                 final Intent intent = AssetUtils.getOpenFileIntent(uri, asset.getMimeType());
                                 context.startActivity(intent);
                             }
@@ -343,7 +343,7 @@ public class VideoMessageViewController extends MessageViewController implements
                         messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(new PlayedVideoMessageEvent(
                             (int) asset.getDuration().getSeconds(),
                             !message.getUser().isMe(),
-                            messageViewsContainer.getConversationType().name()));
+                            messageViewsContainer.getStoreFactory().getConversationStore().getCurrentConversation()));
                         final Intent intent = AssetUtils.getOpenFileIntent(uri, asset.getMimeType());
                         context.startActivity(intent);
                     }

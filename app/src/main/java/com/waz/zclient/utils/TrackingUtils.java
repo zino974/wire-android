@@ -208,7 +208,7 @@ public class TrackingUtils {
                                                 AudioEffect appliedAudioEffect,
                                                 boolean fromMinimisedState,
                                                 boolean sentWithQuickAction,
-                                                String conversationType) {
+                                                IConversation conversation) {
         int durationSec = (int) audioAssetForUpload.getDuration().getSeconds();
 
 
@@ -243,18 +243,18 @@ public class TrackingUtils {
                                                               audioEffectType,
                                                               sentWithQuickAction,
                                                               fromMinimisedState,
-                                                              conversationType));
+                                                              conversation));
     }
 
     public static void onSentTextMessage(ITrackingController trackingController, IConversation conversation) {
-        trackingController.tagEvent(new SentTextMessageEvent(conversation.getType().name()));
+        trackingController.tagEvent(new SentTextMessageEvent(conversation));
         trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.TEXT,
                                                                   conversation.getType().name(),
                                                                   conversation.isOtto()));
     }
 
     public static void onSentGifMessage(ITrackingController trackingController, IConversation conversation) {
-        trackingController.tagEvent(new SentTextMessageEvent(conversation.getType().name()));
+        trackingController.tagEvent(new SentTextMessageEvent(conversation));
         trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.TEXT,
                                                                   conversation.getType().name(),
                                                                   conversation.isOtto()));
@@ -262,7 +262,8 @@ public class TrackingUtils {
         trackingController.tagEvent(new SentPictureEvent(SentPictureEvent.Source.GIPHY,
                                                          conversation.getType().name(),
                                                          SentPictureEvent.Method.DEFAULT,
-                                                         SentPictureEvent.SketchSource.NONE));
+                                                         SentPictureEvent.SketchSource.NONE,
+                                                         conversation.isOtto()));
         trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.PHOTO,
                                                                   conversation.getType().name(),
                                                                   conversation.isOtto()));
@@ -288,7 +289,8 @@ public class TrackingUtils {
         trackingController.tagEvent(new SentPictureEvent(SentPictureEvent.Source.SKETCH,
                                                          conversation.getType().name(),
                                                          SentPictureEvent.Method.DEFAULT,
-                                                         sketchSource));
+                                                         sketchSource,
+                                                         conversation.isOtto()));
         trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.PHOTO,
                                                                   conversation.getType().name(),
                                                                   conversation.isOtto()));
@@ -296,7 +298,7 @@ public class TrackingUtils {
     }
 
     public static void onSentLocationMessage(ITrackingController trackingController, IConversation conversation) {
-        trackingController.tagEvent(new SentLocationEvent(conversation.getType().name()));
+        trackingController.tagEvent(new SentLocationEvent(conversation));
         trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.LOCATION,
                                                                   conversation.getType().name(),
                                                                   conversation.isOtto()));
@@ -308,7 +310,8 @@ public class TrackingUtils {
         trackingController.tagEvent(new SentPictureEvent(SentPictureEvent.Source.SHARING,
                                                          conversation.getType().name(),
                                                          SentPictureEvent.Method.DEFAULT,
-                                                         SentPictureEvent.SketchSource.NONE));
+                                                         SentPictureEvent.SketchSource.NONE,
+                                                         conversation.isOtto()));
         trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.PHOTO,
                                                                   conversation.getType().name(),
                                                                   conversation.isOtto()));
@@ -322,7 +325,8 @@ public class TrackingUtils {
         trackingController.tagEvent(new SentPictureEvent(source,
                                                          conversation.getType().name(),
                                                          method,
-                                                         SentPictureEvent.SketchSource.NONE));
+                                                         SentPictureEvent.SketchSource.NONE,
+                                                         conversation.isOtto()));
         trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.PHOTO,
                                                                   conversation.getType().name(),
                                                                   conversation.isOtto()));

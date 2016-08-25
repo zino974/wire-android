@@ -64,9 +64,10 @@ public class SentPictureEvent extends Event {
         }
     }
 
-    public SentPictureEvent(Source source, String conversationType, Method method, SketchSource sketchSource) {
+    public SentPictureEvent(Source source, String conversationType, Method method, SketchSource sketchSource, boolean withBot) {
         attributes.put(Attribute.SOURCE, source.nameString);
         attributes.put(Attribute.CONVERSATION_TYPE, conversationType);
+        attributes.put(Attribute.WITH_BOT, String.valueOf(withBot));
         if (source == Source.CAMERA || source == Source.GALLERY) {
             attributes.put(Attribute.METHOD, method.toString());
         }

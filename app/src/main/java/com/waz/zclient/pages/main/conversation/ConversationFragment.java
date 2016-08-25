@@ -1879,7 +1879,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                appliedAudioEffect,
                                                true,
                                                sentWithQuickAction,
-                                               getConversationTypeString());
+                                               getStoreFactory().getConversationStore().getCurrentConversation());
     }
 
     @Override
@@ -1903,7 +1903,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                appliedAudioEffect,
                                                false,
                                                false,
-                                               getConversationTypeString());
+                                               getStoreFactory().getConversationStore().getCurrentConversation());
         extendedCursorContainer.close(true);
 
     }
@@ -2144,7 +2144,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 getControllerFactory().getTrackingController().tagEvent(new SentVideoMessageEvent((int) (AssetUtils.getVideoAssetDurationMilliSec(
                     getContext(),
                     uri) / 1000),
-                                                                                                  getConversationTypeString(),
+                                                                                                  getStoreFactory().getConversationStore().getCurrentConversation(),
                                                                                                   SentVideoMessageEvent.Source.CURSOR_BUTTON));
                 break;
             case VIDEO:
@@ -2152,7 +2152,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 getControllerFactory().getTrackingController().tagEvent(new SentVideoMessageEvent((int) (AssetUtils.getVideoAssetDurationMilliSec(
                     getContext(),
                     uri) / 1000),
-                                                                                                  getConversationTypeString(),
+                                                                                                  getStoreFactory().getConversationStore().getCurrentConversation(),
                                                                                                   SentVideoMessageEvent.Source.KEYBOARD));
                 break;
             case CAMERA:

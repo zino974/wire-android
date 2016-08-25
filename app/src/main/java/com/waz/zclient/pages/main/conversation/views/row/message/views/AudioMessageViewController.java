@@ -284,7 +284,7 @@ public class AudioMessageViewController extends MessageViewController implements
                 asset.getMimeType(),
                 (int) asset.getDuration().getSeconds(),
                 !message.getUser().isMe(),
-                messageViewsContainer.getConversationType().name()));
+                messageViewsContainer.getStoreFactory().getConversationStore().getCurrentConversation()));
         }
     }
 
