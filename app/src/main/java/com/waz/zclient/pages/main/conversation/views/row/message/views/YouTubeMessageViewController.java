@@ -187,7 +187,7 @@ public class YouTubeMessageViewController extends RetryMessageViewController imp
         messageViewsContainer.getControllerFactory()
                              .getTrackingController()
                              .tagEvent(new PlayedYouTubeMessageEvent(!message.getUser().isMe(),
-                                                                     getConversationTypeString()));
+                                                                     messageViewsContainer.getStoreFactory().getConversationStore().getCurrentConversation()));
         messageViewsContainer.getControllerFactory()
                              .getTrackingController()
                              .updateSessionAggregates(RangedAttribute.YOUTUBE_CONTENT_CLICKS);

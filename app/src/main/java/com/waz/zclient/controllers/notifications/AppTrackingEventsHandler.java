@@ -74,14 +74,15 @@ public class AppTrackingEventsHandler implements TrackingEventsHandler {
                 break;
             case IMAGE_UPLOAD_AS_ASSET:
                 String type = trackingEvent.getConversationType().getOrElse(IConversation.Type.UNKNOWN).toString();
-                boolean isOtto = trackingEvent.isInConversationWithOtto().getOrElse(false);
+                boolean withBot = trackingEvent.isInConversationWithOtto().getOrElse(false);
                 trackingController.tagEvent(new InitiatedFileUploadEvent(assetMimeType, assetSize, type));
                 trackingController.tagEvent(new SentPictureEvent(SentPictureEvent.Source.CLIP, type,
                                                                  SentPictureEvent.Method.DEFAULT,
-                                                                 SentPictureEvent.SketchSource.NONE));
+                                                                 SentPictureEvent.SketchSource.NONE,
+                                                                 withBot));
                 trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.PHOTO,
                                                                           type,
-                                                                          isOtto));
+                                                                          withBot));
                 break;
             case ASSET_UPLOAD_SUCCESSFUL:
                 int durationInSeconds = (int) (trackingEvent.getDuration().getOrElse(Duration.ofSeconds(-1)).toMillis() / 1000);

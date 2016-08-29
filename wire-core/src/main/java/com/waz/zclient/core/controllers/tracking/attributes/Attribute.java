@@ -54,6 +54,7 @@ public enum Attribute {
     CALLING_END_REASON("reason"),
     CALLING_APP_IS_ACTIVE("app_is_active"),
     WITH_OTTO("with_otto"),
+    WITH_BOT("with_bot"),
 
     FILE_SIZE_BYTES("file_size_bytes"),
 
