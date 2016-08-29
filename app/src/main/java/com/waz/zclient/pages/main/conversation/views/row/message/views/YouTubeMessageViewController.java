@@ -79,7 +79,8 @@ public class YouTubeMessageViewController extends RetryMessageViewController imp
         super(context, messageViewsContainer);
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.row_conversation_youtube, null);
-        textWithTimestamp = ViewUtils.getView(view, R.id.tmwt__message_and_timestamp);
+//        TODO FIX
+//        textWithTimestamp = ViewUtils.getView(view, R.id.tmwt__message_and_timestamp);
         textWithTimestamp.setMessageViewsContainer(messageViewsContainer);
         imageView = ViewUtils.getView(view, R.id.iv__row_conversation__youtube_image);
         imageView.setOnClickListener(this);

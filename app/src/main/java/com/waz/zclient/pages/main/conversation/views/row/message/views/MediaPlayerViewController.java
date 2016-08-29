@@ -123,7 +123,8 @@ public abstract class MediaPlayerViewController extends RetryMessageViewControll
         updateProgressEnabled = true;
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.row_conversation_media_player, null);
-        textWithTimestamp = ViewUtils.getView(view, R.id.tmwt__message_and_timestamp);
+        //TODO FIX 
+        //textWithTimestamp = ViewUtils.getView(view, R.id.tmwt__message_and_timestamp);
         textWithTimestamp.setMessageViewsContainer(messageViewsContainer);
         mediaPlayerView = ViewUtils.getView(view, R.id.mpv__row_conversation__message_media_player);
         mediaPlayerView.setOnLongClickListener(this);

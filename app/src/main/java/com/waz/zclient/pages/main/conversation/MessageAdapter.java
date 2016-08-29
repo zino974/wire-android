@@ -24,6 +24,8 @@ import android.widget.BaseAdapter;
 import com.waz.api.Message;
 import com.waz.api.MessagesList;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
+import com.waz.zclient.pages.main.conversation.views.row.footer.FooterViewController;
+import com.waz.zclient.pages.main.conversation.views.row.footer.FooterViewControllerFactory;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageAndSeparatorViewController;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewControllerFactory;
@@ -149,7 +151,9 @@ public class MessageAdapter extends BaseAdapter {
         MessageViewController messageViewController = MessageViewControllerFactory.create(parent.getContext(),
                                                                                           message,
                                                                                           container);
+        FooterViewController footerViewController = FooterViewControllerFactory.create(parent.getContext(), message, container);
         return new MessageAndSeparatorViewController(messageViewController,
+                                                     footerViewController,
                                                      container,
                                                      parent.getContext());
     }

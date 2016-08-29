@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import com.waz.api.Message;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
+import com.waz.zclient.pages.main.conversation.views.row.footer.FooterViewController;
 import com.waz.zclient.pages.main.conversation.views.row.message.views.RecyclingLinearLayout;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.pages.main.conversation.views.row.separator.SeparatorViewController;
@@ -31,12 +32,15 @@ public class MessageAndSeparatorViewController implements ConversationItemViewCo
 
     private SeparatorViewController separatorViewController;
     private MessageViewController messageViewController;
+    private FooterViewController footerViewController;
     private Context context;
 
     public MessageAndSeparatorViewController(final MessageViewController messageViewController,
+                                             FooterViewController footerViewController,
                                              MessageViewsContainer messageViewsContainer,
                                              Context context) {
         this.messageViewController = messageViewController;
+        this.footerViewController = footerViewController;
         this.context = context;
         separatorViewController = new SeparatorViewController(this.context, messageViewsContainer);
         separatorViewController.setOnSeparatorClickListener(new View.OnClickListener() {
@@ -45,11 +49,16 @@ public class MessageAndSeparatorViewController implements ConversationItemViewCo
                 messageViewController.onHeaderClick();
             }
         });
+        this.messageViewController.setFooterActionCallback(footerViewController);
+
     }
 
     public void setModel(@NonNull Message message, @NonNull Separator separator) {
         messageViewController.setMessage(message, separator);
         separatorViewController.setMessage(message, separator);
+        if (footerViewController != null) {
+            footerViewController.setMessage(message);
+        }
     }
 
     public MessageViewController getMessageViewController() {
@@ -62,6 +71,9 @@ public class MessageAndSeparatorViewController implements ConversationItemViewCo
         separatorAndMessageView.setOrientation(LinearLayout.VERTICAL);
         separatorAndMessageView.addView(separatorViewController.getView());
         separatorAndMessageView.addView(messageViewController.getView());
+        if (footerViewController != null) {
+            separatorAndMessageView.addView(footerViewController.getView());
+        }
         separatorAndMessageView.setViewController(this);
         return separatorAndMessageView;
     }
@@ -70,6 +82,9 @@ public class MessageAndSeparatorViewController implements ConversationItemViewCo
     public void recycle() {
         messageViewController.recycle();
         separatorViewController.recycle();
+        if (footerViewController != null) {
+            footerViewController.recycle();
+        }
     }
 
     public Message getMessage() {
