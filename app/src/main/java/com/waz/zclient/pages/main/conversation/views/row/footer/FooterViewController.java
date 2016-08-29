@@ -21,6 +21,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -28,30 +31,44 @@ import android.view.animation.Interpolator;
 import android.widget.TextView;
 import com.waz.api.Message;
 import com.waz.zclient.R;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.footer.views.FooterLikeDetailsLayout;
 import com.waz.zclient.pages.main.conversation.views.row.message.ConversationItemViewController;
 import com.waz.zclient.utils.ViewUtils;
+import com.waz.zclient.utils.ZTimeFormatter;
+import org.threeten.bp.DateTimeUtils;
+import org.threeten.bp.Instant;
 
 public class FooterViewController implements ConversationItemViewController, FooterActionCallback {
 
+    private static final int LIKE_HINT_VISIBILITY_MIL_SEC = 3000;
     private final Context context;
     private final MessageViewsContainer container;
-    private final View view;
-    private final TextView likeButton;
-    private final FooterLikeDetailsLayout likeDetails;
+    private View view;
+    private TextView likeButton;
+    private TextView messageStatusTextView;
+    private FooterLikeDetailsLayout likeDetails;
+
+    private Handler mainHandler;
 
     private int likeButtonColorLiked;
     private int likeButtonColorUnliked;
     private Message message;
-    private boolean animateLikeButton;
 
+    private boolean animateLikeButton;
 
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
         public void updated(Message message) {
+            if (message.isLiked()) {
+                showLikeDetails();
+            } else {
+                showMessageStatus();
+            }
             updateLikeButton();
+            updateMessageStatusLabel();
             likeDetails.setUsers(message.isLiked() ? message.getLikes() : null);
         }
     };
@@ -59,18 +76,21 @@ public class FooterViewController implements ConversationItemViewController, Foo
     public FooterViewController(Context context, MessageViewsContainer container) {
         this.context = context;
         this.container = container;
+        mainHandler = new Handler(Looper.getMainLooper());
         view = View.inflate(context, R.layout.row_conversation_footer, null);
         likeButton = ViewUtils.getView(view, R.id.gtv__footer__like__button);
+        messageStatusTextView = ViewUtils.getView(view, R.id.tv__footer__message_status);
+        likeDetails = ViewUtils.getView(view, R.id.fldl_like_details);
+
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggleLike(true);
             }
         });
-        likeDetails = ViewUtils.getView(view, R.id.fldl_like_details);
 
-        likeButtonColorLiked = context.getResources().getColor(R.color.accent_red);
-        likeButtonColorUnliked = context.getResources().getColor(R.color.text__secondary_light);
+        likeButtonColorLiked = ContextCompat.getColor(context, R.color.accent_red);
+        likeButtonColorUnliked = ContextCompat.getColor(context, R.color.text__secondary_light);
     }
 
     public void setMessage(Message message) {
@@ -78,8 +98,12 @@ public class FooterViewController implements ConversationItemViewController, Foo
         messageModelObserver.setAndUpdate(message);
         if (message.isLiked()) {
             view.setVisibility(View.VISIBLE);
+            likeDetails.setVisibility(View.VISIBLE);
+            messageStatusTextView.setVisibility(View.INVISIBLE);
         } else {
             view.setVisibility(View.GONE);
+            likeDetails.setVisibility(View.INVISIBLE);
+            messageStatusTextView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -92,6 +116,7 @@ public class FooterViewController implements ConversationItemViewController, Foo
     public void recycle() {
         view.setVisibility(View.GONE);
         messageModelObserver.clear();
+        likeDetails.setUsers(null);
         message = null;
         animateLikeButton = false;
     }
@@ -103,6 +128,9 @@ public class FooterViewController implements ConversationItemViewController, Foo
         } else {
             animateLikeButton = animate;
             message.like();
+            if (!container.getControllerFactory().getUserPreferencesController().hasPerformedAction(IUserPreferencesController.LIKED_MESSAGE)) {
+                container.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
+            }
         }
     }
 
@@ -119,6 +147,14 @@ public class FooterViewController implements ConversationItemViewController, Foo
         if (showLikeAnimation) {
             showLikeAnimation();
         }
+    }
+
+    private void updateMessageStatusLabel() {
+        Instant messageTime = message.isEdited() ?
+                              message.getEditTime() :
+                              message.getTime();
+        String timestamp = ZTimeFormatter.getSingleMessageTime(getView().getContext(), DateTimeUtils.toDate(messageTime));
+        messageStatusTextView.setText(timestamp);
     }
 
     private void showLikeAnimation() {
@@ -160,6 +196,29 @@ public class FooterViewController implements ConversationItemViewController, Foo
         final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         view.measure(widthSpec, heightSpec);
         ValueAnimator animator = createHeightAnimator(view, 0, view.getMeasuredHeight());
+
+
+        if (!message.isLiked() &&
+            !message.getUser().isMe() &&
+            !container.getControllerFactory().getUserPreferencesController().hasPerformedAction(IUserPreferencesController.LIKED_MESSAGE)) {
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mainHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            showMessageStatus();
+                        }
+                    }, LIKE_HINT_VISIBILITY_MIL_SEC);
+                }
+
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    showLikeDetails();
+                }
+            });
+        }
+
         animator.start();
     }
 
@@ -178,6 +237,18 @@ public class FooterViewController implements ConversationItemViewController, Foo
             }
         });
         animator.start();
+    }
+
+    // TODO will add animations here
+    private void showLikeDetails() {
+        likeDetails.setVisibility(View.VISIBLE);
+        messageStatusTextView.setVisibility(View.INVISIBLE);
+    }
+
+    // TODO will add animations here
+    private void showMessageStatus() {
+        likeDetails.setVisibility(View.INVISIBLE);
+        messageStatusTextView.setVisibility(View.VISIBLE);
     }
 
     public ValueAnimator createHeightAnimator(final View view, final int start, final int end) {

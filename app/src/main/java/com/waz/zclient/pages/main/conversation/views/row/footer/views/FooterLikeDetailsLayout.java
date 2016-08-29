@@ -32,7 +32,6 @@ import com.waz.zclient.views.chathead.ChatheadImageView;
 
 public class FooterLikeDetailsLayout extends LinearLayout {
 
-    private User[] users;
     private User firstUser;
     private User secondUser;
 
@@ -91,7 +90,6 @@ public class FooterLikeDetailsLayout extends LinearLayout {
     }
 
     public void setUsers(User[] users) {
-        this.users = users;
         if (users == null || users.length == 0) {
             clearUsers();
             return;
@@ -120,7 +118,7 @@ public class FooterLikeDetailsLayout extends LinearLayout {
     }
 
     private void clearUsers() {
-        ViewUtils.fadeInView(hintArrow);
+        hintArrow.setVisibility(VISIBLE);
         description.setText(R.string.message_footer__tap_to_like);
         descriptionModelObserver.clear();
         firstUser = null;
