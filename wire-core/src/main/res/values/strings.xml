@@ -480,7 +480,7 @@
     <string name="pref_options_image_download_wifi">Wi-Fi only</string>
     <string name="pref_options_media_category_title">Media</string>
     <string name="pref_options_giphy_title">Giphy</string>
-    <string name="pref_options_giphy_summary">Replace message text with animated GIFs.</string>
+    <string name="pref_options_giphy_summary">Show GIF button</string>
     <string name="pref_options_spotify_title">Connect with Spotify</string>
     <string name="pref_options_spotify_logout_title">Disconnect with Spotify</string>
     <string name="pref_options_spotify_summary">You need a Spotify Premium account.</string>
@@ -490,11 +490,11 @@
     <string name="pref_devices_screen_title">Devices</string>
     <string name="pref_current_device_category_title">Current device</string>
     <string name="pref_other_devices_category_title">Active devices</string>
-    <string name="pref_devices_summary">Click to delete</string>
+    <string name="pref_devices_summary">Tap to delete</string>
     <string name="pref_devices_current_device_category_title">Current Device</string>
     <string name="pref_devices_other_devices_category_title">Other Devices</string>
     <string name="pref_devices_device_title" translatable="false">[[%1$s]]</string>
-    <string name="pref_devices_device_activation_summary">Activated in [[%1$s]]\nfrom [[%2$s]]</string>
+    <string name="pref_devices_device_activation_summary">Activated on [[%1$s]]\nin [[%2$s]]</string>
     <string name="pref_devices_device_id">ID: %1$s</string>
     <string name="pref_devices_device_verified">Verified</string>
     <string name="pref_devices_device_not_verified">Not verified</string>
@@ -987,7 +987,7 @@
     <string name="audio_message__recording__limit_reached__message">Audio messages are limited to 25MB. Send this message?</string>
     <string name="audio_message__recording__limit_reached__confirmation">SEND</string>
 
-    <string name="hint_change_filter">Change a filter above</string>
+    <string name="hint_change_filter">Choose a filter above</string>
 
     <string name="message_bottom_menu_action_forward">Forward</string>
     <string name="message_bottom_menu_action_copy">Copy</string>
