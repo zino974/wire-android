@@ -170,21 +170,16 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
             messageTextView.setVisibility(VISIBLE);
         }
         this.message = message;
-        if (messageViewContainer.getTimestampShownSet().contains(message.getId())) {
-            messageViewContainer.setShownTimestampView(this);
-            timestampTextView.setVisibility(VISIBLE);
-        } else {
+//        if (messageViewContainer.getTimestampShownSet().contains(message.getId())) {
+            //messageViewContainer.setExpandedView(this);
+//            timestampTextView.setVisibility(VISIBLE);
+//        } else {
             timestampTextView.setVisibility(GONE);
-        }
+//        }
     }
 
     private void expandTimestamp() {
-        if (messageViewContainer.getShownTimestampView() != null &&
-            messageViewContainer.getShownTimestampView() != this) {
-            messageViewContainer.getShownTimestampView().collapseTimestamp();
-        }
-        messageViewContainer.getTimestampShownSet().add(message.getId());
-        messageViewContainer.setShownTimestampView(this);
+//        messageViewContainer.getTimestampShownSet().add(message.getId());
         timestampTextView.setVisibility(VISIBLE);
 
         View parent = (View) timestampTextView.getParent();
@@ -199,7 +194,7 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
     }
 
     private void collapseTimestamp() {
-        messageViewContainer.getTimestampShownSet().remove(message.getId());
+//        messageViewContainer.getTimestampShownSet().remove(message.getId());
         int origHeight = timestampTextView.getHeight();
 
         ValueAnimator animator = createHeightAnimator(timestampTextView, origHeight, 0);
