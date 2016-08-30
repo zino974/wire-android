@@ -372,7 +372,7 @@ public class SeparatorViewController implements ConversationItemViewController,
     }
 
     private void showRecalledGlyph(Separator separator) {
-        messageRecalledGlyph.setVisibility(separator.nextMessage.getMessageType() == Message.Type.RECALLED ?
+        messageRecalledGlyph.setVisibility(separator.getNextMessage().getMessageType() == Message.Type.RECALLED ?
                                            View.VISIBLE : View.GONE);
     }
 

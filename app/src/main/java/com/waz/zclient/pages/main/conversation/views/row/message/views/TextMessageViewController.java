@@ -53,7 +53,7 @@ public class TextMessageViewController extends RetryMessageViewController {
             @Override
             public void onClick(View v) {
                 if (footerActionCallback != null) {
-                    footerActionCallback.toggleVisibility();
+                    footerActionCallback.toggleVisibility(true);
                 }
             }
         });
@@ -78,7 +78,7 @@ public class TextMessageViewController extends RetryMessageViewController {
     @Override
     protected void onHeaderClick() {
         if (message.getMessageType() == Message.Type.RECALLED && footerActionCallback != null) {
-            footerActionCallback.toggleVisibility();
+            footerActionCallback.toggleVisibility(true);
         }
     }
 
