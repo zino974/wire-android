@@ -15,10 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.pages.main.conversation.views.row.footer;
+package com.waz.zclient.pages.main.conversation.views;
 
-import com.waz.zclient.pages.main.conversation.views.ExpandableView;
-
-public interface FooterActionCallback extends ExpandableView {
-    void toggleVisibility();
+public interface ExpandableView {
+    void close();
 }

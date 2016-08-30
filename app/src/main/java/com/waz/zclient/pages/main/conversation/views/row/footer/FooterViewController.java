@@ -100,7 +100,16 @@ public class FooterViewController implements ConversationItemViewController, Foo
             view.setVisibility(View.VISIBLE);
             likeDetails.setVisibility(View.VISIBLE);
             messageStatusTextView.setVisibility(View.INVISIBLE);
+        } else if (message.getId().equals(container.getExpandedMessageId())) {
+            if (container.getExpandedView() != null && container.getExpandedView() != this) {
+                container.getExpandedView().close();
+                container.setExpandedView(this);
+            }
+            view.setVisibility(View.VISIBLE);
+            likeDetails.setVisibility(View.INVISIBLE);
+            messageStatusTextView.setVisibility(View.VISIBLE);
         } else {
+            // handle refresh
             view.setVisibility(View.GONE);
             likeDetails.setVisibility(View.INVISIBLE);
             messageStatusTextView.setVisibility(View.VISIBLE);
@@ -179,13 +188,11 @@ public class FooterViewController implements ConversationItemViewController, Foo
     }
 
     private void expand() {
-        // TODO add possible closing of other footers
-//        if (container.getShownTimestampView() != null &&
-//            container.getShownTimestampView() != this) {
-//            container.getShownTimestampView().collapseTimestamp();
-//        }
-//        messageViewContainer.getTimestampShownSet().add(message.getId());
-//        messageViewContainer.setShownTimestampView(this);
+        if (container.getExpandedView() != null && container.getExpandedView() != this) {
+            container.getExpandedView().close();
+        }
+        container.setExpandedMessageId(message.getId());
+        container.setExpandedView(this);
         view.setVisibility(View.VISIBLE);
 
         View parent = (View) view.getParent();
@@ -226,6 +233,9 @@ public class FooterViewController implements ConversationItemViewController, Foo
     private void collapse() {
         if (message.isLiked()) {
             return;
+        }
+        if (message.getId().equals(container.getExpandedMessageId())) {
+            container.setExpandedMessageId(null);
         }
         int origHeight = view.getHeight();
 
@@ -272,6 +282,18 @@ public class FooterViewController implements ConversationItemViewController, Foo
             expand();
         } else {
             collapse();
+        }
+    }
+
+    @Override
+    public void close() {
+        if (message != null) {
+            collapse();
+        } else {
+            view.setVisibility(View.GONE);
+        }
+        if (container.getExpandedView() == this) {
+            container.setExpandedView(null);
         }
     }
 
