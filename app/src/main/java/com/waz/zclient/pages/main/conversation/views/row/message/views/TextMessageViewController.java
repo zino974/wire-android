@@ -19,6 +19,7 @@ package com.waz.zclient.pages.main.conversation.views.row.message.views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -26,19 +27,23 @@ import com.waz.api.Message;
 import com.waz.zclient.R;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
-import com.waz.zclient.pages.main.conversation.views.row.message.RetryMessageViewController;
+import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.ViewUtils;
 
-public class TextMessageViewController extends RetryMessageViewController {
+public class TextMessageViewController extends MessageViewController {
 
     private View view;
     private TextView textView;
 
+    private final float textSizeRegular;
+    private final float textSizeEmoji;
+
     private ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
         public void updated(Message message) {
+            resizeIfEmoji(message);
             textView.setText(message.getBody());
         }
     };
@@ -49,7 +54,8 @@ public class TextMessageViewController extends RetryMessageViewController {
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.row_conversation_text_message, null);
         textView = ViewUtils.getView(view, R.id.ltv__row_conversation__message);
-        textView.setOnClickListener(new View.OnClickListener() {
+        View textContainer = ViewUtils.getView(view, R.id.ll__row_conversation__message_container);
+        textContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (footerActionCallback != null) {
@@ -57,12 +63,22 @@ public class TextMessageViewController extends RetryMessageViewController {
                 }
             }
         });
+        textContainer.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                messageViewContainer.onItemLongClick(message);
+                return true;
+            }
+        });
+
+        textSizeRegular = context.getResources().getDimensionPixelSize(R.dimen.wire__text_size__regular);
+        textSizeEmoji = context.getResources().getDimensionPixelSize(R.dimen.wire__text_size__emoji);
+
         afterInit();
     }
 
     @Override
     public void onSetMessage(Separator separator) {
-        super.onSetMessage(separator);
         messageModelObserver.setAndUpdate(message);
     }
 
@@ -92,4 +108,13 @@ public class TextMessageViewController extends RetryMessageViewController {
         messageModelObserver.clear();
         super.recycle();
     }
+
+    private void resizeIfEmoji(Message message) {
+        if (message.getMessageType() == Message.Type.TEXT_EMOJI_ONLY) {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeEmoji);
+        } else {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeRegular);
+        }
+    }
+
 }

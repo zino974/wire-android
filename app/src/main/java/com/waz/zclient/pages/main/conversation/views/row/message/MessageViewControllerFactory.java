@@ -138,7 +138,7 @@ public class MessageViewControllerFactory {
                 }
                 final Message.Part richMediaPart = MessageUtils.getFirstRichMediaPart(message);
                 if (richMediaPart == null) {
-                    return new LinkPreviewViewController(context, messageViewsContainer);
+                    return new TextMessageViewController(context, messageViewsContainer);
                 }
                 switch (richMediaPart.getPartType()) {
                     case TEXT:
