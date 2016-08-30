@@ -68,7 +68,7 @@ public class SingleImageMessageFragment extends SingleImageFragment {
 
     @Override
     protected String getTimeText() {
-        return ZTimeFormatter.getSingleMessageTime(getActivity(), DateTimeUtils.toDate(message.getTime()));
+        return ZTimeFormatter.getSingleMessageTimeAndDate(getActivity(), DateTimeUtils.toDate(message.getTime()));
     }
 
     @Override

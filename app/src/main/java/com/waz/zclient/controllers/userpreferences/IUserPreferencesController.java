@@ -27,6 +27,7 @@ public interface IUserPreferencesController {
     @IntDef(SEND_LOCATION_MESSAGE)
     @interface Action { }
     int SEND_LOCATION_MESSAGE = 0;
+    int LIKED_MESSAGE = 1;
 
     void tearDown();
 
