@@ -187,22 +187,13 @@ public class FooterViewController implements ConversationItemViewController, Foo
         container.getControllerFactory().getVibratorController().vibrate(new long[]{10, 20, 10, 20, 10, 30, 10, 20, 10, 20, 10, 30});
     }
 
-    private void expand(boolean animate) {
+    private void expand() {
         if (container.getExpandedView() != null && container.getExpandedView() != this) {
             container.getExpandedView().close();
         }
         container.setExpandedMessageId(message.getId());
         container.setExpandedView(this);
         view.setVisibility(View.VISIBLE);
-
-        if (!animate) {
-            if (!message.isLiked() &&
-                !message.getUser().isMe() &&
-                !container.getControllerFactory().getUserPreferencesController().hasPerformedAction(IUserPreferencesController.LIKED_MESSAGE)) {
-                showMessageStatus();
-            }
-            return;
-        }
 
         View parent = (View) view.getParent();
         final int widthSpec = View.MeasureSpec.makeMeasureSpec(parent.getMeasuredWidth()
@@ -286,9 +277,9 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
 
     @Override
-    public void toggleVisibility(boolean animate) {
+    public void toggleVisibility() {
         if (view.getVisibility() == View.GONE) {
-            expand(animate);
+            expand();
         } else {
             collapse();
         }
