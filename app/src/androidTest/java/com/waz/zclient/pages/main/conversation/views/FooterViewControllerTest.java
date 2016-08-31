@@ -54,12 +54,15 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(false);
 
-        MessageViewsContainer messageViewsContainer = ViewControllerMockHelper.getMockMessageViewsContainer(activity);
-        FooterViewController footerViewController = FooterViewControllerFactory.create(activity, message, messageViewsContainer);
-        setView(footerViewController.getView());
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
 
-        footerViewController.setMessage(message);
-        footerViewController.toggleVisibility(false);
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+
+        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
 
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
         onView(withId(R.id.gtv__footer__like__button)).perform(click());
@@ -73,12 +76,10 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(true);
 
-        MessageViewsContainer messageViewsContainer = ViewControllerMockHelper.getMockMessageViewsContainer(activity);
-        FooterViewController footerViewController = FooterViewControllerFactory.create(activity, message, messageViewsContainer);
-        setView(footerViewController.getView());
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
 
-        footerViewController.setMessage(message);
-        footerViewController.toggleVisibility(false);
+        setView(messageAndSeparatorViewController.getView());
 
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
         onView(withId(R.id.gtv__footer__like__button)).perform(click());
@@ -91,12 +92,15 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
         when(message.isLikedByThisUser()).thenReturn(true);
 
-        MessageViewsContainer messageViewsContainer = ViewControllerMockHelper.getMockMessageViewsContainer(activity);
-        FooterViewController footerViewController = FooterViewControllerFactory.create(activity, message, messageViewsContainer);
-        setView(footerViewController.getView());
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
 
-        footerViewController.setMessage(message);
-        footerViewController.toggleVisibility(false);
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+
+        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
 
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
         onView(withId(R.id.gtv__footer__like__button)).perform(click());

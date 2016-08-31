@@ -20,5 +20,5 @@ package com.waz.zclient.pages.main.conversation.views.row.footer;
 import com.waz.zclient.pages.main.conversation.views.ExpandableView;
 
 public interface FooterActionCallback extends ExpandableView {
-    void toggleVisibility(boolean animate);
+    void toggleVisibility();
 }
