@@ -31,6 +31,7 @@ import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewCont
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.ViewUtils;
+import com.waz.zclient.views.OnDoubleClickListener;
 
 public class TextMessageViewController extends MessageViewController {
 
@@ -55,9 +56,17 @@ public class TextMessageViewController extends MessageViewController {
         view = inflater.inflate(R.layout.row_conversation_text_message, null);
         textView = ViewUtils.getView(view, R.id.ltv__row_conversation__message);
         View textContainer = ViewUtils.getView(view, R.id.ll__row_conversation__message_container);
-        textContainer.setOnClickListener(new View.OnClickListener() {
+        textContainer.setOnClickListener(new OnDoubleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onDoubleClick() {
+                if (message.isLikedByThisUser()) {
+                    message.unlike();
+                } else {
+                    message.like();
+                }
+            }
+            @Override
+            public void onSingleClick() {
                 if (footerActionCallback != null) {
                     footerActionCallback.toggleVisibility();
                 }

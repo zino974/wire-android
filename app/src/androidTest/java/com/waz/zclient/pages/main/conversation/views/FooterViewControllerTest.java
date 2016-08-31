@@ -49,7 +49,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     }
 
     @Test
-    public void verifyICanLikeMessage() {
+    public void verifyICanLikeMessage() throws InterruptedException {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(false);
@@ -63,6 +63,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
         onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+
+        Thread.sleep(400);
 
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
         onView(withId(R.id.gtv__footer__like__button)).perform(click());
@@ -88,7 +90,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     }
 
     @Test
-    public void verifyICanUnlikeMessage() {
+    public void verifyICanUnlikeMessage() throws InterruptedException {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
         when(message.isLikedByThisUser()).thenReturn(true);
 
@@ -102,6 +104,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
         onView(withId(R.id.ltv__row_conversation__message)).perform(click());
 
+        Thread.sleep(400);
+
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
         onView(withId(R.id.gtv__footer__like__button)).perform(click());
 
@@ -109,7 +113,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     }
 
     @Test
-    public void verifyICanTapMessageToRevealLikeButtonIfMessageHasNoLikes() {
+    public void verifyICanTapMessageToRevealLikeButtonIfMessageHasNoLikes() throws InterruptedException {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
         when(message.isLiked()).thenReturn(false);
 
@@ -122,6 +126,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
         onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+
+        Thread.sleep(400);
 
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
     }
