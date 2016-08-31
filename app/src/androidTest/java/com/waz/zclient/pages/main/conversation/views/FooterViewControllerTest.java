@@ -36,6 +36,7 @@ import org.threeten.bp.Instant;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static com.waz.zclient.testutils.CustomViewAssertions.containsText;
 import static com.waz.zclient.testutils.CustomViewAssertions.hasText;
 import static com.waz.zclient.testutils.CustomViewAssertions.isGone;
 import static com.waz.zclient.testutils.CustomViewAssertions.isInvisible;
@@ -199,8 +200,85 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
     }
 
+    /**
+     * Sent messages in 1:1 conversations
+     */
+
     @Test
-    public void verifyMyLastMessageThatHasNoLikesShowsDeliveryStatus() {
+    public void verifyMySendingMessageHasCorrectMessageStatus() {
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.PENDING, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(true);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.tv__footer__message_status)).check(isVisible());
+        onView(withId(R.id.tv__footer__message_status)).check(hasText(activity.getString(R.string.message_footer__status__sending)));
+    }
+
+    @Test
+    public void verifyMySentMessageHasCorrectMessageStatus() {
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(true);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.tv__footer__message_status)).check(isVisible());
+        onView(withId(R.id.tv__footer__message_status)).check(containsText(getMessageStatusKeyword(R.string.message_footer__status__sent)));
+    }
+
+    @Test
+    public void verifyMyDeliveredMessageHasCorrectMessageStatus() {
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(true);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.tv__footer__message_status)).check(isVisible());
+        onView(withId(R.id.tv__footer__message_status)).check(containsText(getMessageStatusKeyword(R.string.message_footer__status__delivered)));
+    }
+
+    @Test
+    public void verifyMyFailedMessageHasCorrectMessageStatus() {
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.FAILED, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(false);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.tv__footer__message_status)).check(isVisible());
+        String keyword = activity.getString(R.string.message_footer__status__failed).replace("_", "");
+        onView(withId(R.id.tv__footer__message_status)).check(containsText(keyword));
+    }
+
+    @Test
+    public void verifyMyLastMessageThatHasNoLikesShowsMessageStatus() {
         IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
 
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, true);
@@ -262,7 +340,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     }
 
     @Test
-    public void verifyMyMessageThatIsNotLastAndHasNoLikesHidesDeliveryStatusAndLikeButton() {
+    public void verifyMyMessageThatIsNotLastAndHasNoLikesHidesMessageStatusAndLikeButton() {
         IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
 
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, true);
@@ -327,8 +405,12 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         onView(withId(R.id.fldl_like_details)).check(isVisible());
     }
 
+    /**
+     * Sent messages in group conversations
+     */
+
     @Test
-    public void verifyMyLastMessageThatHasNoLikesHidesDeliveryStatusInGroupConversation() {
+    public void verifyMyLastMessageThatHasNoLikesHidesMessageStatusInGroupConversation() {
         IConversation conversation = createMockConversation(IConversation.Type.GROUP);
 
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, true);
@@ -346,6 +428,118 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         onView(withId(R.id.fldl_like_details)).check(isInvisible());
     }
 
+    @Test
+    public void verifyICanTapOnMyMessageThatIsNotLastToRevealMessageStatusInGroup() throws InterruptedException {
+        IConversation conversation = createMockConversation(IConversation.Type.GROUP);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(false);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+
+        Thread.sleep(400);
+
+        onView(withId(R.id.tv__footer__message_status)).check(isVisible());
+        onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
+        onView(withId(R.id.fldl_like_details)).check(isInvisible());
+    }
+
+    @Test
+    public void verifyMySendingMessageHasCorrectMessageStatusInGroupConversation() throws InterruptedException {
+        IConversation conversation = createMockConversation(IConversation.Type.GROUP);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.PENDING, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(false);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+
+        Thread.sleep(400);
+
+        onView(withId(R.id.tv__footer__message_status)).check(isVisible());
+        onView(withId(R.id.tv__footer__message_status)).check(hasText(activity.getString(R.string.message_footer__status__sending)));
+    }
+
+    @Test
+    public void verifyMySentMessageHasCorrectMessageStatusInGroupConversation() throws InterruptedException {
+        IConversation conversation = createMockConversation(IConversation.Type.GROUP);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(false);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+
+        Thread.sleep(400);
+
+        onView(withId(R.id.tv__footer__message_status)).check(isVisible());
+        onView(withId(R.id.tv__footer__message_status)).check(containsText(getMessageStatusKeyword(R.string.message_footer__status__sent)));
+    }
+
+    @Test
+    public void verifyMyDeliveredMessageHasCorrectMessageStatusInGroupConversation() throws InterruptedException {
+        IConversation conversation = createMockConversation(IConversation.Type.GROUP);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(false);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+
+        Thread.sleep(400);
+
+        onView(withId(R.id.tv__footer__message_status)).check(isVisible());
+        onView(withId(R.id.tv__footer__message_status)).check(containsText(getMessageStatusKeyword(R.string.message_footer__status__sent)));
+    }
+
+    @Test
+    public void verifyMyFailedMessageHasCorrectMessageStatusInGroupConversation() {
+        IConversation conversation = createMockConversation(IConversation.Type.GROUP);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.FAILED, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(false);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.tv__footer__message_status)).check(isVisible());
+        String keyword = activity.getString(R.string.message_footer__status__failed).replace("_", "");
+        onView(withId(R.id.tv__footer__message_status)).check(hasText(keyword));
+    }
+
     private MessageAndSeparatorViewController createMessageAndSeparatorViewController(Message message) {
         MessageViewsContainer messageViewsContainer = ViewControllerMockHelper.getMockMessageViewsContainer(activity);
         MessageViewController viewController = MessageViewControllerFactory.create(activity,
@@ -360,6 +554,19 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
                                                      activity);
     }
 
+    /**
+     * Extracts message status string from string of format "%1$s \u30FB Sent";
+     * @param resId
+     * @return
+     */
+    private String getMessageStatusKeyword(int resId) {
+        String messageStatusStr = activity.getString(resId);
+        int i = messageStatusStr.indexOf("\u30FB");
+        if (i < 0) {
+            i = 0;
+        }
+        return messageStatusStr.substring(i);
+    }
 
     private Separator createMockSeparator() {
         User mockUser = mock(User.class);
