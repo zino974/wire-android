@@ -40,6 +40,7 @@
         android:gravity="center_vertical"
         android:textColor="@color/text__secondary_light"
         android:textSize="@dimen/wire__text_size__small"
+        android:maxLines="1"
         app:font="@string/wire__typeface__light"
         />
 

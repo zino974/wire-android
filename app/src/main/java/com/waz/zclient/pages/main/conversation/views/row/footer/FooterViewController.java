@@ -36,6 +36,7 @@ import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.footer.views.FooterLikeDetailsLayout;
 import com.waz.zclient.pages.main.conversation.views.row.message.ConversationItemViewController;
+import com.waz.zclient.ui.utils.TextViewUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.ZTimeFormatter;
 import org.threeten.bp.DateTimeUtils;
@@ -44,6 +45,7 @@ import org.threeten.bp.Instant;
 public class FooterViewController implements ConversationItemViewController, FooterActionCallback {
 
     private static final int LIKE_HINT_VISIBILITY_MIL_SEC = 3000;
+    private static final int TIMESTAMP_VISIBILITY_MIL_SEC = 5000;
     private final Context context;
     private final MessageViewsContainer container;
     private View view;
@@ -58,6 +60,7 @@ public class FooterViewController implements ConversationItemViewController, Foo
     private Message message;
 
     private boolean animateLikeButton;
+    private boolean isMyLastMessage;
 
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
@@ -67,9 +70,40 @@ public class FooterViewController implements ConversationItemViewController, Foo
             } else {
                 showMessageStatus();
             }
+
+            if (shouldBeExpanded() && (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0)) {
+                if (container.getExpandedView() != null && container.getExpandedView() != FooterViewController.this) {
+                    container.getExpandedView().close();
+                }
+                container.setExpandedView(FooterViewController.this);
+                container.setExpandedMessageId(message.getId());
+                expand();
+                if (message.isLastMessageFromSelf()) {
+                    likeButton.setVisibility(View.GONE);
+                }
+            } else if (isMyLastMessage && !message.isLastMessageFromSelf()) {
+                collapse();
+            }
+
+            isMyLastMessage = message.isLastMessageFromSelf();
+
             updateLikeButton();
             updateMessageStatusLabel();
             likeDetails.setUsers(message.isLiked() ? message.getLikes() : null);
+        }
+    };
+
+    private Runnable showLikeDetailsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            showLikeDetails();
+        }
+    };
+
+    private Runnable showMessageStatusRunnable = new Runnable() {
+        @Override
+        public void run() {
+            showMessageStatus();
         }
     };
 
@@ -95,25 +129,22 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
     public void setMessage(Message message) {
         this.message = message;
-        messageModelObserver.setAndUpdate(message);
-        if (message.isLiked()) {
+        isMyLastMessage = message.isLastMessageFromSelf();
+        if (shouldBeExpanded() || message.getId().equals(container.getExpandedMessageId())) {
             view.setVisibility(View.VISIBLE);
-            likeDetails.setVisibility(View.VISIBLE);
-            messageStatusTextView.setVisibility(View.INVISIBLE);
-        } else if (message.getId().equals(container.getExpandedMessageId())) {
-            if (container.getExpandedView() != null && container.getExpandedView() != this) {
-                container.getExpandedView().close();
-                container.setExpandedView(this);
+            if (message.isLiked()) {
+                likeDetails.setVisibility(View.VISIBLE);
+                messageStatusTextView.setVisibility(View.INVISIBLE);
+            } else {
+                likeDetails.setVisibility(View.INVISIBLE);
+                messageStatusTextView.setVisibility(View.VISIBLE);
             }
-            view.setVisibility(View.VISIBLE);
-            likeDetails.setVisibility(View.INVISIBLE);
-            messageStatusTextView.setVisibility(View.VISIBLE);
         } else {
-            // handle refresh
             view.setVisibility(View.GONE);
             likeDetails.setVisibility(View.INVISIBLE);
             messageStatusTextView.setVisibility(View.VISIBLE);
         }
+        messageModelObserver.setAndUpdate(message);
     }
 
     @Override
@@ -123,11 +154,14 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
     @Override
     public void recycle() {
+        mainHandler.removeCallbacksAndMessages(null);
         view.setVisibility(View.GONE);
+        likeButton.setVisibility(View.VISIBLE);
         messageModelObserver.clear();
         likeDetails.setUsers(null);
         message = null;
         animateLikeButton = false;
+        isMyLastMessage = false;
     }
 
     private void toggleLike(boolean animate) {
@@ -141,6 +175,13 @@ public class FooterViewController implements ConversationItemViewController, Foo
                 container.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
             }
         }
+    }
+
+    private boolean shouldBeExpanded() {
+        return message.isLiked() ||
+               message.isLastMessageFromSelf() ||
+               message.getMessageStatus() == Message.Status.FAILED ||
+               message.getMessageStatus() == Message.Status.FAILED_READ;
     }
 
     private void updateLikeButton() {
@@ -159,11 +200,46 @@ public class FooterViewController implements ConversationItemViewController, Foo
     }
 
     private void updateMessageStatusLabel() {
-        Instant messageTime = message.isEdited() ?
+        Instant messageTime = message.isEdited() || message.isDeleted() ?
                               message.getEditTime() :
                               message.getTime();
         String timestamp = ZTimeFormatter.getSingleMessageTime(getView().getContext(), DateTimeUtils.toDate(messageTime));
-        messageStatusTextView.setText(timestamp);
+        String status;
+        if (message.getUser().isMe()) {
+            switch (message.getMessageStatus()) {
+                case PENDING:
+                    status = context.getString(R.string.message_footer__status__sending);
+                    break;
+                case SENT:
+                    status = context.getString(R.string.message_footer__status__sent, timestamp);
+                    break;
+                case DELETED:
+                    status = context.getString(R.string.message_footer__status__deleted, timestamp);
+                    break;
+                case DELIVERED:
+                    status = context.getString(R.string.message_footer__status__delivered, timestamp);
+                    break;
+                case FAILED:
+                case FAILED_READ:
+                    status = context.getString(R.string.message_footer__status__failed);
+                    break;
+                default:
+                    status = timestamp;
+                    break;
+            }
+        } else {
+            status = timestamp;
+        }
+        messageStatusTextView.setText(status);
+        TextViewUtils.linkifyText(messageStatusTextView,
+                                  ContextCompat.getColor(context, R.color.accent_red),
+                                  false,
+                                  new Runnable() {
+                                      @Override
+                                      public void run() {
+                                          message.retry();
+                                      }
+                                  });
     }
 
     private void showLikeAnimation() {
@@ -194,16 +270,22 @@ public class FooterViewController implements ConversationItemViewController, Foo
         container.setExpandedMessageId(message.getId());
         container.setExpandedView(this);
         view.setVisibility(View.VISIBLE);
+        likeButton.setVisibility(View.VISIBLE);
 
         View parent = (View) view.getParent();
-        final int widthSpec = View.MeasureSpec.makeMeasureSpec(parent.getMeasuredWidth()
-                                                               - parent.getPaddingLeft()
-                                                               - parent.getPaddingRight(),
-                                                               View.MeasureSpec.AT_MOST);
+        final int widthSpec;
+        if (parent == null) {
+            // needed for tests
+            widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        } else {
+             widthSpec = View.MeasureSpec.makeMeasureSpec(parent.getMeasuredWidth()
+                                                                   - parent.getPaddingLeft()
+                                                                   - parent.getPaddingRight(),
+                                                                   View.MeasureSpec.AT_MOST);
+        }
         final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         view.measure(widthSpec, heightSpec);
         ValueAnimator animator = createHeightAnimator(view, 0, view.getMeasuredHeight());
-
 
         if (!message.isLiked() &&
             !message.getUser().isMe() &&
@@ -211,12 +293,8 @@ public class FooterViewController implements ConversationItemViewController, Foo
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mainHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            showMessageStatus();
-                        }
-                    }, LIKE_HINT_VISIBILITY_MIL_SEC);
+                    mainHandler.removeCallbacksAndMessages(null);
+                    mainHandler.postDelayed(showMessageStatusRunnable, LIKE_HINT_VISIBILITY_MIL_SEC);
                 }
 
                 @Override
@@ -231,7 +309,7 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
 
     private void collapse() {
-        if (message.isLiked()) {
+        if (shouldBeExpanded()) {
             return;
         }
         if (message.getId().equals(container.getExpandedMessageId())) {
@@ -261,6 +339,17 @@ public class FooterViewController implements ConversationItemViewController, Foo
         messageStatusTextView.setVisibility(View.VISIBLE);
     }
 
+    private void showTimestampForABit() {
+        mainHandler.removeCallbacksAndMessages(null);
+        // TODO check this again when adding animations
+        if (likeDetails.getVisibility() == View.VISIBLE) {
+            showMessageStatus();
+            mainHandler.postDelayed(showLikeDetailsRunnable, TIMESTAMP_VISIBILITY_MIL_SEC);
+        } else {
+            showLikeDetails();
+        }
+    }
+
     public ValueAnimator createHeightAnimator(final View view, final int start, final int end) {
         ValueAnimator animator = ValueAnimator.ofInt(start, end);
         animator.setDuration(250);
@@ -268,6 +357,10 @@ public class FooterViewController implements ConversationItemViewController, Foo
             @Override
             public void onAnimationUpdate(final ValueAnimator valueAnimator) {
                 ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+                if (layoutParams == null) {
+                    // needed for tests
+                    return;
+                }
                 layoutParams.height = (Integer) valueAnimator.getAnimatedValue();
                 view.setLayoutParams(layoutParams);
             }
@@ -278,8 +371,12 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
     @Override
     public void toggleVisibility() {
-        if (view.getVisibility() == View.GONE) {
+        if (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0) {
             expand();
+        } else if (likeButton.getVisibility() == View.GONE) {
+            likeButton.setVisibility(View.VISIBLE);
+        } else if (message.isLiked()) {
+            showTimestampForABit();
         } else {
             collapse();
         }

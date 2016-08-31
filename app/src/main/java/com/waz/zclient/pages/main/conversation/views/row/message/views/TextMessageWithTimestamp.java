@@ -26,7 +26,6 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -47,9 +46,6 @@ import org.threeten.bp.Instant;
 
 public class TextMessageWithTimestamp extends LinearLayout implements AccentColorObserver {
 
-    private final float textSizeRegular;
-    private final float textSizeEmoji;
-
     private LinkTextView messageTextView;
     private TypefaceTextView timestampTextView;
     private MessageViewsContainer messageViewContainer;
@@ -63,8 +59,6 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
                 messageViewContainer.isTornDown()) {
                 return;
             }
-
-            resizeIfEmoji(message);
 
             String messageText;
             if (message.isDeleted()) {
@@ -127,9 +121,6 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
         messageTextView = ViewUtils.getView(this, R.id.ltv__row_conversation__message);
         timestampTextView = ViewUtils.getView(this, R.id.ttv__row_conversation__timestamp);
         animationDuration = getResources().getInteger(R.integer.content__message_timestamp__animation_duration);
-
-        textSizeRegular = context.getResources().getDimensionPixelSize(R.dimen.wire__text_size__regular);
-        textSizeEmoji = context.getResources().getDimensionPixelSize(R.dimen.wire__text_size__emoji);
 
         messageTextView.setOnTouchListener(new OnTouchListener() {
             @Override
@@ -273,11 +264,4 @@ public class TextMessageWithTimestamp extends LinearLayout implements AccentColo
         messageModelObserver.pauseListening();
     }
 
-    private void resizeIfEmoji(Message message) {
-        if (message.getMessageType() == Message.Type.TEXT_EMOJI_ONLY) {
-            messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeEmoji);
-        } else {
-            messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeRegular);
-        }
-    }
 }

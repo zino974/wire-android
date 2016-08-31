@@ -227,6 +227,11 @@ public class MockMessagesList extends MockObservable implements MessagesList {
         }
 
         @Override
+        public boolean isLastMessageFromOther() {
+            return false;
+        }
+
+        @Override
         public boolean isUserMentioned() {
             return false;
         }
