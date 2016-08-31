@@ -25,7 +25,7 @@
               android:orientation="vertical"
     >
 
-    <com.waz.zclient.pages.main.conversation.views.row.message.views.TextMessageWithTimestamp
+    <com.waz.zclient.pages.main.conversation.views.row.message.views.TextMessageLinkTextView
         android:id="@+id/cv__row_conversation__link_preview__text_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -33,15 +33,15 @@ public class FooterViewControllerFactory {
     private static boolean showFooter(Message message) {
         switch (message.getMessageType()) {
             case TEXT:
-                return true;
             case TEXT_EMOJI_ONLY:
-            case ANY_ASSET:
-            case ASSET:
-            case AUDIO_ASSET:
-            case KNOCK:
-            case LOCATION:
             case RICH_MEDIA:
+            case LOCATION:
             case VIDEO_ASSET:
+                return true;
+            case ANY_ASSET: // File
+            case ASSET: // Image
+            case AUDIO_ASSET: // Audio
+            case KNOCK: //Ping
             default:
                 return false;
         }
