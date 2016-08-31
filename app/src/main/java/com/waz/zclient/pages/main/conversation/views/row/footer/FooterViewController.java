@@ -218,7 +218,11 @@ public class FooterViewController implements ConversationItemViewController, Foo
                     status = context.getString(R.string.message_footer__status__deleted, timestamp);
                     break;
                 case DELIVERED:
-                    status = context.getString(R.string.message_footer__status__delivered, timestamp);
+                    if (message.getConversation().getType() == IConversation.Type.GROUP) {
+                        status = context.getString(R.string.message_footer__status__sent, timestamp);
+                    } else {
+                        status = context.getString(R.string.message_footer__status__delivered, timestamp);
+                    }
                     break;
                 case FAILED:
                 case FAILED_READ:
