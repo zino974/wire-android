@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.TextView;
+import com.waz.api.IConversation;
 import com.waz.api.Message;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
@@ -179,7 +180,7 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
     private boolean shouldBeExpanded() {
         return message.isLiked() ||
-               message.isLastMessageFromSelf() ||
+               (message.isLastMessageFromSelf() && message.getConversation().getType() == IConversation.Type.ONE_TO_ONE) ||
                message.getMessageStatus() == Message.Status.FAILED ||
                message.getMessageStatus() == Message.Status.FAILED_READ;
     }

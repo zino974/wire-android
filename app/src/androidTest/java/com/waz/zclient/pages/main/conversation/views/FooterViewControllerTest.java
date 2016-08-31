@@ -18,6 +18,7 @@
 package com.waz.zclient.pages.main.conversation.views;
 
 import android.support.test.runner.AndroidJUnit4;
+import com.waz.api.IConversation;
 import com.waz.api.Message;
 import com.waz.api.User;
 import com.waz.zclient.MainTestActivity;
@@ -36,6 +37,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static com.waz.zclient.testutils.CustomViewAssertions.isGone;
+import static com.waz.zclient.testutils.CustomViewAssertions.isInvisible;
 import static com.waz.zclient.testutils.CustomViewAssertions.isVisible;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -133,6 +135,25 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     }
 
 
+    @Test
+    public void verifyMyLastMessageThatHasNoLikesHidesDeliveryStatusInGroupConversation() {
+        IConversation conversation = createMockConversation(IConversation.Type.GROUP);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(true);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.tv__footer__message_status)).check(isGone());
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+        onView(withId(R.id.fldl_like_details)).check(isInvisible());
+    }
+
     private MessageAndSeparatorViewController createMessageAndSeparatorViewController(Message message) {
         MessageViewsContainer messageViewsContainer = ViewControllerMockHelper.getMockMessageViewsContainer(activity);
         MessageViewController viewController = MessageViewControllerFactory.create(activity,
@@ -176,5 +197,11 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         when(message.getUser()).thenReturn(mockUser);
 
         return message;
+    }
+
+    private IConversation createMockConversation(IConversation.Type type) {
+        IConversation conversation = mock(IConversation.class);
+        when(conversation.getType()).thenReturn(type);
+        return conversation;
     }
 }
