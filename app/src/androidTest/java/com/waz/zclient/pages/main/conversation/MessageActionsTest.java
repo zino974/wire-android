@@ -653,4 +653,64 @@ public class MessageActionsTest extends FragmentTest<MainTestActivity> {
         onView(withId(R.id.emct__edit_message__toolbar)).check(isVisible());
         onView(withId(R.id.cet__cursor)).check(hasText(secondMessageText));
     }
+
+    @Test
+    public void assertReceivedTextMessageCanBeLiked() throws InterruptedException {
+        IConversation mockConversation = mock(IConversation.class);
+        when(mockConversation.getType()).thenReturn(IConversation.Type.ONE_TO_ONE);
+        when(mockConversation.isMemberOfConversation()).thenReturn(true);
+
+        IConversationStore mockConversationStore = activity.getStoreFactory().getConversationStore();
+        when(mockConversationStore.getCurrentConversation()).thenReturn(mockConversation);
+
+        User mockUser = mock(User.class);
+        when(mockUser.isMe()).thenReturn(false);
+
+        final Message mockMessage = mock(Message.class);
+        when(mockMessage.getMessageType()).thenReturn(Message.Type.TEXT);
+        when(mockMessage.getUser()).thenReturn(mockUser);
+        when(mockMessage.isLikedByThisUser()).thenReturn(false);
+        when(mockMessage.isLiked()).thenReturn(false);
+
+        ConversationFragment fragment = ConversationFragment.newInstance();
+        attachFragment(fragment, ConversationFragment.TAG);
+        Thread.sleep(500);
+        fragment.onItemLongClick(mockMessage);
+
+        Thread.sleep(500);
+        onView(withId(R.id.message_bottom_menu_item_like)).check(isVisible());
+        onView(withId(R.id.message_bottom_menu_item_like)).perform(click());
+
+        verify(mockMessage).like();
+    }
+
+    @Test
+    public void assertReceivedAndLikedTextMessageCanBeUnliked() throws InterruptedException {
+        IConversation mockConversation = mock(IConversation.class);
+        when(mockConversation.getType()).thenReturn(IConversation.Type.ONE_TO_ONE);
+        when(mockConversation.isMemberOfConversation()).thenReturn(true);
+
+        IConversationStore mockConversationStore = activity.getStoreFactory().getConversationStore();
+        when(mockConversationStore.getCurrentConversation()).thenReturn(mockConversation);
+
+        User mockUser = mock(User.class);
+        when(mockUser.isMe()).thenReturn(false);
+
+        final Message mockMessage = mock(Message.class);
+        when(mockMessage.getMessageType()).thenReturn(Message.Type.TEXT);
+        when(mockMessage.getUser()).thenReturn(mockUser);
+        when(mockMessage.isLikedByThisUser()).thenReturn(true);
+        when(mockMessage.isLiked()).thenReturn(false);
+
+        ConversationFragment fragment = ConversationFragment.newInstance();
+        attachFragment(fragment, ConversationFragment.TAG);
+        Thread.sleep(500);
+        fragment.onItemLongClick(mockMessage);
+
+        Thread.sleep(500);
+        onView(withId(R.id.message_bottom_menu_item_unlike)).check(isVisible());
+        onView(withId(R.id.message_bottom_menu_item_unlike)).perform(click());
+
+        verify(mockMessage).unlike();
+    }
 }
