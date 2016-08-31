@@ -147,7 +147,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="@dimen/single_image_message__icon__adjust_to_left"
             android:layout_marginBottom="@dimen/single_image_message__icon__adjust_to_bottom"
-            android:text="@string/glyph__love"
+            android:text="@string/glyph__like"
             android:visibility="gone"
             android:textColor="@color/wire__text_color_primary_dark_selector"
             android:textSize="@dimen/single_image_message__icon__text_size"

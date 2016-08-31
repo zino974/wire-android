@@ -36,7 +36,7 @@
             android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="@dimen/chathead__margin"
             android:gravity="center"
-            android:text="@string/glyph__love"
+            android:text="@string/glyph__like"
             android:textSize="@dimen/wire__text_size__small"
             />
 
