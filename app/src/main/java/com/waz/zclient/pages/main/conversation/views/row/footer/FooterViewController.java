@@ -19,6 +19,7 @@ package com.waz.zclient.pages.main.conversation.views.row.footer;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Handler;
@@ -37,6 +38,7 @@ import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.footer.views.FooterLikeDetailsLayout;
 import com.waz.zclient.pages.main.conversation.views.row.message.ConversationItemViewController;
+import com.waz.zclient.ui.animation.interpolators.penner.Expo;
 import com.waz.zclient.ui.utils.TextViewUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.ZTimeFormatter;
@@ -62,14 +64,15 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
     private boolean animateLikeButton;
     private boolean isMyLastMessage;
+    private final float height;
 
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
         public void updated(Message message) {
             if (message.isLiked()) {
-                showLikeDetails();
+                showLikeDetails(true);
             } else {
-                showMessageStatus();
+                showMessageStatus(false);
             }
 
             if (shouldBeExpanded() && (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0)) {
@@ -97,14 +100,14 @@ public class FooterViewController implements ConversationItemViewController, Foo
     private Runnable showLikeDetailsRunnable = new Runnable() {
         @Override
         public void run() {
-            showLikeDetails();
+            showLikeDetails(true);
         }
     };
 
     private Runnable showMessageStatusRunnable = new Runnable() {
         @Override
         public void run() {
-            showMessageStatus();
+            showMessageStatus(true);
         }
     };
 
@@ -126,6 +129,7 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
         likeButtonColorLiked = ContextCompat.getColor(context, R.color.accent_red);
         likeButtonColorUnliked = ContextCompat.getColor(context, R.color.text__secondary_light);
+        height = context.getResources().getDimension(R.dimen.content__footer__height);
     }
 
     public void setMessage(Message message) {
@@ -135,14 +139,18 @@ public class FooterViewController implements ConversationItemViewController, Foo
             view.setVisibility(View.VISIBLE);
             if (message.isLiked()) {
                 likeDetails.setVisibility(View.VISIBLE);
-                messageStatusTextView.setVisibility(View.INVISIBLE);
+                messageStatusTextView.setVisibility(View.GONE);
+                messageStatusTextView.setTranslationY(height);
+
             } else {
-                likeDetails.setVisibility(View.INVISIBLE);
+                likeDetails.setVisibility(View.GONE);
+                likeDetails.setTranslationY(-height);
                 messageStatusTextView.setVisibility(View.VISIBLE);
             }
         } else {
             view.setVisibility(View.GONE);
-            likeDetails.setVisibility(View.INVISIBLE);
+            likeDetails.setVisibility(View.GONE);
+            likeDetails.setTranslationY(-height);
             messageStatusTextView.setVisibility(View.VISIBLE);
         }
         messageModelObserver.setAndUpdate(message);
@@ -308,14 +316,12 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
                 @Override
                 public void onAnimationStart(Animator animation) {
-                    showLikeDetails();
+                    showLikeDetails(true);
                 }
             });
         }
-
         animator.start();
     }
-
 
     private void collapse() {
         if (shouldBeExpanded()) {
@@ -336,26 +342,71 @@ public class FooterViewController implements ConversationItemViewController, Foo
         animator.start();
     }
 
-    // TODO will add animations here
-    private void showLikeDetails() {
-        likeDetails.setVisibility(View.VISIBLE);
-        messageStatusTextView.setVisibility(View.INVISIBLE);
+    private void showLikeDetails(boolean animate) {
+        if (animate) {
+            int height = view.getHeight();
+            getViewTextViewAnimator(messageStatusTextView, false, height).start();
+            getViewTextViewAnimator(likeDetails, true, 0).start();
+        } else {
+            likeDetails.setVisibility(View.VISIBLE);
+            likeDetails.setTranslationY(0);
+            messageStatusTextView.setVisibility(View.INVISIBLE);
+            messageStatusTextView.setTranslationY(height);
+        }
     }
 
-    // TODO will add animations here
-    private void showMessageStatus() {
-        likeDetails.setVisibility(View.INVISIBLE);
-        messageStatusTextView.setVisibility(View.VISIBLE);
+    private void showMessageStatus(boolean animate) {
+        if (animate) {
+            int height = view.getHeight();
+            getViewTextViewAnimator(messageStatusTextView, true, 0).start();
+            getViewTextViewAnimator(likeDetails, false, -height).start();
+        } else {
+            likeDetails.setVisibility(View.INVISIBLE);
+            likeDetails.setTranslationY(-height);
+            messageStatusTextView.setVisibility(View.VISIBLE);
+            messageStatusTextView.setTranslationY(0);
+        }
+    }
+
+    private ObjectAnimator getViewTextViewAnimator(final View view, boolean animateIn, float to) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, to);
+        animator.setDuration(context.getResources().getInteger(com.waz.zclient.ui.R.integer.wire__animation__duration__short));
+        if (animateIn) {
+            animator.setInterpolator(new Expo.EaseOut());
+        } else {
+            animator.setInterpolator(new Expo.EaseIn());
+        }
+        if (animateIn) {
+            animator.setStartDelay(context.getResources().getInteger(com.waz.zclient.ui.R.integer.animation_delay_short));
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    view.setVisibility(View.VISIBLE);
+                }
+            });
+        } else {
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    view.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    view.setVisibility(View.GONE);
+                }
+            });
+        }
+        return animator;
     }
 
     private void showTimestampForABit() {
         mainHandler.removeCallbacksAndMessages(null);
-        // TODO check this again when adding animations
         if (likeDetails.getVisibility() == View.VISIBLE) {
-            showMessageStatus();
+            showMessageStatus(true);
             mainHandler.postDelayed(showLikeDetailsRunnable, TIMESTAMP_VISIBILITY_MIL_SEC);
         } else {
-            showLikeDetails();
+            showLikeDetails(true);
         }
     }
 
@@ -376,7 +427,6 @@ public class FooterViewController implements ConversationItemViewController, Foo
         });
         return animator;
     }
-
 
     @Override
     public void toggleVisibility() {
