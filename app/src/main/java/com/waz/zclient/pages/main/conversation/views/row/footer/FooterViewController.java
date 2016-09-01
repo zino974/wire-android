@@ -195,6 +195,9 @@ public class FooterViewController implements ConversationItemViewController, Foo
         likeButton.setText(context.getText(likedByThisUser ? R.string.glyph__liked : R.string.glyph__like));
         likeButton.setTextColor(likedByThisUser ? likeButtonColorLiked : likeButtonColorUnliked);
         likeButton.setTag(likedByThisUser);
+        if (message.isLiked() && likeButton.getVisibility() == View.GONE) {
+            likeButton.setVisibility(View.VISIBLE);
+        }
         if (showLikeAnimation) {
             showLikeAnimation();
         }

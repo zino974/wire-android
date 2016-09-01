@@ -96,6 +96,7 @@ public class AudioMessageViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.aab__row_conversation__audio_button)).check(isVisible());
         onView(withText(activity.getString(R.string.glyph__close))).perform(click());
+        Thread.sleep(400);
 
         verify(progressIndicator).cancel();
     }
@@ -122,7 +123,7 @@ public class AudioMessageViewControllerTest extends ViewTest<MainTestActivity> {
     }
 
     @Test
-    public void verifyRetryUpload() {
+    public void verifyRetryUpload() throws InterruptedException {
         Message message = createMockMessage(Message.Status.FAILED);
         User user = createMockUser();
         Asset asset = createMockAsset(AssetStatus.UPLOAD_FAILED);
@@ -141,6 +142,7 @@ public class AudioMessageViewControllerTest extends ViewTest<MainTestActivity> {
         onView(withId(R.id.aab__row_conversation__audio_button)).check(isVisible());
         onView(withText(activity.getString(R.string.glyph__redo))).check(isVisible());
         onView(withId(R.id.aab__row_conversation__audio_button)).perform(click());
+        Thread.sleep(400);
 
         verify(message).retry();
     }
@@ -191,6 +193,7 @@ public class AudioMessageViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.aab__row_conversation__audio_button)).check(isVisible());
         onView(withText(activity.getString(R.string.glyph__close))).perform(click());
+        Thread.sleep(400);
 
         verify(progressIndicator).cancel();
     }
@@ -236,6 +239,7 @@ public class AudioMessageViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.aab__row_conversation__audio_button)).check(isVisible());
         onView(withText(activity.getString(R.string.glyph__redo))).perform(click());
+        Thread.sleep(400);
 
         verify(asset).getPlaybackControls(any(Asset.LoadCallback.class));
     }
