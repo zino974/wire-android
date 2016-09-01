@@ -180,6 +180,7 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
     private boolean shouldBeExpanded() {
         return message.isLiked() ||
+               message.isLastMessageFromOther() ||
                (message.isLastMessageFromSelf() && message.getConversation().getType() == IConversation.Type.ONE_TO_ONE) ||
                message.getMessageStatus() == Message.Status.FAILED ||
                message.getMessageStatus() == Message.Status.FAILED_READ;
