@@ -18,8 +18,11 @@
 package com.waz.zclient.pages.main.conversation.views;
 
 import android.support.test.runner.AndroidJUnit4;
+import com.waz.api.Asset;
+import com.waz.api.AssetStatus;
 import com.waz.api.IConversation;
 import com.waz.api.Message;
+import com.waz.api.MessageContent;
 import com.waz.api.User;
 import com.waz.zclient.MainTestActivity;
 import com.waz.zclient.R;
@@ -35,9 +38,11 @@ import com.waz.zclient.utils.ZTimeFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.threeten.bp.DateTimeUtils;
+import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.doubleClick;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static com.waz.zclient.testutils.CustomViewAssertions.containsText;
 import static com.waz.zclient.testutils.CustomViewAssertions.doesNotContainText;
@@ -63,7 +68,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
     @Test
     public void verifyICanLikeTextMessage() throws InterruptedException {
-        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(false);
 
@@ -86,8 +91,103 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     }
 
     @Test
+    public void verifyICanLikeTextMessageByDoubleTap() throws InterruptedException {
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
+        when(message.isLikedByThisUser()).thenReturn(false);
+        when(message.isLiked()).thenReturn(false);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(doubleClick());
+
+        verify(message).like();
+    }
+
+    @Test
+    public void verifyICanLikeLocationMessagebyDoubleTap() throws InterruptedException {
+        MessageContent.Location mockLocation = mock(MessageContent.Location.class);
+        when(mockLocation.getName()).thenReturn("Berlin");
+
+        Message message = createMockMessage(Message.Type.LOCATION, Message.Status.DELIVERED, false);
+        when(message.isLikedByThisUser()).thenReturn(false);
+        when(message.isLiked()).thenReturn(false);
+        when(message.getLocation()).thenReturn(mockLocation);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+
+        onView(withId(R.id.fl__row_conversation__map_image_container)).check(isVisible());
+        onView(withId(R.id.fl__row_conversation__map_image_container)).perform(doubleClick());
+
+        verify(message).like();
+    }
+
+    @Test
+    public void verifyICanLikeEmojiMessage() throws InterruptedException {
+        Message message = createMockMessage(Message.Type.TEXT_EMOJI_ONLY, Message.Status.DELIVERED, false);
+        when(message.isLikedByThisUser()).thenReturn(false);
+        when(message.isLiked()).thenReturn(false);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
+
+        Thread.sleep(400);
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
+        onView(withId(R.id.gtv__footer__like__button)).perform(click());
+
+        verify(message).like();
+    }
+
+    @Test
+    public void verifyICanLikeAudioMessage() throws InterruptedException {
+        Asset mockAsset = mock(Asset.class);
+        when(mockAsset.getStatus()).thenReturn(AssetStatus.DOWNLOAD_DONE);
+        when(mockAsset.getDuration()).thenReturn(Duration.ZERO);
+
+        Message message = createMockMessage(Message.Type.AUDIO_ASSET, Message.Status.DELIVERED, false);
+        when(message.isLikedByThisUser()).thenReturn(false);
+        when(message.isLiked()).thenReturn(false);
+        when(message.getAsset()).thenReturn(mockAsset);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+
+        onView(withId(R.id.tfll__audio_message_container)).check(isVisible());
+        onView(withId(R.id.tfll__audio_message_container)).perform(click());
+
+        Thread.sleep(400);
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
+        onView(withId(R.id.gtv__footer__like__button)).perform(click());
+
+        verify(message).like();
+    }
+
+    @Test
     public void verifyICanLikeMessageThatIsLikedByOthers() {
-        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(true);
 
@@ -104,7 +204,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
     @Test
     public void verifyICanUnlikeMessage() throws InterruptedException {
-        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(true);
 
         MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
@@ -129,22 +229,22 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     public void verifyICannotLikeSystemMessage() {
         MessageViewsContainer messageViewsContainer = ViewControllerMockHelper.getMockMessageViewsContainer(activity);
 
-        Message memberLeaveMessage = createMockMessage(Message.Type.MEMBER_LEAVE, Message.Status.SENT, false);
+        Message memberLeaveMessage = createMockMessage(Message.Type.MEMBER_LEAVE, Message.Status.DELIVERED, false);
         FooterViewController memberLeaveFooterViewController = FooterViewControllerFactory.create(activity, memberLeaveMessage, messageViewsContainer);
         assertTrue(memberLeaveFooterViewController  == null);
 
-        Message memberJoinMessage = createMockMessage(Message.Type.MEMBER_JOIN, Message.Status.SENT, false);
+        Message memberJoinMessage = createMockMessage(Message.Type.MEMBER_JOIN, Message.Status.DELIVERED, false);
         FooterViewController memberJoinFooterViewController = FooterViewControllerFactory.create(activity, memberJoinMessage, messageViewsContainer);
         assertTrue(memberJoinFooterViewController  == null);
 
-        Message connectAcceptedMessage = createMockMessage(Message.Type.CONNECT_ACCEPTED, Message.Status.SENT, false);
+        Message connectAcceptedMessage = createMockMessage(Message.Type.CONNECT_ACCEPTED, Message.Status.DELIVERED, false);
         FooterViewController connectAcceptedFooterViewController = FooterViewControllerFactory.create(activity, connectAcceptedMessage, messageViewsContainer);
         assertTrue(connectAcceptedFooterViewController == null);
     }
 
     @Test
     public void verifyICanSeeIfSomeoneElseLikedMessage() {
-        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(true);
         User likedUser = mock(User.class);
@@ -167,7 +267,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
     @Test
     public void verifyICanSeeThatILikedMessage() {
-        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(true);
         when(message.isLiked()).thenReturn(true);
         User likedUser = mock(User.class);
@@ -190,8 +290,9 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
     @Test
     public void verifyICanTapMessageToRevealLikeButtonIfMessageHasNoLikes() throws InterruptedException {
-        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromOther()).thenReturn(false);
 
         MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
         messageAndSeparatorViewController.setModel(message, createMockSeparator());
@@ -305,7 +406,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     public void verifyLastReceivedMessageShowsTimestampButNotMessageStatusInGroups() throws InterruptedException {
         IConversation conversation = createMockConversation(IConversation.Type.GROUP);
 
-        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
         when(message.getConversation()).thenReturn(conversation);
         when(message.isLiked()).thenReturn(false);
         when(message.isLastMessageFromOther()).thenReturn(true);
@@ -328,7 +429,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     public void verifyReceivedMessageShowsTimestampButNotMessageStatusinGroups() throws InterruptedException {
         IConversation conversation = createMockConversation(IConversation.Type.GROUP);
 
-        Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
         when(message.getConversation()).thenReturn(conversation);
         when(message.isLiked()).thenReturn(false);
         when(message.isLastMessageFromOther()).thenReturn(false);
