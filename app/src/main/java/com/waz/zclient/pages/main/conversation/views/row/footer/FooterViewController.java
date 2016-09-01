@@ -379,15 +379,19 @@ public class FooterViewController implements ConversationItemViewController, Foo
 
 
     @Override
-    public void toggleVisibility() {
+    public boolean toggleVisibility() {
         if (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0) {
             expand();
+            return true;
         } else if (likeButton.getVisibility() == View.GONE) {
             likeButton.setVisibility(View.VISIBLE);
+            return true;
         } else if (message.isLiked()) {
             showTimestampForABit();
+            return true;
         } else {
             collapse();
+            return false;
         }
     }
 

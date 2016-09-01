@@ -114,7 +114,6 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
             case ANY_ASSET:
             case ASSET:
             case AUDIO_ASSET:
-            case KNOCK:
             case LOCATION:
             case TEXT:
             case TEXT_EMOJI_ONLY:

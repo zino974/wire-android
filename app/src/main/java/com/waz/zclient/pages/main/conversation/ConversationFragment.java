@@ -812,10 +812,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 }
                 final ImageView clickedImageView = ViewUtils.getView(messageView,
                                                                      R.id.iv__row_conversation__message_image);
-                final View clickedImageSendingIndicator = ViewUtils.getView(messageView,
-                                                                            R.id.fl__row_conversation__message_error_container);
-                getControllerFactory().getSingleImageController().setViewReferences(clickedImageView,
-                                                                                    clickedImageSendingIndicator);
+                getControllerFactory().getSingleImageController().setViewReferences(clickedImageView);
             }
         }, getResources().getInteger(R.integer.framework_animation_duration_long));
     }

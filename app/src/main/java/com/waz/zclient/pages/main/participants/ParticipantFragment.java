@@ -582,11 +582,8 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
             if (user == null) {
                 return;
             }
-            getControllerFactory().getSingleImageController()
-                                  .setViewReferences(bodyContainer, null);
-
-            getControllerFactory().getSingleImageController()
-                                  .showSingleImage(user);
+            getControllerFactory().getSingleImageController().setViewReferences(bodyContainer);
+            getControllerFactory().getSingleImageController().showSingleImage(user);
         }
     }
 
