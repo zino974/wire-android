@@ -19,13 +19,10 @@ package com.waz.zclient.pages.main.conversation.views.row.message.views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
 import com.waz.api.Message;
 import com.waz.zclient.R;
-import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
@@ -36,25 +33,15 @@ import com.waz.zclient.views.OnDoubleClickListener;
 public class TextMessageViewController extends MessageViewController {
 
     private View view;
-    private TextView textView;
-
-    private final float textSizeRegular;
-    private final float textSizeEmoji;
-
-    private ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
-        @Override
-        public void updated(Message message) {
-            resizeIfEmoji(message);
-            textView.setText(message.getBody());
-        }
-    };
+    private TextMessageLinkTextView textView;
 
     @SuppressLint("InflateParams")
     public TextMessageViewController(Context context, final MessageViewsContainer messageViewContainer) {
         super(context, messageViewContainer);
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.row_conversation_text_message, null);
-        textView = ViewUtils.getView(view, R.id.ltv__row_conversation__message);
+        textView = ViewUtils.getView(view, R.id.tmltv__row_conversation__message);
+        textView.setMessageViewsContainer(messageViewContainer);
         View textContainer = ViewUtils.getView(view, R.id.ll__row_conversation__message_container);
         textContainer.setOnClickListener(new OnDoubleClickListener() {
             @Override
@@ -80,15 +67,13 @@ public class TextMessageViewController extends MessageViewController {
             }
         });
 
-        textSizeRegular = context.getResources().getDimensionPixelSize(R.dimen.wire__text_size__regular);
-        textSizeEmoji = context.getResources().getDimensionPixelSize(R.dimen.wire__text_size__emoji);
-
         afterInit();
     }
 
     @Override
     public void onSetMessage(Separator separator) {
-        messageModelObserver.setAndUpdate(message);
+        textView.setMessage(message);
+        messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(textView);
     }
 
     @Override
@@ -114,16 +99,11 @@ public class TextMessageViewController extends MessageViewController {
 
     @Override
     public void recycle() {
-        messageModelObserver.clear();
-        super.recycle();
-    }
-
-    private void resizeIfEmoji(Message message) {
-        if (message.getMessageType() == Message.Type.TEXT_EMOJI_ONLY) {
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeEmoji);
-        } else {
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeRegular);
+        if (!messageViewsContainer.isTornDown()) {
+            messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(textView);
         }
+        textView.recycle();
+        super.recycle();
     }
 
 }

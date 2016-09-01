@@ -31,16 +31,15 @@
 
     <LinearLayout
         android:id="@+id/ll__row_conversation__message_container"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/content__width"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_weight="1"
-        android:paddingStart="@dimen/content__padding_left"
         android:layout_gravity="center"
+        tools:ignore="UselessParent"
         >
 
-        <com.waz.zclient.ui.text.LinkTextView
-            android:id="@+id/ltv__row_conversation__message"
+        <com.waz.zclient.pages.main.conversation.views.row.message.views.TextMessageLinkTextView
+            android:id="@+id/tmltv__row_conversation__message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:font="@string/wire__typeface__light"

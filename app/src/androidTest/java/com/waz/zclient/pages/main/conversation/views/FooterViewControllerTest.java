@@ -66,8 +66,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.gtv__footer__like__button)).check(isGone());
 
-        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
-        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
 
         Thread.sleep(400);
 
@@ -106,8 +106,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.gtv__footer__like__button)).check(isGone());
 
-        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
-        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
 
         Thread.sleep(400);
 
@@ -192,8 +192,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.gtv__footer__like__button)).check(isGone());
 
-        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
-        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
 
         Thread.sleep(400);
 
@@ -312,8 +312,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         setView(messageAndSeparatorViewController.getView());
 
         onView(withId(R.id.gtv__footer__like__button)).check(isGone());
-        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
-        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
 
         Thread.sleep(400);
 
@@ -376,8 +376,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         onView(withId(R.id.gtv__footer__like__button)).check(isGone());
         onView(withId(R.id.fldl_like_details)).check(isGone());
 
-        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
-        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
 
         Thread.sleep(400);
 
@@ -442,8 +442,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         setView(messageAndSeparatorViewController.getView());
 
-        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
-        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
 
         Thread.sleep(400);
 
@@ -466,8 +466,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         setView(messageAndSeparatorViewController.getView());
 
-        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
-        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
 
         Thread.sleep(400);
 
@@ -489,8 +489,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         setView(messageAndSeparatorViewController.getView());
 
-        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
-        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
 
         Thread.sleep(400);
 
@@ -512,8 +512,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         setView(messageAndSeparatorViewController.getView());
 
-        onView(withId(R.id.ltv__row_conversation__message)).check(isVisible());
-        onView(withId(R.id.ltv__row_conversation__message)).perform(click());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
 
         Thread.sleep(400);
 
