@@ -72,12 +72,13 @@ public class FileMessageViewControllerTest extends ViewTest<MainTestActivity> {
         onView(withId(R.id.aab__row_conversation__action_button)).check(isVisible());
         onView(withText(activity.getString(R.string.glyph__close))).check(isVisible());
         onView(withId(R.id.aab__row_conversation__action_button)).perform(click());
+        Thread.sleep(400);
 
         verify(asset.getUploadProgress()).cancel();
     }
 
     @Test
-    public void verifyRetryUpload() {
+    public void verifyRetryUpload() throws InterruptedException {
         Message message = createMockMessage(Message.Status.FAILED);
         User user = createMockUser();
         Asset asset = createMockAsset(AssetStatus.UPLOAD_IN_PROGRESS);
@@ -96,6 +97,7 @@ public class FileMessageViewControllerTest extends ViewTest<MainTestActivity> {
         onView(withId(R.id.aab__row_conversation__action_button)).check(isVisible());
         onView(withText(activity.getString(R.string.glyph__redo))).check(isVisible());
         onView(withId(R.id.aab__row_conversation__action_button)).perform(click());
+        Thread.sleep(400);
 
         verify(message).retry();
     }

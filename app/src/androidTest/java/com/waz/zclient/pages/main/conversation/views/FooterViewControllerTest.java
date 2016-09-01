@@ -335,7 +335,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         setView(messageAndSeparatorViewController.getView());
 
         onView(withId(R.id.tv__footer__message_status)).check(isInvisible());
-        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+        onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
         onView(withId(R.id.fldl_like_details)).check(isVisible());
     }
 

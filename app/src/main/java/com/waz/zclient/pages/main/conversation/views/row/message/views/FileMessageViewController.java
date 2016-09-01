@@ -45,6 +45,7 @@ import com.waz.zclient.ui.utils.TextViewUtils;
 import com.waz.zclient.utils.AssetUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.AssetActionButton;
+import com.waz.zclient.views.OnDoubleClickListener;
 import timber.log.Timber;
 
 import java.util.Locale;
@@ -82,12 +83,6 @@ public class FileMessageViewController extends MessageViewController implements 
         @Override
         public void updated(Asset asset) {
             Timber.i("Asset %s status %s", asset.getName(), asset.getStatus());
-            actionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onActionButtonClicked();
-                }
-            });
             setProgressDotsVisible(receivingMessage(asset));
             FileMessageViewController.this.asset = asset;
             updateFileStatus();
@@ -159,13 +154,49 @@ public class FileMessageViewController extends MessageViewController implements 
         }
     };
 
+    private final View.OnClickListener actionButtonOnClickListener = new OnDoubleClickListener() {
+        @Override
+        public void onDoubleClick() {
+            if (message.isLikedByThisUser()) {
+                message.unlike();
+            } else {
+                message.like();
+            }
+        }
+
+        @Override
+        public void onSingleClick() {
+            onActionButtonClicked();
+        }
+    };
+
+    private final View.OnClickListener containerOnClickListener = new OnDoubleClickListener() {
+        @Override
+        public void onDoubleClick() {
+            if (message.isLikedByThisUser()) {
+                message.unlike();
+            } else {
+                message.like();
+            }
+        }
+
+        @Override
+        public void onSingleClick() {
+            if (footerActionCallback != null) {
+                footerActionCallback.toggleVisibility();
+            }
+        }
+    };
+
     public FileMessageViewController(Context context, MessageViewsContainer messageViewContainer) {
         super(context, messageViewContainer);
         view = View.inflate(context, R.layout.row_conversation_file, null);
         selectionContainer = ViewUtils.getView(view, R.id.ll__row_conversation__file__message_container);
         selectionContainer.setOnLongClickListener(this);
+        selectionContainer.setOnClickListener(containerOnClickListener);
         progressDotsView = ViewUtils.getView(view, R.id.pdv__row_conversation__file_placeholder_dots);
         actionButton = ViewUtils.getView(view, R.id.aab__row_conversation__action_button);
+        actionButton.setOnClickListener(actionButtonOnClickListener);
         downloadDoneIndicatorView = ViewUtils.getView(view, R.id.gtv__row_conversation__download_done_indicator);
         fileNameTextView = ViewUtils.getView(view, R.id.ttv__row_conversation__file__filename);
         fileInfoTextView = ViewUtils.getView(view, R.id.ttv__row_conversation__file__fileinfo);
