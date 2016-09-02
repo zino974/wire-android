@@ -318,9 +318,9 @@
 
     <dimen name="content__link_preview__image_height">160dp</dimen>
 
-    <dimen name="content__footer__height">40dp</dimen>
+    <dimen name="content__footer__height">24dp</dimen>
     <dimen name="content__footer__hint_arrow_padding">50dp</dimen>
-    <dimen name="content__footer__like_icon__size">28dp</dimen>
+    <dimen name="content__footer__like_icon__size">24dp</dimen>
     <dimen name="content__footer__chathead__size">20dp</dimen>
 
     <dimen name="conversation__header__media__button_size">60dp</dimen>
