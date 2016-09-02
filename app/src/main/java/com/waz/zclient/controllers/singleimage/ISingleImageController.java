@@ -17,7 +17,6 @@
  */
 package com.waz.zclient.controllers.singleimage;
 
-import android.support.annotation.Nullable;
 import android.view.View;
 import com.waz.annotations.Controller;
 import com.waz.api.Message;
@@ -35,15 +34,13 @@ public interface ISingleImageController {
 
     void updateViewReferences();
 
-    void setViewReferences(View imageContainer, @Nullable View loadingIndicatorView);
+    void setViewReferences(View imageContainer);
 
     void setContainerOutOfScreen(boolean containerOutOfScreen);
 
     boolean isContainerOutOfScreen();
 
     View getImageContainer();
-
-    View getLoadingIndicator();
 
     void tearDown();
 

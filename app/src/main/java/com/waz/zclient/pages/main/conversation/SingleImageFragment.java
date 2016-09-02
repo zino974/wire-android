@@ -373,8 +373,6 @@ public abstract class SingleImageFragment extends BaseFragment<SingleImageFragme
                           .withStartAction(new Runnable() {
                               @Override
                               public void run() {
-                                  ViewUtils.fadeOutView(getControllerFactory().getSingleImageController().getLoadingIndicator(),
-                                                        getResources().getInteger(R.integer.framework_animation_duration_short));
                                   getControllerFactory().getSingleImageController().getImageContainer().setVisibility(
                                       View.INVISIBLE);
                               }
@@ -458,8 +456,6 @@ public abstract class SingleImageFragment extends BaseFragment<SingleImageFragme
                                  getControllerFactory().getSingleImageController().getImageContainer().setVisibility(
                                      View.INVISIBLE);
                              }
-                             ViewUtils.fadeInView(getControllerFactory().getSingleImageController().getLoadingIndicator(),
-                                                  getResources().getInteger(R.integer.framework_animation_duration_short));
                          }
                      })
                      .withEndAction(new Runnable() {

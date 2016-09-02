@@ -287,6 +287,7 @@
     <dimen name="content__image__polka_size" tools:ignore="UnusedResources">6dp</dimen>
     <dimen name="content__image__polka_spacing" tools:ignore="UnusedResources">2dp</dimen>
     <dimen name="content__image__progress_size">40dp</dimen>
+    <dimen name="content__image__button_size">40dp</dimen>
     <dimen name="content__image__progress_circle_padding">4dp</dimen>
     <dimen name="content__missed_call__space_between_image_and_text">8dp</dimen>
     <dimen name="cursor__list_view_footer__height">16dp</dimen>

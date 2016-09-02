@@ -39,9 +39,8 @@ public class FooterViewControllerFactory {
             case VIDEO_ASSET:
             case AUDIO_ASSET:
             case ANY_ASSET:
+            case ASSET:
                 return true;
-            case ASSET: // Image
-            case KNOCK: //Ping
             default:
                 return false;
         }
