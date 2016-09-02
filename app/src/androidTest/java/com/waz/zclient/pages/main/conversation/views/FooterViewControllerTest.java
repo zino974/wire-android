@@ -686,6 +686,54 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         onView(withId(R.id.fldl_like_details)).check(isVisible());
     }
 
+    @Test
+    public void verifyICannotLikeFailedMessage() throws InterruptedException {
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.FAILED, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLikedByThisUser()).thenReturn(false);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(true);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
+
+        Thread.sleep(400);
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+    }
+
+    @Test
+    public void verifyICannotLikeSendingMessage() throws InterruptedException {
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.PENDING, true);
+        when(message.getConversation()).thenReturn(conversation);
+        when(message.isLikedByThisUser()).thenReturn(false);
+        when(message.isLiked()).thenReturn(false);
+        when(message.isLastMessageFromSelf()).thenReturn(true);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+        onView(withId(R.id.tmltv__row_conversation__message)).check(isVisible());
+        onView(withId(R.id.tmltv__row_conversation__message)).perform(click());
+
+        Thread.sleep(400);
+
+        onView(withId(R.id.gtv__footer__like__button)).check(isGone());
+    }
+
     /**
      * Sent messages in group conversations
      */
