@@ -290,7 +290,9 @@ public class FooterViewController implements ConversationItemViewController,
         container.setExpandedMessageId(message.getId());
         container.setExpandedView(this);
         view.setVisibility(View.VISIBLE);
-        likeButton.setVisibility(View.VISIBLE);
+        if (shouldShowLikeButton()) {
+            likeButton.setVisibility(View.VISIBLE);
+        }
 
         View parent = (View) view.getParent();
         final int widthSpec;
@@ -436,7 +438,7 @@ public class FooterViewController implements ConversationItemViewController,
         if (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0) {
             expand();
             return true;
-        } else if (likeButton.getVisibility() == View.GONE) {
+        } else if (likeButton.getVisibility() == View.GONE && shouldShowLikeButton()) {
             likeButton.setVisibility(View.VISIBLE);
             return true;
         } else if (message.isLiked()) {
@@ -465,5 +467,11 @@ public class FooterViewController implements ConversationItemViewController,
         if (container != null) {
             container.getControllerFactory().getConversationScreenController().showLikesList(message);
         }
+    }
+
+    private boolean shouldShowLikeButton() {
+        return !(message.getMessageStatus() == Message.Status.FAILED ||
+                 message.getMessageStatus() == Message.Status.FAILED_READ ||
+                 message.getMessageStatus() == Message.Status.PENDING);
     }
 }
