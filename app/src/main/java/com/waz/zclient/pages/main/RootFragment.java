@@ -41,6 +41,7 @@ import com.waz.api.SyncState;
 import com.waz.api.User;
 import com.waz.api.UsersList;
 import com.waz.api.Verification;
+import com.waz.api.Message;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.drawing.DrawingController;
@@ -689,6 +690,11 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
 
     @Override
     public void onHideOtrClient() {
+
+    }
+
+    @Override
+    public void onShowLikesList(Message message) {
 
     }
 

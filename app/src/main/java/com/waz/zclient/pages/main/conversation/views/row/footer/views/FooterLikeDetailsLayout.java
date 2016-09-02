@@ -32,6 +32,8 @@ import com.waz.zclient.views.chathead.ChatheadImageView;
 
 public class FooterLikeDetailsLayout extends LinearLayout {
 
+    private static final int NUM_LIKE_USERS_TO_SHOW_AVATARS = 3;
+
     private User firstUser;
     private User secondUser;
 
@@ -79,7 +81,7 @@ public class FooterLikeDetailsLayout extends LinearLayout {
             @Override
             public void onClick(View v) {
                 if (onClickListener != null) {
-                    onClickListener.onChatheadClick();
+                    onClickListener.onClickedLikersAvatars();
                 }
             }
         });
@@ -98,7 +100,7 @@ public class FooterLikeDetailsLayout extends LinearLayout {
         firstUser = users[users.length - 1];
         secondUser = users.length > 1 ? users[users.length - 2] : null;
 
-        if (users.length > 2) {
+        if (users.length >= NUM_LIKE_USERS_TO_SHOW_AVATARS) {
             hintArrow.setVisibility(INVISIBLE);
             description.setText(getResources().getQuantityString(R.plurals.message_footer__number_of_likes, users.length, users.length));
             chatheadContainer.setVisibility(VISIBLE);
@@ -129,7 +131,7 @@ public class FooterLikeDetailsLayout extends LinearLayout {
     }
 
     public interface OnClickListener {
-        void onChatheadClick();
+        void onClickedLikersAvatars();
     }
 
 }

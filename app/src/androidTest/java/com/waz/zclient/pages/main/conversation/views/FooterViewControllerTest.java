@@ -20,6 +20,7 @@ package com.waz.zclient.pages.main.conversation.views;
 import android.support.test.runner.AndroidJUnit4;
 import com.waz.api.Asset;
 import com.waz.api.AssetStatus;
+import com.waz.api.AccentColor;
 import com.waz.api.IConversation;
 import com.waz.api.Message;
 import com.waz.api.MessageContent;
@@ -34,7 +35,9 @@ import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewCont
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewControllerFactory;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.testutils.ViewTest;
+import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.ZTimeFormatter;
+import com.waz.zclient.views.chathead.ChatheadImageView;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.threeten.bp.DateTimeUtils;
@@ -44,6 +47,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.doubleClick;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.waz.zclient.testutils.CustomViewAssertions.containsText;
 import static com.waz.zclient.testutils.CustomViewAssertions.doesNotContainText;
 import static com.waz.zclient.testutils.CustomViewAssertions.hasText;
@@ -247,9 +251,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(true);
-        User likedUser = mock(User.class);
-        when(likedUser.getId()).thenReturn("456");
-        when(likedUser.getDisplayName()).thenReturn("Barry");
+        User likedUser = createMockUser("Barry", "345");
         User[] likes = {likedUser};
         when(message.getLikes()).thenReturn(likes);
 
@@ -270,9 +272,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(true);
         when(message.isLiked()).thenReturn(true);
-        User likedUser = mock(User.class);
-        when(likedUser.getId()).thenReturn("456");
-        when(likedUser.getDisplayName()).thenReturn("Barry");
+        User likedUser = createMockUser("Barry", "345");
         User[] likes = {likedUser};
         when(message.getLikes()).thenReturn(likes);
 
@@ -341,6 +341,30 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         setView(messageAndSeparatorViewController.getView());
 
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
+    }
+
+    @Test
+    public void verifyICanSeeLikersAvatarsIfMoreThanThreeLikers() {
+        Message message = createMockMessage(Message.Type.TEXT, Message.Status.SENT, false);
+        when(message.isLikedByThisUser()).thenReturn(true);
+        when(message.isLiked()).thenReturn(true);
+
+        User lastLiker = createMockUser("Otto", "345");
+        User secondLastLiker = createMockUser("Susan", "234");
+        User[] likes = {createMockUser("Barry", "456"), createMockUser("Jack", "123"), secondLastLiker, lastLiker};
+        when(message.getLikes()).thenReturn(likes);
+
+        MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
+        messageAndSeparatorViewController.setModel(message, createMockSeparator());
+
+        setView(messageAndSeparatorViewController.getView());
+
+        onView(withId(R.id.ll__like_chathead_container)).check(isVisible());
+        onView(withText(activity.getString(R.string.glyph__more))).check(isVisible());
+        ChatheadImageView lastLikerAvatar =  ViewUtils.getView(activity, R.id.cv__first_like_chathead);
+        assertTrue(lastLikerAvatar.getUser().getId().equals(lastLiker.getId()));
+        ChatheadImageView secondLastLikerAvatar =  ViewUtils.getView(activity, R.id.cv__second_like_chathead);
+        assertTrue(secondLastLikerAvatar.getUser().getId().equals(secondLastLiker.getId()));
     }
 
     /**
@@ -857,6 +881,16 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         when(message.getUser()).thenReturn(mockUser);
 
         return message;
+    }
+
+    private User createMockUser(String name, String id) {
+        User mockUser = mock(User.class);
+        when(mockUser.getId()).thenReturn(id);
+        when(mockUser.getDisplayName()).thenReturn(name);
+        AccentColor mockAccent = mock(AccentColor.class);
+        when(mockAccent.getColor()).thenReturn(3);
+        when(mockUser.getAccent()).thenReturn(mockAccent);
+        return mockUser;
     }
 
     private IConversation createMockConversation(IConversation.Type type) {
