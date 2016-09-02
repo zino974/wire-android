@@ -1048,6 +1048,11 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
 
     }
 
+    @Override
+    public void onShowLikesList(Message message) {
+
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////
     //
     //  ConversationListFragment.Container

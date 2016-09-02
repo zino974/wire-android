@@ -45,7 +45,9 @@ import com.waz.zclient.utils.ZTimeFormatter;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.Instant;
 
-public class FooterViewController implements ConversationItemViewController, FooterActionCallback {
+public class FooterViewController implements ConversationItemViewController,
+                                             FooterLikeDetailsLayout.OnClickListener,
+                                             FooterActionCallback {
 
     private static final int LIKE_HINT_VISIBILITY_MIL_SEC = 3000;
     private static final int TIMESTAMP_VISIBILITY_MIL_SEC = 5000;
@@ -126,6 +128,7 @@ public class FooterViewController implements ConversationItemViewController, Foo
                 toggleLike(true);
             }
         });
+        likeDetails.setOnClickListener(this);
 
         likeButtonColorLiked = ContextCompat.getColor(context, R.color.accent_red);
         likeButtonColorUnliked = ContextCompat.getColor(context, R.color.text__secondary_light);
@@ -457,4 +460,10 @@ public class FooterViewController implements ConversationItemViewController, Foo
         }
     }
 
+    @Override
+    public void onClickedLikersAvatars() {
+        if (container != null) {
+            container.getControllerFactory().getConversationScreenController().showLikesList(message);
+        }
+    }
 }

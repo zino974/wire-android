@@ -111,4 +111,6 @@ public interface IConversationScreenController {
     void setMessageBeingEdited(Message message);
 
     boolean isMessageBeingEdited(Message message);
+
+    void showLikesList(Message message);
 }
