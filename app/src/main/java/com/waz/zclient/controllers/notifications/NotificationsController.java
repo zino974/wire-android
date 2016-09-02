@@ -420,6 +420,15 @@ public class NotificationsController implements INotificationsController {
                 }
                 break;
 
+            case LIKE:
+                header = getDefaultNotificationMessageLineHeader(gcmNotification, multiple, false, singleConversationInBatch, false);
+                if (multiple) {
+                    body = context.getString(R.string.notification__message__group__liked);
+                } else {
+                    body = context.getString(R.string.notification__message__one_to_one__liked);
+                }
+                break;
+
             default:
                 return null;
 
@@ -532,6 +541,7 @@ public class NotificationsController implements INotificationsController {
             case CONNECT_ACCEPTED:
             case CONNECT_REQUEST:
             case RENAME:
+            case LIKE:
                 value = sharedPreferences.getString(context.getString(R.string.pref_options_ringtones_text_key), null);
                 return getSelectedSoundUri(value, R.raw.new_message_gcm);
             case KNOCK:

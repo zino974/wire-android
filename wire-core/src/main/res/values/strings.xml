@@ -647,6 +647,7 @@
     <string name="notification__message__one_to_one__shared_video">Shared a video</string>
     <string name="notification__message__one_to_one__shared_audio">Shared an audio message</string>
     <string name="notification__message__one_to_one__shared_location">Shared a location</string>
+    <string name="notification__message__one_to_one__liked">Liked a message</string>
 
     <!-- %1$s == username, %2$s == conversation -->
     <string name="notification__message__name__prefix__other">%1$s \u0020</string>
@@ -663,6 +664,7 @@
     <string name="notification__message__multiple__accept_request">accepted your connection request</string>
     <string name="notification__message__single__accept_request">Accepted your connection request</string>
     <string name="notification__message__group__default_conversation_name">group conversation</string>
+    <string name="notification__message__group__liked">liked a message</string>
 
     <!-- Others -->
     <string name="app_name">Wire</string>
