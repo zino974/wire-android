@@ -42,6 +42,7 @@
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__tools">\uE134</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__equalizer">\uE135</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__ping">\uE137</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__fullscreen">\uE139</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__profile">\uE142</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__camera">\uE143</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__snap">\uE144</string>

@@ -76,7 +76,7 @@
             android:gravity="center"
             android:background="@drawable/selector__icon_button__background__video_message"
             android:textColor="@color/white"
-            android:text="@string/glyph__flip"
+            android:text="@string/glyph__fullscreen"
             />
 
         <com.waz.zclient.ui.text.GlyphTextView
