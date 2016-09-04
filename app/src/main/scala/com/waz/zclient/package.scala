@@ -17,7 +17,7 @@
  */
 package com.waz
 
-import android.app.{Activity, ActivityManager, Application}
+import android.app.{NotificationManager, Activity, ActivityManager, Application}
 import android.content.{ContentResolver, Context, ContextWrapper}
 import android.media.AudioManager
 import android.os.{Vibrator, PowerManager}
@@ -34,10 +34,11 @@ package object zclient {
     bind [ContentResolver]  to ctx.getContentResolver
 
     //Android services
-    bind [ActivityManager]  to ctx.getSystemService(Context.ACTIVITY_SERVICE).asInstanceOf[ActivityManager]
-    bind [PowerManager]     to ctx.getSystemService(Context.POWER_SERVICE).asInstanceOf[PowerManager]
-    bind [Vibrator]         to ctx.getSystemService(Context.VIBRATOR_SERVICE).asInstanceOf[Vibrator]
-    bind [AudioManager]     to ctx.getSystemService(Context.AUDIO_SERVICE).asInstanceOf[AudioManager]
+    bind [ActivityManager]          to ctx.getSystemService(Context.ACTIVITY_SERVICE).asInstanceOf[ActivityManager]
+    bind [PowerManager]             to ctx.getSystemService(Context.POWER_SERVICE).asInstanceOf[PowerManager]
+    bind [Vibrator]                 to ctx.getSystemService(Context.VIBRATOR_SERVICE).asInstanceOf[Vibrator]
+    bind [AudioManager]             to ctx.getSystemService(Context.AUDIO_SERVICE).asInstanceOf[AudioManager]
+    bind [NotificationManager]      to ctx.getSystemService(Context.NOTIFICATION_SERVICE).asInstanceOf[NotificationManager]
   }
 
   def ContextModule(ctx: WireContext) = new Module {

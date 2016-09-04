@@ -25,6 +25,7 @@ import com.waz.utils.events.{EventContext, Signal, Subscription}
 import com.waz.zclient.calling.controllers.{CallPermissionsController, CurrentCallController, GlobalCallingController}
 import com.waz.zclient.camera.controllers.{AndroidCameraFactory, GlobalCameraController}
 import com.waz.zclient.common.controllers.{PermissionActivity, PermissionsController, PermissionsWrapper}
+import com.waz.zclient.notifications.controllers.NotificationsController
 
 object WireApplication {
   var APP_INSTANCE: WireApplication = _
@@ -35,6 +36,7 @@ object WireApplication {
     bind[GlobalCallingController] to new GlobalCallingController(inject[Context])
     bind[GlobalCameraController] to new GlobalCameraController(inject[Context], new AndroidCameraFactory)(EventContext.Global)
     bind[MediaManagerService] to ZMessaging.currentGlobal.mediaManager
+    bind[NotificationsController] to new NotificationsController(inject[Context])
   }
 
   def services(ctx: WireContext) = new Module {
@@ -61,6 +63,11 @@ class WireApplication extends MultiDexApplication with WireContext with Injectab
   lazy val module: Injector = Global :: AppModule
 
   def contextModule(ctx: WireContext): Injector = controllers(ctx) :: services(ctx) :: ContextModule(ctx)
+
+  override def onCreate(): Unit = {
+    super.onCreate()
+    inject[NotificationsController] //ensure created on app start
+  }
 }
 
 class ZMessagingApiProvider(ctx: WireContext) {

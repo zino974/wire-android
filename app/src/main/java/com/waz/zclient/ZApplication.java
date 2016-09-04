@@ -19,11 +19,15 @@ package com.waz.zclient;
 
 import android.app.Activity;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.localytics.android.Localytics;
 import com.localytics.android.LocalyticsActivityLifecycleCallbacks;
 import com.waz.api.CallingEventsHandler;
+import com.waz.api.GcmNotificationsList;
+import com.waz.api.ImageAsset;
 import com.waz.api.LogLevel;
 import com.waz.api.NotificationsHandler;
 import com.waz.api.TrackingEventsHandler;
@@ -158,7 +162,35 @@ public class ZApplication extends WireApplication implements NotificationsHandle
 
     @Override
     public INotificationsController getNotificationsHandler() {
-        return getControllerFactory().getNotificationsController();
+        return new INotificationsController() {
+
+            @Override
+            public void showImageSavedNotification(@NonNull ImageAsset image, @NonNull Uri uri) {
+
+            }
+
+            @Override
+            public void dismissImageSavedNotification(@Nullable Uri uri) {
+
+            }
+
+            @Override
+            public void tearDown() {
+
+            }
+
+            @Override
+            public void updateGcmNotification(GcmNotificationsList notifications) {
+
+            }
+
+            @Override
+            public void updateOngoingCallNotification(ActiveChannel ongoingCall,
+                                                      ActiveChannel incomingCall,
+                                                      boolean isUiActive) {
+
+            }
+        }; //getControllerFactory().getNotificationsController();
     }
 
     @Override
