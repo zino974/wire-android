@@ -15,19 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient
+package com.waz.zclient.common.controllers
 
 import _root_.com.waz.threading.Threading
 import _root_.com.waz.utils.events.{EventContext, EventStream}
 import android.Manifest.permission
 import android.app.Activity
-import android.content.{Intent, DialogInterface, Context}
 import android.content.pm.PackageManager
+import android.content.{Context, DialogInterface, Intent}
 import android.net.Uri
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.PermissionChecker
 import com.waz.zclient.utils.ViewUtils
+import com.waz.zclient.{ActivityHelper, Injectable, Injector, R}
 
 import scala.concurrent.{Future, Promise}
 

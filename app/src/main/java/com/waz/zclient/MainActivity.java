@@ -50,7 +50,7 @@ import com.waz.api.User;
 import com.waz.api.Verification;
 import com.waz.api.VoiceChannel;
 import com.waz.model.ConvId;
-import com.waz.zclient.calling.CallPermissionsController;
+import com.waz.zclient.calling.controllers.CallPermissionsController;
 import com.waz.zclient.calling.CallingActivity;
 import com.waz.zclient.controllers.accentcolor.AccentColorChangeRequester;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;

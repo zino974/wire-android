@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.camera
+package com.waz.zclient.camera.views
 
 import android.content.Context
 import android.graphics.{Matrix, Rect, SurfaceTexture}
@@ -28,7 +28,10 @@ import com.waz.service.MediaManagerService
 import com.waz.threading.CancellableFuture.CancelException
 import com.waz.threading.Threading
 import com.waz.utils.returning
-import com.waz.zclient.{CameraPermission, PermissionsController, R, ViewHelper}
+import com.waz.zclient.camera._
+import com.waz.zclient.camera.controllers.{PreviewSize, Orientation, GlobalCameraController}
+import com.waz.zclient.common.controllers.{CameraPermission, PermissionsController}
+import com.waz.zclient.{R, ViewHelper}
 import timber.log.Timber
 
 import scala.collection.JavaConverters._

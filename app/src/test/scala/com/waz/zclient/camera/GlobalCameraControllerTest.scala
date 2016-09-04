@@ -27,6 +27,7 @@ import com.waz.testutils.TestUtils.{PrintSignalVals, RichLatch}
 import com.waz.testutils.TestWireContext
 import com.waz.utils.events.EventContext
 import com.waz.zclient.Module
+import com.waz.zclient.camera.controllers._
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

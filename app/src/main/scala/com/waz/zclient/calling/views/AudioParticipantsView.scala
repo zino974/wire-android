@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.calling
+package com.waz.zclient.calling.views
 
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager.HORIZONTAL
@@ -30,9 +30,10 @@ import com.waz.model._
 import com.waz.service.ZMessaging
 import com.waz.threading.Threading
 import com.waz.utils.events.Signal
+import com.waz.zclient.calling.controllers.CurrentCallController
 import com.waz.zclient.ui.text.TypefaceTextView
 import com.waz.zclient.views.calling.CallingGainView
-import com.waz.zclient.views.chathead.ChatheadView
+import com.waz.zclient.common.views.ChatheadView
 import com.waz.zclient.{R, ViewHelper}
 import timber.log.Timber
 

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.views.chathead
+package com.waz.zclient.common.views
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -227,7 +227,7 @@ object ChatheadView {
   private val defaultInitialFontSize = -1;
 }
 
-protected[chathead] class ChatheadController(val setSelectable: Boolean = false,
+protected class ChatheadController(val setSelectable: Boolean = false,
                                              val showBorder: Boolean = true,
                                              val border: Option[Border] = None,
                                              val contactBackgroundColor: ColorVal = ColorVal(Color.GRAY))
@@ -321,4 +321,3 @@ case class Border(val minSizeForLargeBorderWidth: Int, val smallBorderWidth: Int
 }
 
 case class ColorVal(value: Int)
-

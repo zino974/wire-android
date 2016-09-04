@@ -31,7 +31,7 @@ import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewCont
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.TextViewUtils;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.views.chathead.ChatheadView;
+import com.waz.zclient.common.views.ChatheadView;
 
 public class ConnectRequestMessageViewController extends MessageViewController {
 

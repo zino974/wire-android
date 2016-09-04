@@ -27,7 +27,7 @@ import android.widget.TextView;
 import com.waz.api.ImageAsset;
 import com.waz.zclient.R;
 import com.waz.zclient.camera.CameraPreviewObserver;
-import com.waz.zclient.camera.CameraPreviewTextureView;
+import com.waz.zclient.camera.views.CameraPreviewTextureView;
 import com.waz.zclient.camera.FlashMode;
 import com.waz.zclient.utils.ViewUtils;
 

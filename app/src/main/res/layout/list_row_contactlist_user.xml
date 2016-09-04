@@ -28,7 +28,7 @@
               android:paddingEnd="@dimen/people_picker__search_result__row__padding_horizontal"
     >
 
-    <com.waz.zclient.views.chathead.ChatheadView
+    <com.waz.zclient.common.views.ChatheadView
         android:id="@+id/cv__contactlist__user__chathead"
         android:layout_width="@dimen/people_picker__chathead__width"
         android:layout_height="wrap_content"

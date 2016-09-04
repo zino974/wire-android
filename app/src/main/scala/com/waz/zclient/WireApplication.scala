@@ -24,8 +24,9 @@ import android.support.multidex.MultiDexApplication
 import com.waz.api.{NetworkMode, ZMessagingApi, ZMessagingApiFactory}
 import com.waz.service.{MediaManagerService, PreferenceService, ZMessaging}
 import com.waz.utils.events.{EventContext, Signal, Subscription}
-import com.waz.zclient.calling.{CallPermissionsController, CurrentCallController}
-import com.waz.zclient.camera.{AndroidCameraFactory, GlobalCameraController}
+import com.waz.zclient.calling.controllers.{CallPermissionsController, CurrentCallController, GlobalCallingController}
+import com.waz.zclient.camera.controllers.{AndroidCameraFactory, GlobalCameraController}
+import com.waz.zclient.common.controllers.{PermissionActivity, PermissionsController, PermissionsWrapper}
 
 object WireApplication {
   var APP_INSTANCE: WireApplication = _

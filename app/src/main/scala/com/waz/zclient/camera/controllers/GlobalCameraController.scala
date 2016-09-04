@@ -15,8 +15,7 @@
   * You should have received a copy of the GNU General Public License
   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
-package com.waz.zclient.camera
-
+package com.waz.zclient.camera.controllers
 
 import java.util.concurrent.{Executors, ThreadFactory}
 
@@ -32,6 +31,7 @@ import com.waz.threading.{CancellableFuture, Threading}
 import com.waz.utils.RichFuture
 import com.waz.utils.events.{EventContext, Signal}
 import com.waz.zclient.WireContext
+import com.waz.zclient.camera.{CameraFacing, FlashMode}
 import com.waz.zclient.utils.Callback
 import timber.log.Timber
 

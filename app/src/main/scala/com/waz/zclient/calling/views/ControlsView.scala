@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.calling
+package com.waz.zclient.calling.views
 
 import android.animation.{Animator, AnimatorListenerAdapter, AnimatorSet, ValueAnimator}
 import android.content.Context
@@ -38,7 +38,8 @@ import com.waz.service.images.BitmapSignal
 import com.waz.threading.Threading
 import com.waz.utils.NameParts
 import com.waz.utils.events.{EventStream, Signal}
-import com.waz.zclient.ui.animation.interpolators.penner.{Quart, Expo}
+import com.waz.zclient.calling.controllers.{CallPermissionsController, CurrentCallController}
+import com.waz.zclient.ui.animation.interpolators.penner.{Expo, Quart}
 import com.waz.zclient.ui.calling.CallControlButtonView
 import com.waz.zclient.ui.text.TypefaceFactory
 import com.waz.zclient.ui.utils.{ResourceUtils, TypefaceUtils}

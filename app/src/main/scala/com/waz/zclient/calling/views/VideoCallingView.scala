@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.calling
+package com.waz.zclient.calling.views
 
 import java.util.concurrent.TimeUnit
 
@@ -31,6 +31,7 @@ import com.waz.api.VideoSendState
 import com.waz.avs.{VideoPreview, VideoRenderer}
 import com.waz.threading.{CancellableFuture, Threading}
 import com.waz.utils.events.Signal
+import com.waz.zclient.calling.controllers.CurrentCallController
 import com.waz.zclient.ui.calling.{CallControlCameraToggleButtonView, RoundedLayout}
 import com.waz.zclient.utils.ViewUtils
 import com.waz.zclient.{R, ViewHelper}

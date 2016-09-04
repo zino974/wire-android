@@ -15,14 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.calling
+package com.waz.zclient.calling.views
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.{TextView, LinearLayout}
+import android.widget.{LinearLayout, TextView}
 import com.waz.threading.Threading
-import com.waz.zclient.views.chathead.ChatheadView
+import com.waz.zclient.calling.controllers.CurrentCallController
+import com.waz.zclient.common.views.ChatheadView
 import com.waz.zclient.{R, ViewHelper}
 
 class HeaderLayoutAudio(val context: Context, val attrs: AttributeSet, val defStyleAttr: Int) extends LinearLayout(context, attrs, defStyleAttr) with ViewHelper {

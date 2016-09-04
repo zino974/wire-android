@@ -15,15 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient
+package com.waz.zclient.calling.controllers
 
-import android.os.PowerManager
 import _root_.com.waz.api.VoiceChannelState._
 import _root_.com.waz.model.VoiceChannelData
 import _root_.com.waz.service.ZMessaging
 import _root_.com.waz.utils.events.{EventContext, Signal}
+import android.os.PowerManager
 import com.waz.threading.Threading
 import com.waz.zclient.calling.CallingActivity
+import com.waz.zclient.{Injectable, Injector, WireContext}
 
 class GlobalCallingController(cxt: WireContext)(implicit inj: Injector) extends Injectable {
 

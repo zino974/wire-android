@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.views.chathead
+package com.waz.zclient.common.views
 
 import com.waz.api.impl.ContactDetails
 import com.waz.model.NameSource.Nickname

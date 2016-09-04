@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.calling
+package com.waz.zclient.calling.controllers
 
 import _root_.com.waz.zclient.utils.LayoutSpec
 import android.media.AudioManager

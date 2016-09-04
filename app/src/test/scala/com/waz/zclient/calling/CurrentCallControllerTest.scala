@@ -32,7 +32,9 @@ import com.waz.service.call.{FlowManagerService, VoiceChannelContent, VoiceChann
 import com.waz.testutils.TestUtils.{PrintSignalVals, signalTest}
 import com.waz.testutils.{MockZMessaging, TestWireContext}
 import com.waz.utils.events.Signal
-import com.waz.zclient.{GlobalCallingController, Module, PermissionsController, R}
+import com.waz.zclient.calling.controllers.{GlobalCallingController, CurrentCallController}
+import com.waz.zclient.common.controllers.PermissionsController
+import com.waz.zclient.{Module, R}
 import org.junit.runner.RunWith
 import org.junit.{Before, Test}
 import org.mockito.Matchers.{any, anyInt}
