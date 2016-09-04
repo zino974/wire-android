@@ -18,8 +18,6 @@
 package com.waz.zclient
 
 import android.content.Context
-import android.media.AudioManager
-import android.os.{PowerManager, Vibrator}
 import android.support.multidex.MultiDexApplication
 import com.waz.api.{NetworkMode, ZMessagingApi, ZMessagingApiFactory}
 import com.waz.service.{MediaManagerService, PreferenceService, ZMessaging}
@@ -37,11 +35,6 @@ object WireApplication {
     bind[GlobalCallingController] to new GlobalCallingController(inject[Context])
     bind[GlobalCameraController] to new GlobalCameraController(inject[Context], new AndroidCameraFactory)(EventContext.Global)
     bind[MediaManagerService] to ZMessaging.currentGlobal.mediaManager
-
-    //Global android services
-    bind[PowerManager] to inject[Context].getSystemService(Context.POWER_SERVICE).asInstanceOf[PowerManager]
-    bind[Vibrator] to inject[Context].getSystemService(Context.VIBRATOR_SERVICE).asInstanceOf[Vibrator]
-    bind[AudioManager] to inject[Context].getSystemService(Context.AUDIO_SERVICE).asInstanceOf[AudioManager]
   }
 
   def services(ctx: WireContext) = new Module {
@@ -53,7 +46,6 @@ object WireApplication {
   def controllers(implicit ctx: WireContext) = new Module {
     bind[CurrentCallController] to new CurrentCallController()
     bind[CallPermissionsController] to new CallPermissionsController()
-
     bind[PermissionActivity] to ctx.asInstanceOf[PermissionActivity]
     bind[PermissionsController] to new PermissionsController(new PermissionsWrapper)
   }
