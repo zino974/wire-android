@@ -28,7 +28,7 @@ import com.waz.zclient.camera.controllers.{AndroidCameraFactory, GlobalCameraCon
 import com.waz.zclient.common.controllers.{PermissionActivity, PermissionsController, PermissionsWrapper}
 import com.waz.zclient.controllers.{DefaultControllerFactory, IControllerFactory}
 import com.waz.zclient.core.stores.IStoreFactory
-import com.waz.zclient.notifications.controllers.NewNotificationsController
+import com.waz.zclient.notifications.controllers.{CallingNotificationsController, ImageNotificationsController, MessageNotificationsController}
 import com.waz.zclient.utils.{BackendPicker, BuildConfigUtils, Callback}
 
 object WireApplication {
@@ -40,7 +40,11 @@ object WireApplication {
     bind[GlobalCallingController] to new GlobalCallingController(inject[Context])
     bind[GlobalCameraController] to new GlobalCameraController(inject[Context], new AndroidCameraFactory)(EventContext.Global)
     bind[MediaManagerService] to ZMessaging.currentGlobal.mediaManager
-    bind[NewNotificationsController] to new NewNotificationsController(inject[Context])
+
+    //notifications
+    bind[MessageNotificationsController] to new MessageNotificationsController(inject[Context])
+    bind[ImageNotificationsController] to new ImageNotificationsController(inject[Context])
+    bind[CallingNotificationsController] to new CallingNotificationsController(inject[Context])
   }
 
   def services(ctx: WireContext) = new Module {
@@ -87,7 +91,9 @@ class WireApplication extends MultiDexApplication with WireContext with Injectab
       storeFactory.getZMessagingApiStore.getAvs.setLogLevel(BuildConfigUtils.getLogLevelAVS(this))
     }
 
-    inject[NewNotificationsController]
+    inject[MessageNotificationsController]
+    inject[ImageNotificationsController]
+    inject[CallingNotificationsController]
   }
 
   override def onTerminate(): Unit = {

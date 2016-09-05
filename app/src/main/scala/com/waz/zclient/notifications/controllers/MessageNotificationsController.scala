@@ -19,34 +19,35 @@ package com.waz.zclient.notifications.controllers
 
 import android.annotation.TargetApi
 import android.app.{Notification, NotificationManager, PendingIntent}
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.{BitmapDrawable, Drawable}
 import android.graphics.{Bitmap, BitmapFactory, Canvas}
 import android.net.Uri
 import android.os.Build
+import android.support.annotation.RawRes
 import android.support.v4.app.NotificationCompat
 import android.text.style.{ForegroundColorSpan, TextAppearanceSpan}
-import android.text.{SpannableString, Spanned}
+import android.text.{SpannableString, Spanned, TextUtils}
+import com.waz.ZLog.ImplicitTag._
+import com.waz.ZLog.verbose
 import com.waz.api.NotificationsHandler.GcmNotification
 import com.waz.api.NotificationsHandler.GcmNotification.Type._
-import com.waz.model.{AssetId, ImageAssetData}
 import com.waz.service.ZMessaging
-import com.waz.service.assets.AssetService.BitmapRequest.Single
-import com.waz.service.assets.AssetService.BitmapResult
-import com.waz.service.images.BitmapSignal
 import com.waz.service.push.NotificationService.Notification2
 import com.waz.threading.Threading
 import com.waz.utils.events.Signal
 import com.waz.zclient._
+import com.waz.zclient.controllers.userpreferences.UserPreferencesController
 import com.waz.zclient.controllers.vibrator.VibratorController
 import com.waz.zclient.utils.ContextUtils._
 import com.waz.zclient.utils.IntentUtils._
+import com.waz.zclient.utils.RingtoneUtils
 import com.waz.zms.GcmHandlerService
 
-//TODO rename when old class deleted
-class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) extends Injectable {
+class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) extends Injectable {
 
-  import NewNotificationsController._
+  import MessageNotificationsController._
   implicit val eventContext = cxt.eventContext
   implicit val context = cxt
 
@@ -58,9 +59,12 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
 
   val notifications = notsService.flatMap(_.getNotifications2)
 
-  lazy val clearIntent = PendingIntent.getService(cxt, 9730, GcmHandlerService.clearNotificationsIntent(cxt), PendingIntent.FLAG_UPDATE_CURRENT)
+  val sharedPreferences = cxt.getSharedPreferences(UserPreferencesController.USER_PREFS_TAG, Context.MODE_PRIVATE)
 
-  notifications.filter(_.nonEmpty).on(Threading.Ui) { nots =>
+  lazy val clearIntent = PendingIntent.getService(cxt, 9730, PushService.clearNotificationsIntent(cxt), PendingIntent.FLAG_UPDATE_CURRENT)
+
+  notifications.on(Threading.Ui) { nots =>
+    verbose(s"Notifications updated: $nots")
     val notification =
       if (nots.size == 1) {
         getSingleMessageNotification(nots.head)
@@ -71,54 +75,57 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
     notification.priority = Notification.PRIORITY_HIGH
     notification.flags |= Notification.FLAG_AUTO_CANCEL
     notification.deleteIntent = clearIntent
+
+    attachNotificationLed(notification)
+    attachNotificationSound(notification, nots)
+
     notManager.notify(ZETA_MESSAGE_NOTIFICATION_ID, notification)
   }
 
-  val savedImageId = Signal[Option[AssetId]](None)
-  val savedImageUri = Signal[Uri]()
-
-  def showImageSavedNotification(imageId: String, uri: Uri) = Option(imageId).map(AssetId).zip(Option(uri)).foreach {
-    case (id, ur) =>
-      savedImageId ! Some(id)
-      savedImageUri ! uri
+  private def attachNotificationLed(notification: Notification) = {
+    var color = sharedPreferences.getInt(UserPreferencesController.USER_PREFS_LAST_ACCENT_COLOR, -1)
+    if (color == -1) {
+      color = context.getResources.getColor(R.color.accent_default)
+    }
+    notification.ledARGB = color
+    notification.ledOnMS = context.getResources.getInteger(R.integer.notifications__system__led_on)
+    notification.ledOffMS = context.getResources.getInteger(R.integer.notifications__system__led_off)
+    notification.flags |= Notification.FLAG_SHOW_LIGHTS
   }
 
-  def dismissImageSavedNotification(uri: Uri) = {
-    notManager.cancel(ZETA_SAVE_IMAGE_NOTIFICATION_ID)
-    savedImageId ! None
+  private def attachNotificationSound(notification: Notification, ns: Seq[Notification2]) = {
+    val soundSetting = sharedPreferences.getString(context.getString(R.string.pref_options_sounds_key), context.getString(R.string.pref_options_sounds_default))
+    notification.sound =
+      if (context.getString(R.string.pref_sound_value_none) == soundSetting) null
+      else if ((context.getString(R.string.pref_sound_value_some) == soundSetting) && ns.size > 1) null
+      else ns.lastOption.fold(null.asInstanceOf[Uri])(getMessageSoundUri)
   }
 
-  zms.zip(savedImageId).flatMap {
-    case (zms, Some(imageId)) =>
-      zms.assetsStorage.signal(imageId).flatMap {
-        case data: ImageAssetData => BitmapSignal(data, Single(getDimenPx(R.dimen.notification__image_saving__image_width)), zms.imageLoader, zms.imageCache)
-        case _ => Signal.empty[BitmapResult]
-      }
-    case _ => Signal.empty[BitmapResult]
-  }.zip(savedImageUri).on(Threading.Ui) {
-    case (BitmapResult.BitmapLoaded(bitmap, _, _), uri) => showBitmap(bitmap, uri)
-    case (_, uri) => showBitmap(null, uri)
+  private def getMessageSoundUri(n: Notification2): Uri = {
+    n.tpe match {
+      case ASSET |
+           ANY_ASSET |
+           VIDEO_ASSET |
+           AUDIO_ASSET |
+           LOCATION |
+           TEXT |
+           CONNECT_ACCEPTED |
+           CONNECT_REQUEST |
+           RENAME =>
+        getSelectedSoundUri(sharedPreferences.getString(context.getString(R.string.pref_options_ringtones_text_key), null), R.raw.new_message_gcm)
+      case KNOCK =>
+        val value = sharedPreferences.getString(context.getString(R.string.pref_options_ringtones_ping_key), null)
+        if (n.isPing) getSelectedSoundUri(value, R.raw.ping_from_them, R.raw.hotping_from_them)
+        else getSelectedSoundUri(value, R.raw.ping_from_them)
+      case _ => null
+    }
   }
 
-  private def showBitmap(bitmap: Bitmap, uri: Uri): Unit = {
-    val summaryText = getString(R.string.notification__image_saving__content__subtitle)
-    val notificationTitle = getString(R.string.notification__image_saving__content__title)
+  private def getSelectedSoundUri(value: String, @RawRes defaultResId: Int): Uri = getSelectedSoundUri(value, defaultResId, defaultResId)
 
-    val notificationStyle = new NotificationCompat.BigPictureStyle()
-      .bigPicture(bitmap)
-      .setSummaryText(summaryText)
-
-    val notification = new NotificationCompat.Builder(context)
-      .setContentTitle(notificationTitle)
-      .setContentText(summaryText)
-      .setSmallIcon(R.drawable.ic_menu_save_image_gallery)
-      .setLargeIcon(bitmap)
-      .setStyle(notificationStyle)
-      .setContentIntent(getGalleryIntent(cxt, uri))
-      .addAction(R.drawable.ic_menu_share, getString(R.string.notification__image_saving__action__share), getPendingShareIntent(cxt, uri)).setLocalOnly(true).setAutoCancel(true)
-      .build
-
-    notManager.notify(ZETA_SAVE_IMAGE_NOTIFICATION_ID, notification)
+  private def getSelectedSoundUri(value: String, @RawRes preferenceDefault: Int, @RawRes returnDefault: Int): Uri = {
+    if (!TextUtils.isEmpty(value) && !RingtoneUtils.isDefaultValue(context, value, preferenceDefault)) Uri.parse(value)
+    else RingtoneUtils.getUriForRawId(context, returnDefault)
   }
 
   private def getSingleMessageNotification(n: Notification2): Notification = {
@@ -214,7 +221,6 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       case _                      => getHeader()
     }
 
-    //TODO use the ContextUtils getString method when that becomes available on this branch again.
     val body = n.tpe match {
       case TEXT | CONNECT_REQUEST   => message
       case MISSED_CALL              => getString(R.string.notification__message__one_to_one__wanted_to_talk)
@@ -282,7 +288,6 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
   }
 }
 
-object NewNotificationsController {
+object MessageNotificationsController {
   val ZETA_MESSAGE_NOTIFICATION_ID: Int = 1339272
-  val ZETA_SAVE_IMAGE_NOTIFICATION_ID: Int = 1339274
 }

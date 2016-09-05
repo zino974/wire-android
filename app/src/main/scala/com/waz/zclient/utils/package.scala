@@ -63,5 +63,7 @@ package object utils {
     def getResEntryName(resId: Int)(implicit context: Context) = context.getResources.getResourceEntryName(resId)
 
     def getResourceFloat(resId: Int)(implicit context: Context) = ResourceUtils.getResourceFloat(context.getResources, resId)
+
+    def toPx(dp: Int)(implicit context: Context) = (dp * context.getResources.getDisplayMetrics.density).toInt
   }
 }
