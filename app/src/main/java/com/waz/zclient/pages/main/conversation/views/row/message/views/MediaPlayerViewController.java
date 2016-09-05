@@ -42,6 +42,7 @@ import com.waz.zclient.controllers.mediaplayer.DefaultMediaPlayer;
 import com.waz.zclient.controllers.mediaplayer.MediaPlayerState;
 import com.waz.zclient.controllers.streammediaplayer.IStreamMediaPlayerController;
 import com.waz.zclient.controllers.streammediaplayer.StreamMediaPlayerObserver;
+import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
 import com.waz.zclient.core.stores.network.DefaultNetworkAction;
 import com.waz.zclient.core.stores.network.NetworkStoreObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
@@ -441,8 +442,14 @@ public abstract class MediaPlayerViewController extends MessageViewController im
     public void onPlaceholderDoubleTap() {
         if (message.isLikedByThisUser()) {
             message.unlike();
+            messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
+                                                                                                                       message,
+                                                                                                                       ReactedToMessageEvent.Method.DOUBLE_TAP));
         } else {
             message.like();
+            messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
+                                                                                                                     message,
+                                                                                                                     ReactedToMessageEvent.Method.DOUBLE_TAP));
         }
     }
 

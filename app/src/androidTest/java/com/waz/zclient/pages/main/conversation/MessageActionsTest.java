@@ -671,6 +671,7 @@ public class MessageActionsTest extends FragmentTest<MainTestActivity> {
         when(mockMessage.getUser()).thenReturn(mockUser);
         when(mockMessage.isLikedByThisUser()).thenReturn(false);
         when(mockMessage.isLiked()).thenReturn(false);
+        when(mockMessage.getConversation()).thenReturn(mockConversation);
 
         ConversationFragment fragment = ConversationFragment.newInstance();
         attachFragment(fragment, ConversationFragment.TAG);
@@ -701,6 +702,7 @@ public class MessageActionsTest extends FragmentTest<MainTestActivity> {
         when(mockMessage.getUser()).thenReturn(mockUser);
         when(mockMessage.isLikedByThisUser()).thenReturn(true);
         when(mockMessage.isLiked()).thenReturn(false);
+        when(mockMessage.getConversation()).thenReturn(mockConversation);
 
         ConversationFragment fragment = ConversationFragment.newInstance();
         attachFragment(fragment, ConversationFragment.TAG);

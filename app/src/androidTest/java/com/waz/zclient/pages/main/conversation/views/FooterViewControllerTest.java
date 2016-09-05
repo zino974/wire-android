@@ -75,6 +75,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(false);
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+        when(message.getConversation()).thenReturn(conversation);
 
         MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
         messageAndSeparatorViewController.setModel(message, createMockSeparator());
@@ -99,6 +101,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(false);
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+        when(message.getConversation()).thenReturn(conversation);
 
         MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
         messageAndSeparatorViewController.setModel(message, createMockSeparator());
@@ -122,6 +126,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(false);
         when(message.getLocation()).thenReturn(mockLocation);
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+        when(message.getConversation()).thenReturn(conversation);
 
         MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
         messageAndSeparatorViewController.setModel(message, createMockSeparator());
@@ -141,6 +147,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         Message message = createMockMessage(Message.Type.TEXT_EMOJI_ONLY, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(false);
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+        when(message.getConversation()).thenReturn(conversation);
 
         MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
         messageAndSeparatorViewController.setModel(message, createMockSeparator());
@@ -170,6 +178,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(false);
         when(message.getAsset()).thenReturn(mockAsset);
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+        when(message.getConversation()).thenReturn(conversation);
 
         MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
         messageAndSeparatorViewController.setModel(message, createMockSeparator());
@@ -194,6 +204,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(false);
         when(message.isLiked()).thenReturn(true);
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+        when(message.getConversation()).thenReturn(conversation);
 
         MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
         messageAndSeparatorViewController.setModel(message, createMockSeparator());
@@ -210,6 +222,8 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
     public void verifyICanUnlikeMessage() throws InterruptedException {
         Message message = createMockMessage(Message.Type.TEXT, Message.Status.DELIVERED, false);
         when(message.isLikedByThisUser()).thenReturn(true);
+        IConversation conversation = createMockConversation(IConversation.Type.ONE_TO_ONE);
+        when(message.getConversation()).thenReturn(conversation);
 
         MessageAndSeparatorViewController messageAndSeparatorViewController = createMessageAndSeparatorViewController(message);
         messageAndSeparatorViewController.setModel(message, createMockSeparator());

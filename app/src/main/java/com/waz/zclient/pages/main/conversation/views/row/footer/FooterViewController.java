@@ -33,6 +33,7 @@ import android.widget.TextView;
 import com.waz.api.IConversation;
 import com.waz.api.Message;
 import com.waz.zclient.R;
+import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
 import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
@@ -179,10 +180,16 @@ public class FooterViewController implements ConversationItemViewController,
     private void toggleLike(boolean animate) {
         if (message.isLikedByThisUser()) {
             message.unlike();
+            container.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
+                                                                                                           message,
+                                                                                                           ReactedToMessageEvent.Method.BUTTON));
             animateLikeButton = false;
         } else {
             animateLikeButton = animate;
             message.like();
+            container.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
+                                                                                                         message,
+                                                                                                         ReactedToMessageEvent.Method.BUTTON));
             if (!container.getControllerFactory().getUserPreferencesController().hasPerformedAction(IUserPreferencesController.LIKED_MESSAGE)) {
                 container.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
             }

@@ -31,6 +31,7 @@ import com.waz.api.Message;
 import com.waz.api.MessageContent;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
+import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.events.media.OpenedSharedLocationEvent;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
@@ -97,8 +98,14 @@ public class LocationMessageViewController extends MessageViewController impleme
         public void onDoubleClick() {
             if (message.isLikedByThisUser()) {
                 message.unlike();
+                messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
+                                                                                                                           message,
+                                                                                                                           ReactedToMessageEvent.Method.DOUBLE_TAP));
             } else {
                 message.like();
+                messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
+                                                                                                                         message,
+                                                                                                                         ReactedToMessageEvent.Method.DOUBLE_TAP));
             }
         }
 
