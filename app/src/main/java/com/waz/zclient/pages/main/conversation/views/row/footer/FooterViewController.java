@@ -56,6 +56,7 @@ public class FooterViewController implements ConversationItemViewController,
     private final MessageViewsContainer container;
     private View view;
     private TextView likeButton;
+    private TextView likeButtonAnimation;
     private TextView messageStatusTextView;
     private FooterLikeDetailsLayout likeDetails;
 
@@ -65,7 +66,6 @@ public class FooterViewController implements ConversationItemViewController,
     private int likeButtonColorUnliked;
     private Message message;
 
-    private boolean animateLikeButton;
     private boolean isMyLastMessage;
     private final float height;
 
@@ -120,13 +120,15 @@ public class FooterViewController implements ConversationItemViewController,
         mainHandler = new Handler(Looper.getMainLooper());
         view = View.inflate(context, R.layout.row_conversation_footer, null);
         likeButton = ViewUtils.getView(view, R.id.gtv__footer__like__button);
+        likeButtonAnimation = ViewUtils.getView(view, R.id.gtv__footer__like__button_animation);
+        likeButtonAnimation.setVisibility(View.GONE);
         messageStatusTextView = ViewUtils.getView(view, R.id.tv__footer__message_status);
         likeDetails = ViewUtils.getView(view, R.id.fldl_like_details);
 
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleLike(true);
+                toggleLike();
             }
         });
         likeDetails.setOnClickListener(this);
@@ -170,22 +172,20 @@ public class FooterViewController implements ConversationItemViewController,
         mainHandler.removeCallbacksAndMessages(null);
         view.setVisibility(View.GONE);
         likeButton.setVisibility(View.VISIBLE);
+        likeButton.setTag(null);
         messageModelObserver.clear();
         likeDetails.setUsers(null);
         message = null;
-        animateLikeButton = false;
         isMyLastMessage = false;
     }
 
-    private void toggleLike(boolean animate) {
+    private void toggleLike() {
         if (message.isLikedByThisUser()) {
             message.unlike();
             container.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                            message,
                                                                                                            ReactedToMessageEvent.Method.BUTTON));
-            animateLikeButton = false;
         } else {
-            animateLikeButton = animate;
             message.like();
             container.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
                                                                                                          message,
@@ -206,11 +206,8 @@ public class FooterViewController implements ConversationItemViewController,
 
     private void updateLikeButton() {
         boolean likedByThisUser = message.isLikedByThisUser();
-        boolean showLikeAnimation = likedByThisUser &&
-                                    animateLikeButton &&
-                                    likeButton.getTag() != null &&
-                                    !(boolean) likeButton.getTag();
-        animateLikeButton = false;
+        boolean showLikeAnimation = likeButton.getTag() != null &&
+                                    (boolean) likeButton.getTag() != likedByThisUser;
         likeButton.setText(context.getText(likedByThisUser ? R.string.glyph__liked : R.string.glyph__like));
         likeButton.setTextColor(likedByThisUser ? likeButtonColorLiked : likeButtonColorUnliked);
         likeButton.setTag(likedByThisUser);
@@ -218,7 +215,7 @@ public class FooterViewController implements ConversationItemViewController,
             likeButton.setVisibility(View.VISIBLE);
         }
         if (showLikeAnimation) {
-            showLikeAnimation();
+            showLikeAnimation(likedByThisUser);
         }
     }
 
@@ -269,21 +266,37 @@ public class FooterViewController implements ConversationItemViewController,
                                   });
     }
 
-    private void showLikeAnimation() {
+    private void showLikeAnimation(boolean like) {
         final Interpolator interpolator = new AccelerateDecelerateInterpolator();
-        likeButton.animate()
-                  .scaleX(2f)
-                  .scaleY(2f)
-                  .setDuration(100)
+        float startScale;
+        float endScale;
+        float startAlpha;
+        float endAlpha;
+        if (like) {
+            startScale = 2f;
+            endScale = 1f;
+            startAlpha = 0f;
+            endAlpha = 1f;
+        } else {
+            startScale = 1f;
+            endScale = 2f;
+            startAlpha = 1f;
+            endAlpha = 0f;
+        }
+        likeButtonAnimation.setScaleX(startScale);
+        likeButtonAnimation.setScaleY(startScale);
+        likeButtonAnimation.setAlpha(startAlpha);
+        likeButtonAnimation.setVisibility(View.VISIBLE);
+        likeButtonAnimation.animate()
+                  .scaleX(endScale)
+                  .scaleY(endScale)
+                  .alpha(endAlpha)
+                  .setDuration(250)
                   .setInterpolator(interpolator).withEndAction(new Runnable() {
             @Override
             public void run() {
-                if (likeButton != null) {
-                    likeButton.animate()
-                              .scaleX(1f)
-                              .scaleY(1f)
-                              .setDuration(100)
-                              .setInterpolator(interpolator);
+                if (likeButtonAnimation != null) {
+                    likeButtonAnimation.setVisibility(View.GONE);
                 }
             }
         });
