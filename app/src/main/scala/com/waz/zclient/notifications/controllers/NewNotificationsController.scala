@@ -41,7 +41,7 @@ import com.waz.zms.GcmHandlerService
 //TODO rename when old class deleted
 class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) extends Injectable {
 
-  import NotificationsController._
+  import NewNotificationsController._
   implicit val eventContext = cxt.eventContext
 
   val zms = inject[Signal[Option[ZMessaging]]].collect { case Some(z) => z }
@@ -54,18 +54,18 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
 
   lazy val clearIntent = PendingIntent.getService(cxt, 9730, GcmHandlerService.clearNotificationsIntent(cxt), PendingIntent.FLAG_UPDATE_CURRENT)
 
-  notifications.on(Threading.Ui) { nots =>
-    val n =
+  notifications.filter(_.nonEmpty).on(Threading.Ui) { nots =>
+    val notification =
       if (nots.size == 1) {
         getSingleMessageNotification(nots.head)
       } else {
         getMultipleMessagesNotification(nots)
       }
 
-    n.priority = Notification.PRIORITY_HIGH
-    n.flags |= Notification.FLAG_AUTO_CANCEL
-    n.deleteIntent = clearIntent
-    notManager.notify(ZETA_MESSAGE_NOTIFICATION_ID, n)
+    notification.priority = Notification.PRIORITY_HIGH
+    notification.flags |= Notification.FLAG_AUTO_CANCEL
+    notification.deleteIntent = clearIntent
+    notManager.notify(ZETA_MESSAGE_NOTIFICATION_ID, notification)
   }
 
   private def getSingleMessageNotification(n: Notification2): Notification = {
@@ -91,7 +91,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       .setPriority(NotificationCompat.PRIORITY_HIGH)
 
 
-    if (n.tpe ne GcmNotification.Type.CONNECT_REQUEST) {
+    if (n.tpe != GcmNotification.Type.CONNECT_REQUEST) {
       builder
         .addAction(R.drawable.ic_action_call, cxt.getString(R.string.notification__action__call), IntentUtils.getNotificationCallIntent(cxt, n.convId.str, requestBase + 1))
         .addAction(R.drawable.ic_action_reply, cxt.getString(R.string.notification__action__reply), IntentUtils.getNotificationReplyIntent(cxt, n.convId.str, requestBase + 2))
@@ -109,19 +109,18 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
     val users = ns.map(_.userName).toSet
 
     val isSingleConv = convIds.size == 1
-    val items = ns.map(n => getMessage(n, multiple = true, singleConversationInBatch = isSingleConv, singleUserInBatch = users.size == 1)).reverse
 
     val (convDesc, headerRes) =
       if (isSingleConv) {
-        if (ns.head.isGroupConv) (ns.head.convName, R.plurals.notification__new_messages_groups)
-        else (ns.head.userName, R.plurals.notification__new_messages)
+        if (ns.head.isGroupConv) (ns.head.convName.getOrElse(""), R.plurals.notification__new_messages_groups)
+        else (ns.head.userName.getOrElse(""), R.plurals.notification__new_messages)
       }
-      else (String.valueOf(convIds.size), R.plurals.notification__new_messages__multiple)
+      else (convIds.size.toString, R.plurals.notification__new_messages__multiple)
 
-    val title = cxt.getResources.getQuantityString(headerRes, ns.size, ns.size, convDesc)
+    val title = cxt.getResources.getQuantityString(headerRes, ns.size, ns.size.toString, convDesc)
 
-    val inboxStyle = new NotificationCompat.InboxStyle
-    inboxStyle.setBigContentTitle(title)
+    val inboxStyle = new NotificationCompat.InboxStyle()
+      .setBigContentTitle(title)
 
     val builder = new NotificationCompat.Builder(cxt)
       .setSmallIcon(R.drawable.ic_menu_logo)
@@ -144,15 +143,14 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
     }
     else builder.setContentIntent(IntentUtils.getNotificationAppLaunchIntent(cxt))
 
-    items.take(5).foreach { line =>
-      builder.setContentText(line)
-      inboxStyle.addLine(line)
-    }
+    val messages = ns.map(n => getMessage(n, multiple = true, singleConversationInBatch = isSingleConv, singleUserInBatch = users.size == 1)).takeRight(5)
+    builder.setContentText(messages.last) //the collapsed notification should have the last message
+    messages.reverse.foreach(inboxStyle.addLine)//the expanded notification should have the most recent at the top (reversed)
 
     builder.build
   }
 
-  private def getMessage(n: Notification2, multiple: Boolean, singleConversationInBatch: Boolean, singleUserInBatch: Boolean): SpannableString = {
+  private def getMessage(n: Notification2, multiple: Boolean, singleConversationInBatch: Boolean, singleUserInBatch: Boolean) = {
     val message = n.message.replaceAll("\\r\\n|\\r|\\n", " ")
 
     def getHeader(testPrefix: Boolean = false, singleUser: Boolean = false) = getDefaultNotificationMessageLineHeader(n, multiple, textPrefix = testPrefix, singleConversationInBatch = singleConversationInBatch, singleUser = singleUser)
@@ -163,6 +161,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       case _ => getHeader()
     }
 
+    //TODO use the ContextUtils getString method when that becomes available on this branch again.
     val body = n.tpe match {
       case TEXT | CONNECT_REQUEST => message
       case MISSED_CALL => cxt.getString(R.string.notification__message__one_to_one__wanted_to_talk)
@@ -181,7 +180,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
     getMessageSpannable(header, body)
   }
 
-  private def getMessageTitle(n: Notification2): String = {
+  private def getMessageTitle(n: Notification2) = {
     val userName = n.userName.getOrElse("")
     if (n.isGroupConv) {
       val convName = n.convName.filterNot(_.isEmpty).getOrElse(cxt.getString(R.string.notification__message__group__default_conversation_name))
@@ -191,7 +190,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
   }
 
   @TargetApi(21)
-  private def getMessageSpannable(header: String, body: String): SpannableString = {
+  private def getMessageSpannable(header: String, body: String) = {
     val messageSpannable = new SpannableString(header + body)
     val textAppearance =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) android.R.style.TextAppearance_Material_Notification_Title
@@ -212,9 +211,6 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
     else cxt.getString(prefixId, n.userName.getOrElse(""), n.convName.filterNot(_.isEmpty).getOrElse(cxt.getString(R.string.notification__message__group__default_conversation_name)))
   }
 
-  def dismissImageSavedNotification(uri: Uri) = {
-  }
-
   private def getAppIcon: Bitmap = {
     try {
       val icon: Drawable = cxt.getPackageManager.getApplicationIcon(cxt.getPackageName)
@@ -230,13 +226,14 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       }
     }
     catch {
-      case e: PackageManager.NameNotFoundException => {
-        BitmapFactory.decodeResource(cxt.getResources, R.drawable.ic_launcher_wire)
-      }
+      case e: PackageManager.NameNotFoundException => BitmapFactory.decodeResource(cxt.getResources, R.drawable.ic_launcher_wire)
     }
   }
+
+  def dismissImageSavedNotification(uri: Uri) = notManager.cancel(ZETA_SAVE_IMAGE_NOTIFICATION_ID)
 }
 
-object NotificationsController {
+object NewNotificationsController {
   val ZETA_MESSAGE_NOTIFICATION_ID: Int = 1339272
+  val ZETA_SAVE_IMAGE_NOTIFICATION_ID: Int = 1339274
 }

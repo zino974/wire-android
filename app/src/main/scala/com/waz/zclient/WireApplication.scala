@@ -22,10 +22,14 @@ import android.support.multidex.MultiDexApplication
 import com.waz.api.{NetworkMode, ZMessagingApi, ZMessagingApiFactory}
 import com.waz.service.{MediaManagerService, PreferenceService, ZMessaging}
 import com.waz.utils.events.{EventContext, Signal, Subscription}
+import com.waz.zclient.api.scala.ScalaStoreFactory
 import com.waz.zclient.calling.controllers.{CallPermissionsController, CurrentCallController, GlobalCallingController}
 import com.waz.zclient.camera.controllers.{AndroidCameraFactory, GlobalCameraController}
 import com.waz.zclient.common.controllers.{PermissionActivity, PermissionsController, PermissionsWrapper}
-import com.waz.zclient.notifications.controllers.NotificationsController
+import com.waz.zclient.controllers.{DefaultControllerFactory, IControllerFactory}
+import com.waz.zclient.core.stores.IStoreFactory
+import com.waz.zclient.notifications.controllers.NewNotificationsController
+import com.waz.zclient.utils.{BackendPicker, BuildConfigUtils, Callback}
 
 object WireApplication {
   var APP_INSTANCE: WireApplication = _
@@ -36,7 +40,7 @@ object WireApplication {
     bind[GlobalCallingController] to new GlobalCallingController(inject[Context])
     bind[GlobalCameraController] to new GlobalCameraController(inject[Context], new AndroidCameraFactory)(EventContext.Global)
     bind[MediaManagerService] to ZMessaging.currentGlobal.mediaManager
-    bind[NotificationsController] to new NotificationsController(inject[Context])
+    bind[NewNotificationsController] to new NewNotificationsController(inject[Context])
   }
 
   def services(ctx: WireContext) = new Module {
@@ -62,11 +66,36 @@ class WireApplication extends MultiDexApplication with WireContext with Injectab
 
   lazy val module: Injector = Global :: AppModule
 
+  protected var controllerFactory: IControllerFactory = _
+  protected var storeFactory: IStoreFactory = _
+
   def contextModule(ctx: WireContext): Injector = controllers(ctx) :: services(ctx) :: ContextModule(ctx)
 
   override def onCreate(): Unit = {
     super.onCreate()
-    inject[NotificationsController] //ensure created on app start
+    controllerFactory = new DefaultControllerFactory(getApplicationContext)
+
+    new BackendPicker(this).withBackend(new Callback[Void]() {
+      def callback(aVoid: Void) = ensureInitialized()
+    })
+  }
+
+  def ensureInitialized() = {
+    if (storeFactory == null) {
+      storeFactory = new ScalaStoreFactory(getApplicationContext)
+      //TODO initialization of ZMessaging happens here - make this more explicit?
+      storeFactory.getZMessagingApiStore.getAvs.setLogLevel(BuildConfigUtils.getLogLevelAVS(this))
+    }
+
+    inject[NewNotificationsController]
+  }
+
+  override def onTerminate(): Unit = {
+    controllerFactory.tearDown()
+    storeFactory.tearDown()
+    storeFactory = null
+    controllerFactory = null
+    super.onTerminate()
   }
 }
 
