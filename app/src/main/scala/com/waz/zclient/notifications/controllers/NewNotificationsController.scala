@@ -35,7 +35,8 @@ import com.waz.threading.Threading
 import com.waz.utils.events.Signal
 import com.waz.zclient._
 import com.waz.zclient.controllers.vibrator.VibratorController
-import com.waz.zclient.utils.IntentUtils
+import com.waz.zclient.utils.ContextUtils.getString
+import com.waz.zclient.utils.{ContextUtils, IntentUtils}
 import com.waz.zms.GcmHandlerService
 
 //TODO rename when old class deleted
@@ -43,6 +44,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
 
   import NewNotificationsController._
   implicit val eventContext = cxt.eventContext
+  implicit val context = cxt
 
   val zms = inject[Signal[Option[ZMessaging]]].collect { case Some(z) => z }
 
@@ -93,8 +95,8 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
 
     if (n.tpe != GcmNotification.Type.CONNECT_REQUEST) {
       builder
-        .addAction(R.drawable.ic_action_call, cxt.getString(R.string.notification__action__call), IntentUtils.getNotificationCallIntent(cxt, n.convId.str, requestBase + 1))
-        .addAction(R.drawable.ic_action_reply, cxt.getString(R.string.notification__action__reply), IntentUtils.getNotificationReplyIntent(cxt, n.convId.str, requestBase + 2))
+        .addAction(R.drawable.ic_action_call, getString(R.string.notification__action__call), IntentUtils.getNotificationCallIntent(cxt, n.convId.str, requestBase + 1))
+        .addAction(R.drawable.ic_action_reply, getString(R.string.notification__action__reply), IntentUtils.getNotificationReplyIntent(cxt, n.convId.str, requestBase + 2))
     }
 
     if (VibratorController.isEnabledInPreferences(cxt)) {
@@ -138,8 +140,8 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       val conversationId = convIds.head.str
       builder
         .setContentIntent(IntentUtils.getNotificationAppLaunchIntent(cxt, conversationId, requestBase))
-        .addAction(R.drawable.ic_action_call, cxt.getString(R.string.notification__action__call), IntentUtils.getNotificationCallIntent(cxt, conversationId, requestBase + 1))
-        .addAction(R.drawable.ic_action_reply, cxt.getString(R.string.notification__action__reply), IntentUtils.getNotificationReplyIntent(cxt, conversationId, requestBase + 2))
+        .addAction(R.drawable.ic_action_call, getString(R.string.notification__action__call), IntentUtils.getNotificationCallIntent(cxt, conversationId, requestBase + 1))
+        .addAction(R.drawable.ic_action_reply, getString(R.string.notification__action__reply), IntentUtils.getNotificationReplyIntent(cxt, conversationId, requestBase + 2))
     }
     else builder.setContentIntent(IntentUtils.getNotificationAppLaunchIntent(cxt))
 
@@ -157,24 +159,24 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
 
     val header = n.tpe match {
       case TEXT | CONNECT_REQUEST => getHeader(testPrefix = true, singleUser = singleUserInBatch)
-      case CONNECT_ACCEPTED => if (multiple) cxt.getString(R.string.notification__message__name__prefix__other, n.convName) else ""
-      case _ => getHeader()
+      case CONNECT_ACCEPTED       => if (multiple) getString(R.string.notification__message__name__prefix__other, n.convName) else ""
+      case _                      => getHeader()
     }
 
     //TODO use the ContextUtils getString method when that becomes available on this branch again.
     val body = n.tpe match {
-      case TEXT | CONNECT_REQUEST => message
-      case MISSED_CALL => cxt.getString(R.string.notification__message__one_to_one__wanted_to_talk)
-      case KNOCK => if (n.isGroupConv) cxt.getString(R.string.notification__message__group__pinged) else cxt.getString(R.string.notification__message__one_to_one__pinged)
-      case ANY_ASSET => if (n.isGroupConv) cxt.getString(R.string.notification__message__group__shared_file) else cxt.getString(R.string.notification__message__one_to_one__shared_file)
-      case ASSET => if (n.isGroupConv) cxt.getString(R.string.notification__message__group__shared_picture) else cxt.getString(R.string.notification__message__one_to_one__shared_picture)
-      case VIDEO_ASSET => if (n.isGroupConv) cxt.getString(R.string.notification__message__group__shared_video) else cxt.getString(R.string.notification__message__one_to_one__shared_video)
-      case AUDIO_ASSET => if (n.isGroupConv) cxt.getString(R.string.notification__message__group__shared_audio) else cxt.getString(R.string.notification__message__one_to_one__shared_audio)
-      case LOCATION => if (n.isGroupConv) cxt.getString(R.string.notification__message__group__shared_location) else cxt.getString(R.string.notification__message__one_to_one__shared_location)
-      case RENAME => cxt.getString(R.string.notification__message__group__renamed_conversation, message)
-      case MEMBER_LEAVE => cxt.getString(R.string.notification__message__group__remove)
-      case MEMBER_JOIN => cxt.getString(R.string.notification__message__group__add)
-      case CONNECT_ACCEPTED => if (multiple) cxt.getString(R.string.notification__message__multiple__accept_request) else cxt.getString(R.string.notification__message__single__accept_request)
+      case TEXT | CONNECT_REQUEST   => message
+      case MISSED_CALL              => getString(R.string.notification__message__one_to_one__wanted_to_talk)
+      case KNOCK                    => if (n.isGroupConv) getString(R.string.notification__message__group__pinged)          else getString(R.string.notification__message__one_to_one__pinged)
+      case ANY_ASSET                => if (n.isGroupConv) getString(R.string.notification__message__group__shared_file)     else getString(R.string.notification__message__one_to_one__shared_file)
+      case ASSET                    => if (n.isGroupConv) getString(R.string.notification__message__group__shared_picture)  else getString(R.string.notification__message__one_to_one__shared_picture)
+      case VIDEO_ASSET              => if (n.isGroupConv) getString(R.string.notification__message__group__shared_video)    else getString(R.string.notification__message__one_to_one__shared_video)
+      case AUDIO_ASSET              => if (n.isGroupConv) getString(R.string.notification__message__group__shared_audio)    else getString(R.string.notification__message__one_to_one__shared_audio)
+      case LOCATION                 => if (n.isGroupConv) getString(R.string.notification__message__group__shared_location) else getString(R.string.notification__message__one_to_one__shared_location)
+      case RENAME                   => getString(R.string.notification__message__group__renamed_conversation, message)
+      case MEMBER_LEAVE             => getString(R.string.notification__message__group__remove)
+      case MEMBER_JOIN              => getString(R.string.notification__message__group__add)
+      case CONNECT_ACCEPTED         => if (multiple) getString(R.string.notification__message__multiple__accept_request)    else getString(R.string.notification__message__single__accept_request)
       case _ => ""
     }
     getMessageSpannable(header, body)
@@ -183,8 +185,8 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
   private def getMessageTitle(n: Notification2) = {
     val userName = n.userName.getOrElse("")
     if (n.isGroupConv) {
-      val convName = n.convName.filterNot(_.isEmpty).getOrElse(cxt.getString(R.string.notification__message__group__default_conversation_name))
-      cxt.getString(R.string.notification__message__group__prefix__other, userName, convName)
+      val convName = n.convName.filterNot(_.isEmpty).getOrElse(getString(R.string.notification__message__group__default_conversation_name))
+      getString(R.string.notification__message__group__prefix__other, userName, convName)
     }
     else userName
   }
@@ -208,7 +210,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
     else 0
 
     if (prefixId == 0) ""
-    else cxt.getString(prefixId, n.userName.getOrElse(""), n.convName.filterNot(_.isEmpty).getOrElse(cxt.getString(R.string.notification__message__group__default_conversation_name)))
+    else getString(prefixId, n.userName.getOrElse(""), n.convName.filterNot(_.isEmpty).getOrElse(getString(R.string.notification__message__group__default_conversation_name)))
   }
 
   private def getAppIcon: Bitmap = {
