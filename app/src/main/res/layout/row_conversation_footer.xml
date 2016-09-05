@@ -40,6 +40,18 @@
             android:textSize="@dimen/wire__text_size__small"
             />
 
+        <com.waz.zclient.ui.text.GlyphTextView
+            android:id="@+id/gtv__footer__like__button_animation"
+            android:layout_width="@dimen/content__footer__like_icon__size"
+            android:layout_height="@dimen/content__footer__like_icon__size"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="@dimen/chathead__margin"
+            android:gravity="center"
+            android:text="@string/glyph__liked"
+            android:textColor="@color/accent_red"
+            android:textSize="@dimen/wire__text_size__small"
+            />
+
     </FrameLayout>
 
     <com.waz.zclient.pages.main.conversation.views.row.footer.views.FooterLikeDetailsLayout
