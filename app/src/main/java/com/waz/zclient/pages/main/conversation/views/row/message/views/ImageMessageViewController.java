@@ -33,6 +33,7 @@ import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.drawing.IDrawingController;
 import com.waz.zclient.controllers.singleimage.ISingleImageController;
+import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
@@ -67,8 +68,14 @@ public class ImageMessageViewController extends MessageViewController implements
         public void onDoubleClick() {
             if (message.isLikedByThisUser()) {
                 message.unlike();
+                messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
+                                                                                                                           message,
+                                                                                                                           ReactedToMessageEvent.Method.DOUBLE_TAP));
             } else {
                 message.like();
+                messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
+                                                                                                                         message,
+                                                                                                                         ReactedToMessageEvent.Method.DOUBLE_TAP));
             }
         }
 
@@ -220,7 +227,7 @@ public class ImageMessageViewController extends MessageViewController implements
                                 }
                             }
                         });
- 
+
                         previewLoadingIndicator.setVisibility(View.GONE);
                         previewLoadingIndicator.hide();
                     }

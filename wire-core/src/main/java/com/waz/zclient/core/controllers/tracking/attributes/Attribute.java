@@ -55,6 +55,7 @@ public enum Attribute {
     CALLING_APP_IS_ACTIVE("app_is_active"),
     WITH_OTTO("with_otto"),
     WITH_BOT("with_bot"),
+    IS_LAST_MESSAGE("is_last_message"),
 
     FILE_SIZE_BYTES("file_size_bytes"),
 

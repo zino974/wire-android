@@ -107,6 +107,7 @@ import com.waz.zclient.controllers.tracking.events.conversation.DeletedMessageEv
 import com.waz.zclient.controllers.tracking.events.conversation.EditedMessageEvent;
 import com.waz.zclient.controllers.tracking.events.conversation.ForwardedMessageEvent;
 import com.waz.zclient.controllers.tracking.events.conversation.OpenedMessageActionEvent;
+import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
 import com.waz.zclient.controllers.tracking.events.navigation.OpenedMoreActionsEvent;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
@@ -401,8 +402,14 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 case UNLIKE:
                     if (message.isLikedByThisUser()) {
                         message.unlike();
+                        getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
+                                                                                                             message,
+                                                                                                             ReactedToMessageEvent.Method.MENU));
                     } else {
                         message.like();
+                        getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
+                                                                                                             message,
+                                                                                                             ReactedToMessageEvent.Method.MENU));
                     }
                     break;
 
