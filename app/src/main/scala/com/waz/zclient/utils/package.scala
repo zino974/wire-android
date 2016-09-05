@@ -18,6 +18,8 @@
 package com.waz.zclient
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.view.View
 import android.view.View._
 import com.waz.zclient.ui.utils.ResourceUtils
@@ -49,6 +51,8 @@ package object utils {
 
     def getStringOrEmpty(resId: Int)(implicit context: Context): String = if (resId > 0) getString(resId) else ""
     def getStringOrEmpty(resId: Int, args: String*)(implicit context: Context): String = if (resId > 0) getString(resId, args:_*) else ""
+
+    def getQuantityString(resId: Int, quantity: Int, args: String*)(implicit context: Context): String = context.getResources.getQuantityString(resId, quantity, args:_*)
 
     def getDimenPx(resId: Int)(implicit context: Context) = context.getResources.getDimensionPixelSize(resId)
     def getDimen(resId: Int)(implicit context: Context) = context.getResources.getDimension(resId)

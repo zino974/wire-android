@@ -30,6 +30,7 @@ import com.waz.zclient.LaunchActivity;
 import com.waz.zclient.MainActivity;
 import com.waz.zclient.PopupActivity;
 import com.waz.zclient.R;
+import com.waz.zclient.controllers.notifications.ShareSavedImageActivity;
 import hugo.weaving.DebugLog;
 
 import java.io.UnsupportedEncodingException;
@@ -226,6 +227,22 @@ public class IntentUtils {
         intent.putExtra(EXTRA_LAUNCH_FROM_NOTIFICATION, true);
         intent.putExtra(EXTRA_LAUNCH_CONVERSATION_ID, conversationId);
         return PendingIntent.getActivity(context, requestCode, intent, 0);
+    }
+
+    public static PendingIntent getGalleryIntent(Context context, Uri uri) {
+        // TODO: AN-2276 - Replace with ShareCompat.IntentBuilder
+        Intent galleryIntent = new Intent(Intent.ACTION_VIEW);
+        galleryIntent.setDataAndTypeAndNormalize(uri, "image/*");
+        galleryIntent.setClipData(new ClipData(null, new String[] {"image/*"}, new ClipData.Item(uri)));
+        galleryIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        return PendingIntent.getActivity(context, 0, galleryIntent, 0);
+    }
+
+    public static PendingIntent getPendingShareIntent(Context context, Uri uri) {
+        Intent shareIntent = new Intent(context, ShareSavedImageActivity.class);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.putExtra(IntentUtils.EXTRA_LAUNCH_FROM_SAVE_IMAGE_NOTIFICATION, true);
+        return PendingIntent.getActivity(context, 0, shareIntent, 0);
     }
 
     public static Intent getDebugReportIntent(Context context, Uri fileUri) {

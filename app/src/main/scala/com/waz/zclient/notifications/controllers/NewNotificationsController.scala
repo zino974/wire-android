@@ -29,14 +29,18 @@ import android.text.style.{ForegroundColorSpan, TextAppearanceSpan}
 import android.text.{SpannableString, Spanned}
 import com.waz.api.NotificationsHandler.GcmNotification
 import com.waz.api.NotificationsHandler.GcmNotification.Type._
+import com.waz.model.{AssetId, ImageAssetData}
 import com.waz.service.ZMessaging
+import com.waz.service.assets.AssetService.BitmapRequest.Single
+import com.waz.service.assets.AssetService.BitmapResult
+import com.waz.service.images.BitmapSignal
 import com.waz.service.push.NotificationService.Notification2
 import com.waz.threading.Threading
 import com.waz.utils.events.Signal
 import com.waz.zclient._
 import com.waz.zclient.controllers.vibrator.VibratorController
-import com.waz.zclient.utils.ContextUtils.getString
-import com.waz.zclient.utils.{ContextUtils, IntentUtils}
+import com.waz.zclient.utils.ContextUtils._
+import com.waz.zclient.utils.IntentUtils._
 import com.waz.zms.GcmHandlerService
 
 //TODO rename when old class deleted
@@ -70,6 +74,53 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
     notManager.notify(ZETA_MESSAGE_NOTIFICATION_ID, notification)
   }
 
+  val savedImageId = Signal[Option[AssetId]](None)
+  val savedImageUri = Signal[Uri]()
+
+  def showImageSavedNotification(imageId: String, uri: Uri) = Option(imageId).map(AssetId).zip(Option(uri)).foreach {
+    case (id, ur) =>
+      savedImageId ! Some(id)
+      savedImageUri ! uri
+  }
+
+  def dismissImageSavedNotification(uri: Uri) = {
+    notManager.cancel(ZETA_SAVE_IMAGE_NOTIFICATION_ID)
+    savedImageId ! None
+  }
+
+  zms.zip(savedImageId).flatMap {
+    case (zms, Some(imageId)) =>
+      zms.assetsStorage.signal(imageId).flatMap {
+        case data: ImageAssetData => BitmapSignal(data, Single(getDimenPx(R.dimen.notification__image_saving__image_width)), zms.imageLoader, zms.imageCache)
+        case _ => Signal.empty[BitmapResult]
+      }
+    case _ => Signal.empty[BitmapResult]
+  }.zip(savedImageUri).on(Threading.Ui) {
+    case (BitmapResult.BitmapLoaded(bitmap, _, _), uri) => showBitmap(bitmap, uri)
+    case (_, uri) => showBitmap(null, uri)
+  }
+
+  private def showBitmap(bitmap: Bitmap, uri: Uri): Unit = {
+    val summaryText = getString(R.string.notification__image_saving__content__subtitle)
+    val notificationTitle = getString(R.string.notification__image_saving__content__title)
+
+    val notificationStyle = new NotificationCompat.BigPictureStyle()
+      .bigPicture(bitmap)
+      .setSummaryText(summaryText)
+
+    val notification = new NotificationCompat.Builder(context)
+      .setContentTitle(notificationTitle)
+      .setContentText(summaryText)
+      .setSmallIcon(R.drawable.ic_menu_save_image_gallery)
+      .setLargeIcon(bitmap)
+      .setStyle(notificationStyle)
+      .setContentIntent(getGalleryIntent(cxt, uri))
+      .addAction(R.drawable.ic_menu_share, getString(R.string.notification__image_saving__action__share), getPendingShareIntent(cxt, uri)).setLocalOnly(true).setAutoCancel(true)
+      .build
+
+    notManager.notify(ZETA_SAVE_IMAGE_NOTIFICATION_ID, notification)
+  }
+
   private def getSingleMessageNotification(n: Notification2): Notification = {
 
     val spannableString = getMessage(n, multiple = false, singleConversationInBatch = true, singleUserInBatch = true)
@@ -87,7 +138,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       .setLargeIcon(getAppIcon)
       .setContentTitle(title)
       .setContentText(spannableString)
-      .setContentIntent(IntentUtils.getNotificationAppLaunchIntent(cxt, n.convId.str, requestBase))
+      .setContentIntent(getNotificationAppLaunchIntent(cxt, n.convId.str, requestBase))
       .setStyle(bigTextStyle)
       .setCategory(NotificationCompat.CATEGORY_MESSAGE)
       .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -95,8 +146,8 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
 
     if (n.tpe != GcmNotification.Type.CONNECT_REQUEST) {
       builder
-        .addAction(R.drawable.ic_action_call, getString(R.string.notification__action__call), IntentUtils.getNotificationCallIntent(cxt, n.convId.str, requestBase + 1))
-        .addAction(R.drawable.ic_action_reply, getString(R.string.notification__action__reply), IntentUtils.getNotificationReplyIntent(cxt, n.convId.str, requestBase + 2))
+        .addAction(R.drawable.ic_action_call, getString(R.string.notification__action__call), getNotificationCallIntent(cxt, n.convId.str, requestBase + 1))
+        .addAction(R.drawable.ic_action_reply, getString(R.string.notification__action__reply), getNotificationReplyIntent(cxt, n.convId.str, requestBase + 2))
     }
 
     if (VibratorController.isEnabledInPreferences(cxt)) {
@@ -119,7 +170,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       }
       else (convIds.size.toString, R.plurals.notification__new_messages__multiple)
 
-    val title = cxt.getResources.getQuantityString(headerRes, ns.size, ns.size.toString, convDesc)
+    val title = getQuantityString(headerRes, ns.size, ns.size.toString, convDesc)
 
     val inboxStyle = new NotificationCompat.InboxStyle()
       .setBigContentTitle(title)
@@ -139,11 +190,11 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       val requestBase = System.currentTimeMillis.toInt
       val conversationId = convIds.head.str
       builder
-        .setContentIntent(IntentUtils.getNotificationAppLaunchIntent(cxt, conversationId, requestBase))
-        .addAction(R.drawable.ic_action_call, getString(R.string.notification__action__call), IntentUtils.getNotificationCallIntent(cxt, conversationId, requestBase + 1))
-        .addAction(R.drawable.ic_action_reply, getString(R.string.notification__action__reply), IntentUtils.getNotificationReplyIntent(cxt, conversationId, requestBase + 2))
+        .setContentIntent(getNotificationAppLaunchIntent(cxt, conversationId, requestBase))
+        .addAction(R.drawable.ic_action_call, getString(R.string.notification__action__call), getNotificationCallIntent(cxt, conversationId, requestBase + 1))
+        .addAction(R.drawable.ic_action_reply, getString(R.string.notification__action__reply), getNotificationReplyIntent(cxt, conversationId, requestBase + 2))
     }
-    else builder.setContentIntent(IntentUtils.getNotificationAppLaunchIntent(cxt))
+    else builder.setContentIntent(getNotificationAppLaunchIntent(cxt))
 
     val messages = ns.map(n => getMessage(n, multiple = true, singleConversationInBatch = isSingleConv, singleUserInBatch = users.size == 1)).takeRight(5)
     builder.setContentText(messages.last) //the collapsed notification should have the last message
@@ -159,7 +210,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
 
     val header = n.tpe match {
       case TEXT | CONNECT_REQUEST => getHeader(testPrefix = true, singleUser = singleUserInBatch)
-      case CONNECT_ACCEPTED       => if (multiple) getString(R.string.notification__message__name__prefix__other, n.convName) else ""
+      case CONNECT_ACCEPTED       => if (multiple) getString(R.string.notification__message__name__prefix__other, n.convName.getOrElse("")) else ""
       case _                      => getHeader()
     }
 
@@ -208,9 +259,7 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       else 0
     }
     else 0
-
-    if (prefixId == 0) ""
-    else getString(prefixId, n.userName.getOrElse(""), n.convName.filterNot(_.isEmpty).getOrElse(getString(R.string.notification__message__group__default_conversation_name)))
+    getStringOrEmpty(prefixId, n.userName.getOrElse(""), n.convName.filterNot(_.isEmpty).getOrElse(getString(R.string.notification__message__group__default_conversation_name)))
   }
 
   private def getAppIcon: Bitmap = {
@@ -231,8 +280,6 @@ class NewNotificationsController(cxt: WireContext)(implicit inj: Injector) exten
       case e: PackageManager.NameNotFoundException => BitmapFactory.decodeResource(cxt.getResources, R.drawable.ic_launcher_wire)
     }
   }
-
-  def dismissImageSavedNotification(uri: Uri) = notManager.cancel(ZETA_SAVE_IMAGE_NOTIFICATION_ID)
 }
 
 object NewNotificationsController {
