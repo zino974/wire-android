@@ -26,6 +26,7 @@ import android.view.View;
 import com.waz.api.Asset;
 import com.waz.api.Message;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
+import com.waz.zclient.pages.main.conversation.views.row.footer.FooterActionCallback;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 
 import static com.waz.api.AssetStatus.META_DATA_SENT;
@@ -39,6 +40,7 @@ public abstract class MessageViewController implements ConversationItemViewContr
     protected Context context;
     protected Message message;
     protected MessageViewsContainer messageViewsContainer;
+    protected FooterActionCallback footerActionCallback;
 
     public MessageViewController(Context context, MessageViewsContainer messageViewsContainer) {
         this.context = context;
@@ -48,6 +50,11 @@ public abstract class MessageViewController implements ConversationItemViewContr
     protected void afterInit() {}
 
     protected void onHeaderClick() {}
+
+    @CallSuper
+    protected void setFooterActionCallback(FooterActionCallback footerActionCallback) {
+        this.footerActionCallback = footerActionCallback;
+    }
 
     /**
      * Set the model to be displayed. The UI setup logic for each message type goes here.

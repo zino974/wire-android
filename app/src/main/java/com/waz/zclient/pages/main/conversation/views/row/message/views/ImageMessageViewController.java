@@ -24,35 +24,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.api.UpdateListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
+import com.waz.zclient.controllers.drawing.IDrawingController;
 import com.waz.zclient.controllers.singleimage.ISingleImageController;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
-import com.waz.zclient.pages.main.conversation.views.row.message.RetryMessageViewController;
+import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
-import com.waz.zclient.ui.theme.ThemeUtils;
-import com.waz.zclient.ui.views.FilledCircularBackgroundDrawable;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.LoadingIndicatorView;
+import com.waz.zclient.views.OnDoubleClickListener;
 import timber.log.Timber;
 
-public class ImageMessageViewController extends RetryMessageViewController implements View.OnClickListener,
-                                                                                      AccentColorObserver {
+public class ImageMessageViewController extends MessageViewController implements AccentColorObserver {
 
     private static final String FULL_IMAGE_LOADED = "FULL_IMAGE_LOADED";
 
     private View view;
-    private FrameLayout errorViewContainer;
     private FrameLayout imageContainer;
     private ImageView gifImageView;
     private ImageView polkadotView;
     private ImageAsset imageAsset;
     private TextView textViewChangeSetting;
+    private TextView sketchButton;
+    private TextView singleImageButton;
     private View wifiContainer;
     private LoadingIndicatorView previewLoadingIndicator;
     private UpdateListener imageAssetUpdateListener;
@@ -61,26 +62,55 @@ public class ImageMessageViewController extends RetryMessageViewController imple
     private int paddingLeft;
     private int paddingRight;
 
+    private final View.OnClickListener containerOnClickListener = new OnDoubleClickListener() {
+        @Override
+        public void onDoubleClick() {
+            if (message.isLikedByThisUser()) {
+                message.unlike();
+            } else {
+                message.like();
+            }
+        }
+
+        @Override
+        public void onSingleClick() {
+            if (footerActionCallback != null) {
+                int visibility = footerActionCallback.toggleVisibility() ? View.VISIBLE : View.GONE;
+                singleImageButton.setVisibility(visibility);
+                sketchButton.setVisibility(visibility);
+            }
+        }
+    };
+
     @SuppressLint("InflateParams")
     public ImageMessageViewController(Context context, MessageViewsContainer messageViewContainer) {
         super(context, messageViewContainer);
         view = View.inflate(context, R.layout.row_conversation_image, null);
         imageContainer = ViewUtils.getView(view, R.id.fl__row_conversation__message_image_container);
-        imageContainer.setOnClickListener(this);
+        imageContainer.setOnClickListener(containerOnClickListener);
         imageContainer.setOnLongClickListener(this);
         gifImageView = ViewUtils.getView(view, R.id.iv__row_conversation__message_image);
         polkadotView = ViewUtils.getView(view, R.id.iv__row_conversation__message_polkadots);
-        errorViewContainer = ViewUtils.getView(view, R.id.fl__row_conversation__message_error_container);
         previewLoadingIndicator = ViewUtils.getView(view, R.id.lbv__row_conversation__message_polkadots);
         textViewChangeSetting = ViewUtils.getView(view, R.id.ttv__conversation_row__image__change_settings);
         wifiContainer = ViewUtils.getView(view, R.id.ll__conversation_row__image__wifi_warning);
         wifiContainer.setVisibility(View.GONE);
-        TextView unsentView = ViewUtils.getView(view, R.id.v__row_conversation__error);
-        final int circleFillColor = ThemeUtils.isDarkTheme(context) ? context.getResources().getColor(R.color.content__image__progress_circle_background_dark)
-                                                                    : context.getResources().getColor(R.color.content__image__progress_circle_background_light);
-        final int circleRadius = context.getResources().getDimensionPixelSize(R.dimen.content__message__unsend_indicator_background_radius);
-        final int circleDiameter = 2 * circleRadius;
-        unsentView.setBackground(new FilledCircularBackgroundDrawable(circleFillColor, circleDiameter));
+        singleImageButton = ViewUtils.getView(view, R.id.gtv__row_conversation__image_fullscreen);
+        singleImageButton.setVisibility(View.GONE);
+        singleImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSingleImageView();
+            }
+        });
+        sketchButton = ViewUtils.getView(view, R.id.gtv__row_conversation__image_sketch);
+        sketchButton.setVisibility(View.GONE);
+        sketchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSketchOnImageView();
+            }
+        });
 
         previewLoadingIndicator.setColor(messageViewContainer.getControllerFactory().getAccentColorController().getColor());
         previewLoadingIndicator.setType(LoadingIndicatorView.INFINITE_LOADING_BAR);
@@ -94,7 +124,6 @@ public class ImageMessageViewController extends RetryMessageViewController imple
 
     @Override
     public void onSetMessage(Separator separator) {
-        super.onSetMessage(separator);
         wifiContainer.setVisibility(View.GONE);
         gifImageView.setTag(message.getId());
         imageAsset = message.getImage();
@@ -121,8 +150,8 @@ public class ImageMessageViewController extends RetryMessageViewController imple
             } else {
                 ViewUtils.setPaddingLeft(imageContainer, paddingLeft);
                 ViewUtils.setPaddingRight(imageContainer, paddingRight);
-                imageContainer.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                                                                            FrameLayout.LayoutParams.MATCH_PARENT));
+                imageContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                                                             LinearLayout.LayoutParams.MATCH_PARENT));
             }
         }
 
@@ -275,10 +304,10 @@ public class ImageMessageViewController extends RetryMessageViewController imple
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
-        errorViewContainer.clearAnimation();
-        errorViewContainer.setVisibility(View.VISIBLE);
         gifImageView.animate().cancel();
         polkadotView.animate().cancel();
+        singleImageButton.setVisibility(View.GONE);
+        sketchButton.setVisibility(View.GONE);
         gifImageView.setVisibility(View.INVISIBLE);
         gifImageView.setImageDrawable(null);
         previewLoadingIndicator.hide();
@@ -306,19 +335,19 @@ public class ImageMessageViewController extends RetryMessageViewController imple
         }
     }
 
-    @Override
-    public void onClick(View v) {
+    public void showSingleImageView() {
         boolean fullImageLoaded = view != null && ImageMessageViewController.FULL_IMAGE_LOADED.equals(view.getTag());
         if (!fullImageLoaded) {
             return;
         }
-        View clickedImageSendingIndicator = errorViewContainer;
-        if (clickedImageSendingIndicator != null && clickedImageSendingIndicator.getVisibility() == View.GONE) {
-            clickedImageSendingIndicator = null;
-        }
         final ISingleImageController singleImageController = messageViewsContainer.getControllerFactory().getSingleImageController();
-        singleImageController.setViewReferences(gifImageView, clickedImageSendingIndicator);
+        singleImageController.setViewReferences(gifImageView);
         singleImageController.showSingleImage(message);
+    }
+
+    public void showSketchOnImageView() {
+        messageViewsContainer.getControllerFactory().getDrawingController().showDrawing(message.getImage(),
+                                                                  IDrawingController.DrawingDestination.SINGLE_IMAGE_VIEW);
     }
 
 }

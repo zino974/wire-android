@@ -47,13 +47,13 @@ import com.waz.zclient.utils.AssetUtils;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.GlyphProgressView;
+import com.waz.zclient.views.OnDoubleClickListener;
 import timber.log.Timber;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class VideoMessageViewController extends MessageViewController implements View.OnClickListener,
-                                                                                 ImageAsset.BitmapCallback,
+public class VideoMessageViewController extends MessageViewController implements ImageAsset.BitmapCallback,
                                                                                  AccentColorObserver {
 
     private static final String INFO_DIVIDER = " · ";
@@ -125,21 +125,47 @@ public class VideoMessageViewController extends MessageViewController implements
         }
     };
 
+    private final OnDoubleClickListener imageOnDoubleClickListener = new OnDoubleClickListener() {
+        @Override
+        public void onDoubleClick() {
+            if (message.isLikedByThisUser()) {
+                message.unlike();
+            } else {
+                message.like();
+            }
+        }
+
+        @Override
+        public void onSingleClick() {
+            if (footerActionCallback != null) {
+                footerActionCallback.toggleVisibility();
+            }
+        }
+    };
+
+    private final View.OnClickListener actionButtinOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            onActionClick();
+        }
+    };
+
     public VideoMessageViewController(Context context, MessageViewsContainer messageViewContainer) {
         super(context, messageViewContainer);
         view = View.inflate(context, R.layout.row_conversation_video_message, null);
 
         previewImage = ViewUtils.getView(view, R.id.biv__row_conversation__video_image);
+        previewImage.setOnClickListener(imageOnDoubleClickListener);
+        previewImage.setOnLongClickListener(this);
         actionButton = ViewUtils.getView(view, R.id.gpv__row_conversation__video_button);
         placeHolderDots = ViewUtils.getView(view, R.id.pdv__row_conversation__video_placeholder_dots);
         videoInfoText = ViewUtils.getView(view, R.id.ttv__row_conversation__video_info);
         videoPreviewContainer = ViewUtils.getView(view, R.id.fl__video_message_container);
-        videoPreviewContainer.setOnLongClickListener(this);
 
         normalButtonBackground = context.getResources().getDrawable(R.drawable.selector__icon_button__background__video_message);
         errorButtonBackground = context.getResources().getDrawable(R.drawable.selector__icon_button__background__video_message__error);
 
-        actionButton.setOnClickListener(this);
+        actionButton.setOnClickListener(actionButtinOnClickListener);
         actionButton.setProgressColor(messageViewsContainer.getControllerFactory().getAccentColorController().getColor());
         actionButton.setBackground(normalButtonBackground);
     }
@@ -261,8 +287,6 @@ public class VideoMessageViewController extends MessageViewController implements
         }
     }
 
-
-
     private void updateViews(String action, Drawable background, ProgressIndicator progressIndicator) {
         placeHolderDots.setVisibility(GONE);
         actionButton.setVisibility(VISIBLE);
@@ -285,8 +309,7 @@ public class VideoMessageViewController extends MessageViewController implements
     }
 
 
-    @Override
-    public void onClick(View v) {
+    private void onActionClick() {
         switch (asset.getStatus()) {
             case UPLOAD_FAILED:
                 if (message.getMessageStatus() != Message.Status.SENT) {
@@ -376,7 +399,6 @@ public class VideoMessageViewController extends MessageViewController implements
         layoutParams.width = displayWidth;
         layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
         videoPreviewContainer.setLayoutParams(layoutParams);
-
     }
 
     @Override

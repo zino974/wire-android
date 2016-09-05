@@ -24,30 +24,56 @@ import android.view.View;
 import com.waz.api.Message;
 import com.waz.zclient.R;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
-import com.waz.zclient.pages.main.conversation.views.row.message.RetryMessageViewController;
+import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.ViewUtils;
+import com.waz.zclient.views.OnDoubleClickListener;
 
-public class TextMessageViewController extends RetryMessageViewController {
+public class TextMessageViewController extends MessageViewController {
 
     private View view;
-    private TextMessageWithTimestamp textWithTimestamp;
+    private TextMessageLinkTextView textView;
 
     @SuppressLint("InflateParams")
     public TextMessageViewController(Context context, final MessageViewsContainer messageViewContainer) {
         super(context, messageViewContainer);
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.row_conversation_text_message, null);
-        textWithTimestamp = ViewUtils.getView(view, R.id.tmwt__message_and_timestamp);
-        textWithTimestamp.setMessageViewsContainer(messageViewContainer);
+        textView = ViewUtils.getView(view, R.id.tmltv__row_conversation__message);
+        textView.setMessageViewsContainer(messageViewContainer);
+        View textContainer = ViewUtils.getView(view, R.id.ll__row_conversation__message_container);
+        textContainer.setOnClickListener(new OnDoubleClickListener() {
+            @Override
+            public void onDoubleClick() {
+                if (message.isLikedByThisUser()) {
+                    message.unlike();
+                } else {
+                    message.like();
+                }
+            }
+            @Override
+            public void onSingleClick() {
+                if (footerActionCallback != null) {
+                    footerActionCallback.toggleVisibility();
+                }
+            }
+        });
+        textContainer.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                messageViewContainer.onItemLongClick(message);
+                return true;
+            }
+        });
+
         afterInit();
     }
 
     @Override
     public void onSetMessage(Separator separator) {
-        super.onSetMessage(separator);
-        textWithTimestamp.setMessage(message);
+        textView.setMessage(message);
+        messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(textView);
     }
 
     @Override
@@ -56,13 +82,13 @@ public class TextMessageViewController extends RetryMessageViewController {
         float opacity = messageViewsContainer.getControllerFactory().getConversationScreenController().isMessageBeingEdited(message) ?
                         ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay) :
                         1f;
-        textWithTimestamp.setAlpha(opacity);
+        textView.setAlpha(opacity);
     }
 
     @Override
     protected void onHeaderClick() {
-        if (message.getMessageType() == Message.Type.RECALLED) {
-            textWithTimestamp.toggleTimestamp();
+        if (message.getMessageType() == Message.Type.RECALLED && footerActionCallback != null) {
+            footerActionCallback.toggleVisibility();
         }
     }
 
@@ -73,7 +99,11 @@ public class TextMessageViewController extends RetryMessageViewController {
 
     @Override
     public void recycle() {
-        textWithTimestamp.recycle();
+        if (!messageViewsContainer.isTornDown()) {
+            messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(textView);
+        }
+        textView.recycle();
         super.recycle();
     }
+
 }

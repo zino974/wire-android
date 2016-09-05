@@ -35,7 +35,7 @@ import com.waz.zclient.R;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.media.PlayedYouTubeMessageEvent;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
-import com.waz.zclient.pages.main.conversation.views.row.message.RetryMessageViewController;
+import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.text.GlyphTextView;
 import com.waz.zclient.ui.text.TypefaceTextView;
@@ -43,15 +43,16 @@ import com.waz.zclient.ui.utils.ColorUtils;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.MessageUtils;
 import com.waz.zclient.utils.ViewUtils;
+import com.waz.zclient.views.OnDoubleClickListener;
 
 import java.util.List;
 
-public class YouTubeMessageViewController extends RetryMessageViewController implements View.OnClickListener,
+public class YouTubeMessageViewController extends MessageViewController implements View.OnClickListener,
                                                                                         ImageAsset.BitmapCallback {
 
     private View view;
     private ImageView imageView;
-    private TextMessageWithTimestamp textWithTimestamp;
+    private TextMessageLinkTextView textMessageLinkTextView;
     private GlyphTextView glyphTextView;
     private TypefaceTextView errorTextView;
     private TypefaceTextView titleTextView;
@@ -74,18 +75,39 @@ public class YouTubeMessageViewController extends RetryMessageViewController imp
         }
     };
 
+    private final OnDoubleClickListener onDoubleClickListener = new OnDoubleClickListener() {
+        @Override
+        public void onDoubleClick() {
+            if (message.isLikedByThisUser()) {
+                message.unlike();
+            } else {
+                message.like();
+            }
+        }
+
+        @Override
+        public void onSingleClick() {
+            if (footerActionCallback != null) {
+                footerActionCallback.toggleVisibility();
+            }
+        }
+    };
+
     @SuppressLint("InflateParams")
     public YouTubeMessageViewController(Context context, MessageViewsContainer messageViewsContainer) {
         super(context, messageViewsContainer);
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.row_conversation_youtube, null);
-        textWithTimestamp = ViewUtils.getView(view, R.id.tmwt__message_and_timestamp);
-        textWithTimestamp.setMessageViewsContainer(messageViewsContainer);
+        textMessageLinkTextView = ViewUtils.getView(view, R.id.tmltv__row_conversation__message);
+        textMessageLinkTextView.setMessageViewsContainer(messageViewsContainer);
+        textMessageLinkTextView.setOnClickListener(onDoubleClickListener);
+        textMessageLinkTextView.setOnLongClickListener(this);
         imageView = ViewUtils.getView(view, R.id.iv__row_conversation__youtube_image);
-        imageView.setOnClickListener(this);
+        imageView.setOnClickListener(onDoubleClickListener);
         imageView.setOnLongClickListener(this);
         errorTextView = ViewUtils.getView(view, R.id.ttv__youtube_message__error);
         glyphTextView = ViewUtils.getView(view, R.id.gtv__youtube_message__play);
+        glyphTextView.setOnClickListener(this);
         titleTextView = ViewUtils.getView(view, R.id.ttv__youtube_message__title);
 
         alphaOverlay = ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay);
@@ -97,8 +119,8 @@ public class YouTubeMessageViewController extends RetryMessageViewController imp
 
     @Override
     protected void onSetMessage(Separator separator) {
-        super.onSetMessage(separator);
-        textWithTimestamp.setMessage(message);
+        textMessageLinkTextView.setMessage(message);
+        messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(textMessageLinkTextView);
         updated();
     }
 
@@ -108,12 +130,10 @@ public class YouTubeMessageViewController extends RetryMessageViewController imp
         float opacity = messageViewsContainer.getControllerFactory().getConversationScreenController().isMessageBeingEdited(message) ?
                         ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay) :
                         1f;
-        textWithTimestamp.setAlpha(opacity);
+        textMessageLinkTextView.setAlpha(opacity);
     }
 
-    @Override
     public void updated() {
-        super.updated();
         if (imageAsset != null) {
             imageAsset.removeUpdateListener(imageAssetUpdateListener);
             imageAsset = null;
@@ -142,6 +162,9 @@ public class YouTubeMessageViewController extends RetryMessageViewController imp
 
     @Override
     public void recycle() {
+        if (!messageViewsContainer.isTornDown()) {
+            messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(textMessageLinkTextView);
+        }
         if (loadHandle != null) {
             loadHandle.cancel();
         }
@@ -150,7 +173,7 @@ public class YouTubeMessageViewController extends RetryMessageViewController imp
             imageAsset = null;
         }
         mediaAsset = null;
-        textWithTimestamp.recycle();
+        textMessageLinkTextView.recycle();
         imageView.setImageDrawable(null);
         glyphTextView.setText(context.getString(R.string.glyph__play));
         errorTextView.setVisibility(View.GONE);

@@ -34,6 +34,7 @@ import com.waz.api.SyncState;
 import com.waz.api.User;
 import com.waz.api.UsersList;
 import com.waz.api.Verification;
+import com.waz.api.Message;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.drawing.DrawingController;
@@ -72,6 +73,7 @@ import java.util.List;
 
 public class ConversationManagerFragment extends BaseFragment<ConversationManagerFragment.Container> implements ConversationFragment.Container,
                                                                                                                 ParticipantFragment.Container,
+                                                                                                                LikesListFragment.Container,
                                                                                                                 OnBackPressedListener,
                                                                                                                 ConversationScreenControllerObserver,
                                                                                                                 DrawingObserver,
@@ -184,6 +186,11 @@ public class ConversationManagerFragment extends BaseFragment<ConversationManage
 
         if (fragment instanceof PickUserFragment) {
             getControllerFactory().getPickUserController().hidePickUser(getCurrentPickerDestination(), true);
+            return true;
+        }
+
+        if (fragment instanceof LikesListFragment) {
+            getChildFragmentManager().popBackStack(LikesListFragment.TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             return true;
         }
 
@@ -310,6 +317,21 @@ public class ConversationManagerFragment extends BaseFragment<ConversationManage
 
     }
 
+    @Override
+    public void onShowLikesList(Message message) {
+        getChildFragmentManager()
+            .beginTransaction()
+            .setCustomAnimations(R.anim.slide_in_from_bottom_pick_user,
+                                 R.anim.open_new_conversation__thread_list_out,
+                                 R.anim.open_new_conversation__thread_list_in,
+                                 R.anim.slide_out_to_bottom_pick_user)
+            .replace(R.id.fl__conversation_manager__message_list_container,
+                     LikesListFragment.newInstance(message),
+                     LikesListFragment.TAG)
+            .addToBackStack(LikesListFragment.TAG)
+            .commit();
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////
     //
     //  ConversationStoreObserver
@@ -341,6 +363,8 @@ public class ConversationManagerFragment extends BaseFragment<ConversationManage
             }
 
             getControllerFactory().getConversationScreenController().hideParticipants(false, (conversationChangerSender == ConversationChangeRequester.START_CONVERSATION));
+
+            closeLikesList();
         }
         if (toConversation != null) {
             getStoreFactory().getParticipantsStore().setCurrentConversation(toConversation);
@@ -643,6 +667,14 @@ public class ConversationManagerFragment extends BaseFragment<ConversationManage
         getControllerFactory().getNavigationController().setRightPage(Page.MESSAGE_STREAM, TAG);
         getStoreFactory().getInAppNotificationStore().setUserSendingPicture(false);
         getChildFragmentManager().popBackStack(LocationFragment.TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    @Override
+    public void closeLikesList() {
+        Fragment fragment = getChildFragmentManager().findFragmentById(R.id.fl__conversation_manager__message_list_container);
+        if (fragment instanceof LikesListFragment) {
+            getChildFragmentManager().popBackStack(LikesListFragment.TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
     }
 
     public interface Container {

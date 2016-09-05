@@ -647,6 +647,7 @@
     <string name="notification__message__one_to_one__shared_video">Shared a video</string>
     <string name="notification__message__one_to_one__shared_audio">Shared an audio message</string>
     <string name="notification__message__one_to_one__shared_location">Shared a location</string>
+    <string name="notification__message__one_to_one__liked">Liked a message</string>
 
     <!-- %1$s == username, %2$s == conversation -->
     <string name="notification__message__name__prefix__other">%1$s \u0020</string>
@@ -663,6 +664,7 @@
     <string name="notification__message__multiple__accept_request">accepted your connection request</string>
     <string name="notification__message__single__accept_request">Accepted your connection request</string>
     <string name="notification__message__group__default_conversation_name">group conversation</string>
+    <string name="notification__message__group__liked">liked a message</string>
 
     <!-- Others -->
     <string name="app_name">Wire</string>
@@ -992,7 +994,23 @@
     <string name="message_bottom_menu_action_forward">Forward</string>
     <string name="message_bottom_menu_action_copy">Copy</string>
     <string name="message_bottom_menu_action_edit">Edit</string>
+    <string name="message_bottom_menu_action_like">Like</string>
+    <string name="message_bottom_menu_action_unlike">Unlike</string>
     <string name="message_bottom_menu_action_delete_local">Delete for me</string>
     <string name="message_bottom_menu_action_delete_global">Delete for everyone</string>
+    <string name="likes_list__header">Liked by</string>
+
+    <string name="message_footer__tap_to_like">Tap to like</string>
+    <plurals name="message_footer__number_of_likes">
+        <item quantity="few">%1$d people</item>
+        <item quantity="many">%1$d people</item>
+        <item quantity="other">%1$d people</item>
+    </plurals>
+    <string name="message_footer__status__sending">Sending…</string>
+    <string name="message_footer__status__sent">%1$s \u30FB Sent</string>
+    <string name="message_footer__status__delivered">%1$s \u30FB Delivered</string>
+    <string name="message_footer__status__failed">Sending failed. _Resend_</string>
+    <string name="message_footer__status__deleted">%1$s \u30FB Deleted</string>
+
 
 </resources>

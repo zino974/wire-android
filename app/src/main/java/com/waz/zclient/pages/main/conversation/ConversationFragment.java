@@ -132,6 +132,7 @@ import com.waz.zclient.pages.extendedcursor.image.CursorImagesLayout;
 import com.waz.zclient.pages.extendedcursor.image.ImagePreviewLayout;
 import com.waz.zclient.pages.extendedcursor.voicefilter.VoiceFilterLayout;
 import com.waz.zclient.pages.main.calling.enums.VoiceBarAppearance;
+import com.waz.zclient.pages.main.conversation.views.ExpandableView;
 import com.waz.zclient.pages.main.conversation.views.MessageBottomSheetDialog;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.TypingIndicatorView;
@@ -141,7 +142,6 @@ import com.waz.zclient.pages.main.conversation.views.listview.ConversationScroll
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.message.views.ImageMessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.message.views.MediaPlayerViewController;
-import com.waz.zclient.pages.main.conversation.views.row.message.views.TextMessageWithTimestamp;
 import com.waz.zclient.pages.main.conversation.views.row.message.views.YouTubeMessageViewController;
 import com.waz.zclient.pages.main.conversationlist.ConversationListAnimation;
 import com.waz.zclient.pages.main.conversationpager.controller.SlidingPaneObserver;
@@ -171,10 +171,8 @@ import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ConversationFragment extends BaseFragment<ConversationFragment.Container> implements ConversationStoreObserver,
                                                                                                   CallingObserver,
@@ -206,7 +204,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                                                                   ExtendedCursorContainer.Callback {
     public static final String TAG = ConversationFragment.class.getName();
     private static final String SAVED_STATE_PREVIEW = "SAVED_STATE_PREVIEW";
-    private static final int REQUEST_FILE_CODE = 9412;
     private static final int REQUEST_VIDEO_CAPTURE = 911;
     private static final int CAMERA_PERMISSION_REQUEST_ID = 21;
     private static final int BOTTOM_MENU_DISPLAY_DELAY_MS = 200;
@@ -234,8 +231,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     private FrameLayout invisibleFooter;
 
     private IConversation.Type toConversationType;
-    private Set<String> timestampShown;
-    private TextMessageWithTimestamp shownTimestampView;
+    private String expandedMessageId;
+    private ExpandableView currentExpandableView;
     private String lastPingMessageId;
     private String lastHotPingMessageId;
     private Toolbar toolbar;
@@ -399,6 +396,14 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 case FORWARD:
                     forwardMessage(message);
                     getControllerFactory().getTrackingController().tagEvent(OpenedMessageActionEvent.forward(message.getMessageType().name()));
+                    break;
+                case LIKE:
+                case UNLIKE:
+                    if (message.isLikedByThisUser()) {
+                        message.unlike();
+                    } else {
+                        message.like();
+                    }
                     break;
 
                 default:
@@ -589,8 +594,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         // Only show Giphy button when text field has input
         cursorLayout.enableGiphyButton(false);
 
-        timestampShown = new HashSet<>();
-
         typingListener = new UpdateListener() {
             @Override
             public void updated() {
@@ -747,10 +750,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public void onDestroyView() {
-        timestampShown.clear();
         containerPreview = null;
-        timestampShown = null;
-        shownTimestampView = null;
         listView = null;
         messageAdapter = null;
         cursorLayout.tearDown();
@@ -812,10 +812,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 }
                 final ImageView clickedImageView = ViewUtils.getView(messageView,
                                                                      R.id.iv__row_conversation__message_image);
-                final View clickedImageSendingIndicator = ViewUtils.getView(messageView,
-                                                                            R.id.fl__row_conversation__message_error_container);
-                getControllerFactory().getSingleImageController().setViewReferences(clickedImageView,
-                                                                                    clickedImageSendingIndicator);
+                getControllerFactory().getSingleImageController().setViewReferences(clickedImageView);
             }
         }, getResources().getInteger(R.integer.framework_animation_duration_long));
     }
@@ -1319,11 +1316,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     //////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public Set<String> getTimestampShownSet() {
-        return timestampShown;
-    }
-
-    @Override
     public int getUnreadMessageCount() {
         return messageStreamManager.getUnreadMessageCount();
     }
@@ -1334,13 +1326,23 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     @Override
-    public void setShownTimestampView(TextMessageWithTimestamp shownTimestampView) {
-        this.shownTimestampView = shownTimestampView;
+    public void setExpandedMessageId(String messageId) {
+        expandedMessageId = messageId;
     }
 
     @Override
-    public TextMessageWithTimestamp getShownTimestampView() {
-        return shownTimestampView;
+    public String getExpandedMessageId() {
+        return expandedMessageId;
+    }
+
+    @Override
+    public void setExpandedView(ExpandableView expandedView) {
+        currentExpandableView = expandedView;
+    }
+
+    @Override
+    public ExpandableView getExpandedView() {
+        return currentExpandableView;
     }
 
     @Override
@@ -1415,7 +1417,14 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 }
             }, BOTTOM_MENU_DISPLAY_DELAY_MS);
         } else {
-            new MessageBottomSheetDialog(getContext(), message, isMemberOfConversation, messageBottomSheetDialogCallback).show();
+            messageBottomSheetDialog = new MessageBottomSheetDialog(getContext(), message, isMemberOfConversation, messageBottomSheetDialogCallback);
+            messageBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    messageBottomSheetDialog = null;
+                }
+            });
+            messageBottomSheetDialog.show();
         }
         return true;
     }
@@ -1444,10 +1453,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     private boolean inSplitPortraitMode() {
         return LayoutSpec.isTablet(getActivity()) && ViewUtils.isInPortrait(getActivity()) && getControllerFactory().getNavigationController().getPagerPosition() == 0;
-    }
-
-    private void enablePager(boolean enable) {
-        getControllerFactory().getNavigationController().setPagerEnabled(enable);
     }
 
     @Override
@@ -1514,7 +1519,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     @Override
-    public void dismissOnboardingHint(OnBoardingHintType requestedType) {
+    public void dismissOnBoardingHint(OnBoardingHintType requestedType) {
 
     }
 
@@ -2194,7 +2199,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public void openIntent(Intent intent, AssetIntentsManager.IntentType intentType) {
-        if (intent.getAction() == MediaStore.ACTION_VIDEO_CAPTURE &&
+        if (MediaStore.ACTION_VIDEO_CAPTURE.equals(intent.getAction()) &&
             extendedCursorContainer.getType() == ExtendedCursorContainer.Type.IMAGES &&
             extendedCursorContainer.isExpanded()) {
             // Close keyboard camera before requesting external camera for recording video

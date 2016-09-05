@@ -300,4 +300,11 @@ public class ConversationScreenController implements IConversationScreenControll
         }
         return messageBeingEdited.getId().equals(message.getId());
     }
+
+    @Override
+    public void showLikesList(Message message) {
+        for (ConversationScreenControllerObserver observer : conversationScreenControllerObservers) {
+            observer.onShowLikesList(message);
+        }
+    }
 }

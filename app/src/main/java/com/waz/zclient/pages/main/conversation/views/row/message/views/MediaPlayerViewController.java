@@ -45,7 +45,7 @@ import com.waz.zclient.controllers.streammediaplayer.StreamMediaPlayerObserver;
 import com.waz.zclient.core.stores.network.DefaultNetworkAction;
 import com.waz.zclient.core.stores.network.NetworkStoreObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
-import com.waz.zclient.pages.main.conversation.views.row.message.RetryMessageViewController;
+import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.MessageUtils;
@@ -53,13 +53,13 @@ import com.waz.zclient.utils.ThreadUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.media.MediaPlayerView;
 
-public abstract class MediaPlayerViewController extends RetryMessageViewController implements MediaPlayerView.MediaPlayerListener,
-                                                                                              StreamMediaPlayerObserver,
-                                                                                              NetworkStoreObserver,
-                                                                                              AccentColorObserver {
+public abstract class MediaPlayerViewController extends MessageViewController implements MediaPlayerView.MediaPlayerListener,
+                                                                                         StreamMediaPlayerObserver,
+                                                                                         NetworkStoreObserver,
+                                                                                         AccentColorObserver {
 
     private View view;
-    private TextMessageWithTimestamp textWithTimestamp;
+    private TextMessageLinkTextView textMessageLinkTextView;
     protected MediaPlayerView mediaPlayerView;
     private boolean updateProgressEnabled;
     private LoadHandle loadHandle;
@@ -123,8 +123,9 @@ public abstract class MediaPlayerViewController extends RetryMessageViewControll
         updateProgressEnabled = true;
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.row_conversation_media_player, null);
-        textWithTimestamp = ViewUtils.getView(view, R.id.tmwt__message_and_timestamp);
-        textWithTimestamp.setMessageViewsContainer(messageViewsContainer);
+        textMessageLinkTextView = ViewUtils.getView(view, R.id.tmltv__row_conversation__message);
+        textMessageLinkTextView.setMessageViewsContainer(messageViewsContainer);
+        textMessageLinkTextView.setOnLongClickListener(this);
         mediaPlayerView = ViewUtils.getView(view, R.id.mpv__row_conversation__message_media_player);
         mediaPlayerView.setOnLongClickListener(this);
         resetMediaPlayerView(R.string.mediaplayer__artist__placeholder, getSource());
@@ -133,8 +134,7 @@ public abstract class MediaPlayerViewController extends RetryMessageViewControll
 
     @Override
     protected void onSetMessage(Separator separator) {
-        super.onSetMessage(separator);
-        textWithTimestamp.setMessage(message);
+        textMessageLinkTextView.setMessage(message);
         messageViewsContainer.getStoreFactory().getNetworkStore().addNetworkStoreObserver(this);
         getPlayerController().addStreamMediaObserver(this);
         resetMediaPlayerView(R.string.mediaplayer__artist__placeholder, getSource());
@@ -150,12 +150,10 @@ public abstract class MediaPlayerViewController extends RetryMessageViewControll
         float opacity = messageViewsContainer.getControllerFactory().getConversationScreenController().isMessageBeingEdited(message) ?
                         ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay) :
                         1f;
-        textWithTimestamp.setAlpha(opacity);
+        textMessageLinkTextView.setAlpha(opacity);
     }
 
-    @Override
     public void updated() {
-        super.updated();
         final Message.Part mediaPart = MessageUtils.getFirstRichMediaPart(message);
         if (imageAsset != null) {
             imageAsset.removeUpdateListener(imageAssetUpdateListener);
@@ -179,7 +177,7 @@ public abstract class MediaPlayerViewController extends RetryMessageViewControll
     @Override
     public void recycle() {
         unscheduleTimeUpdate();
-        textWithTimestamp.recycle();
+        textMessageLinkTextView.recycle();
         mediaPlayerView.setSeekBarEnabled(false);
         if (getPlayerController() != null) {
             getPlayerController().removeStreamMediaObserver(this);
@@ -439,6 +437,15 @@ public abstract class MediaPlayerViewController extends RetryMessageViewControll
         }
     }
 
+    @Override
+    public void onPlaceholderDoubleTap() {
+        if (message.isLikedByThisUser()) {
+            message.unlike();
+        } else {
+            message.like();
+        }
+    }
+
     @SuppressLint("ResourceAsColor")
     protected void showError() {
         mediaPlayerView.setSeekBarEnabled(false);
@@ -493,6 +500,7 @@ public abstract class MediaPlayerViewController extends RetryMessageViewControll
             return;
         }
         mediaPlayerView.setProgressColor(color);
+        textMessageLinkTextView.onAccentColorHasChanged(sender, color);
     }
 
     protected void openExternal() {

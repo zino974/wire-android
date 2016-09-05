@@ -43,13 +43,13 @@ import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.AssetActionButton;
+import com.waz.zclient.views.OnDoubleClickListener;
 import org.threeten.bp.Duration;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class AudioMessageViewController extends MessageViewController implements View.OnClickListener,
-                                                                                 AccentColorObserver {
+public class AudioMessageViewController extends MessageViewController implements AccentColorObserver {
 
     private View view;
     private AssetActionButton actionButton;
@@ -66,7 +66,7 @@ public class AudioMessageViewController extends MessageViewController implements
         public void updated(Message message) {
             if (asset == null) {
                 asset = message.getAsset();
-                actionButton.setOnClickListener(AudioMessageViewController.this);
+                actionButton.setOnClickListener(actionButtonOnClickListener);
                 assetModelObserver.setAndUpdate(asset);
             }
         }
@@ -101,6 +101,40 @@ public class AudioMessageViewController extends MessageViewController implements
         }
     };
 
+    private final OnDoubleClickListener containerOnClickListener = new OnDoubleClickListener() {
+        @Override
+        public void onDoubleClick() {
+            if (message.isLikedByThisUser()) {
+                message.unlike();
+            } else {
+                message.like();
+            }
+        }
+
+        @Override
+        public void onSingleClick() {
+            if (footerActionCallback != null) {
+                footerActionCallback.toggleVisibility();
+            }
+        }
+    };
+
+    private final View.OnClickListener actionButtonOnClickListener = new OnDoubleClickListener()  {
+        @Override
+        public void onDoubleClick() {
+            if (message.isLikedByThisUser()) {
+                message.unlike();
+            } else {
+                message.like();
+            }
+        }
+
+        @Override
+        public void onSingleClick() {
+            onActionClick();
+        }
+    };
+
     public AudioMessageViewController(Context context, MessageViewsContainer messageViewsContainer) {
         super(context, messageViewsContainer);
         view = View.inflate(context, R.layout.row_conversation_audio_message, null);
@@ -110,6 +144,7 @@ public class AudioMessageViewController extends MessageViewController implements
         audioSeekBar = ViewUtils.getView(view, R.id.sb__audio_progress);
         selectionContainer = ViewUtils.getView(view, R.id.tfll__audio_message_container);
         selectionContainer.setOnLongClickListener(this);
+        selectionContainer.setOnClickListener(containerOnClickListener);
 
         actionButton.setProgressColor(messageViewsContainer.getControllerFactory().getAccentColorController().getColor());
 
@@ -204,8 +239,7 @@ public class AudioMessageViewController extends MessageViewController implements
         drawable.setColorFilter(new LightingColorFilter(0xFF000000, color));
     }
 
-    @Override
-    public void onClick(View v) {
+    public void onActionClick() {
         if (messageViewsContainer == null ||
             messageViewsContainer.isTornDown()) {
             return;
