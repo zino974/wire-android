@@ -109,6 +109,7 @@ import com.waz.zclient.controllers.tracking.events.conversation.ForwardedMessage
 import com.waz.zclient.controllers.tracking.events.conversation.OpenedMessageActionEvent;
 import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
 import com.waz.zclient.controllers.tracking.events.navigation.OpenedMoreActionsEvent;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.filetransfer.SelectedTooLargeFileEvent;
@@ -407,6 +408,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                                                                              ReactedToMessageEvent.Method.MENU));
                     } else {
                         message.like();
+                        getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
                         getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
                                                                                                              message,
                                                                                                              ReactedToMessageEvent.Method.MENU));

@@ -92,6 +92,9 @@ public abstract class MessageViewController implements ConversationItemViewContr
     @CallSuper
     public void recycle() {
         message = null;
+        if (footerActionCallback != null) {
+            footerActionCallback.recycle();
+        }
     }
 
     public Message getMessage() {

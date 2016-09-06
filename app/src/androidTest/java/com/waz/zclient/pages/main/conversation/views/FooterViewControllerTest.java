@@ -686,7 +686,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.tv__footer__message_status)).check(isVisible());
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
-        onView(withId(R.id.fldl_like_details)).check(isInvisible());
+        onView(withId(R.id.fldl_like_details)).check(isGone());
     }
 
     @Test
@@ -778,7 +778,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.tv__footer__message_status)).check(isGone());
         onView(withId(R.id.gtv__footer__like__button)).check(isGone());
-        onView(withId(R.id.fldl_like_details)).check(isInvisible());
+        onView(withId(R.id.fldl_like_details)).check(isGone());
     }
 
     @Test
@@ -802,7 +802,7 @@ public class FooterViewControllerTest extends ViewTest<MainTestActivity> {
 
         onView(withId(R.id.tv__footer__message_status)).check(isVisible());
         onView(withId(R.id.gtv__footer__like__button)).check(isVisible());
-        onView(withId(R.id.fldl_like_details)).check(isInvisible());
+        onView(withId(R.id.fldl_like_details)).check(isGone());
     }
 
     @Test
