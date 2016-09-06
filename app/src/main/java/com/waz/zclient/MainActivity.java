@@ -208,7 +208,6 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         getControllerFactory().getNavigationController().addNavigationControllerObserver(this);
         getControllerFactory().getCallingController().addCallingObserver(this);
         getStoreFactory().getConversationStore().addConversationStoreObserver(this);
-        dismissAndroidNotifications();
         handleInvite();
         handleReferral();
 

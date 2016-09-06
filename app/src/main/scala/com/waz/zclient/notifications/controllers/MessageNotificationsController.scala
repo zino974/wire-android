@@ -65,21 +65,21 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
 
   notifications.on(Threading.Ui) { nots =>
     verbose(s"Notifications updated: $nots")
-    val notification =
-      if (nots.size == 1) {
-        getSingleMessageNotification(nots.head)
-      } else {
-        getMultipleMessagesNotification(nots)
-      }
+    if (nots.isEmpty) notManager.cancel(ZETA_MESSAGE_NOTIFICATION_ID)
+    else {
+      val notification =
+        if (nots.size == 1) getSingleMessageNotification(nots.head)
+        else getMultipleMessagesNotification(nots)
 
-    notification.priority = Notification.PRIORITY_HIGH
-    notification.flags |= Notification.FLAG_AUTO_CANCEL
-    notification.deleteIntent = clearIntent
+      notification.priority = Notification.PRIORITY_HIGH
+      notification.flags |= Notification.FLAG_AUTO_CANCEL
+      notification.deleteIntent = clearIntent
 
-    attachNotificationLed(notification)
-    attachNotificationSound(notification, nots)
+      attachNotificationLed(notification)
+      attachNotificationSound(notification, nots)
 
-    notManager.notify(ZETA_MESSAGE_NOTIFICATION_ID, notification)
+      notManager.notify(ZETA_MESSAGE_NOTIFICATION_ID, notification)
+    }
   }
 
   private def attachNotificationLed(notification: Notification) = {
