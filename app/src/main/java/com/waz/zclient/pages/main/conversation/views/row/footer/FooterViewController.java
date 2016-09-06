@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.TextView;
-import com.waz.api.IConversation;
 import com.waz.api.Message;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
@@ -85,9 +84,10 @@ public class FooterViewController implements ConversationItemViewController,
                 container.setExpandedView(FooterViewController.this);
                 container.setExpandedMessageId(message.getId());
                 expand();
-                if (message.isLastMessageFromSelf()) {
-                    likeButton.setVisibility(View.GONE);
-                }
+//                TODO AN-4474 Uncomment to show delivered state
+//                if (message.isLastMessageFromSelf()) {
+//                    likeButton.setVisibility(View.GONE);
+//                }
             } else if (isMyLastMessage && !message.isLastMessageFromSelf()) {
                 collapse();
             }
@@ -198,8 +198,9 @@ public class FooterViewController implements ConversationItemViewController,
 
     private boolean shouldBeExpanded() {
         return message.isLiked() ||
-               message.isLastMessageFromOther() ||
-               (message.isLastMessageFromSelf() && message.getConversation().getType() == IConversation.Type.ONE_TO_ONE) ||
+//               TODO AN-4474 Uncomment to show delivered state
+//               message.isLastMessageFromOther() ||
+//               (message.isLastMessageFromSelf() && message.getConversation().getType() == IConversation.Type.ONE_TO_ONE) ||
                message.getMessageStatus() == Message.Status.FAILED ||
                message.getMessageStatus() == Message.Status.FAILED_READ;
     }
@@ -237,11 +238,12 @@ public class FooterViewController implements ConversationItemViewController,
                     status = context.getString(R.string.message_footer__status__deleted, timestamp);
                     break;
                 case DELIVERED:
-                    if (message.getConversation().getType() == IConversation.Type.GROUP) {
+//                    TODO AN-4474 Uncomment to show delivered state
+//                    if (message.getConversation().getType() == IConversation.Type.GROUP) {
                         status = context.getString(R.string.message_footer__status__sent, timestamp);
-                    } else {
-                        status = context.getString(R.string.message_footer__status__delivered, timestamp);
-                    }
+//                    } else {
+//                        status = context.getString(R.string.message_footer__status__delivered, timestamp);
+//                    }
                     break;
                 case FAILED:
                 case FAILED_READ:
