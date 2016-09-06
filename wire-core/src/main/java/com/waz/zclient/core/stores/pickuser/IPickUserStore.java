@@ -17,12 +17,10 @@
  */
 package com.waz.zclient.core.stores.pickuser;
 
-import com.waz.annotations.Store;
 import com.waz.api.Contacts;
 import com.waz.api.User;
 import com.waz.zclient.core.stores.IStore;
 
-@Store
 public interface IPickUserStore extends IStore {
     void addPickUserStoreObserver(PickUserStoreObserver pickUserStoreObserver);
 

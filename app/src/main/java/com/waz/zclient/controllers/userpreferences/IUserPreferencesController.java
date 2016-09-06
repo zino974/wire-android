@@ -18,10 +18,8 @@
 package com.waz.zclient.controllers.userpreferences;
 
 import android.support.annotation.IntDef;
-import com.waz.annotations.Controller;
 import com.waz.zclient.camera.CameraFacing;
 
-@Controller
 public interface IUserPreferencesController {
 
     @IntDef(SEND_LOCATION_MESSAGE)

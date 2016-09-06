@@ -44,7 +44,7 @@ import com.waz.zclient.controllers.sharing.ISharingController;
 import com.waz.zclient.controllers.singleimage.ISingleImageController;
 import com.waz.zclient.controllers.spotify.ISpotifyController;
 import com.waz.zclient.controllers.streammediaplayer.IStreamMediaPlayerController;
-import com.waz.zclient.controllers.stub.StubThemeController;
+import com.waz.zclient.controllers.stubs.StubThemeController;
 import com.waz.zclient.controllers.theme.IThemeController;
 import com.waz.zclient.controllers.tracking.ITrackingController;
 import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;

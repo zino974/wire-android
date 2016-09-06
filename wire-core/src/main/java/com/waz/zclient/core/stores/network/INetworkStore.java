@@ -18,10 +18,8 @@
 package com.waz.zclient.core.stores.network;
 
 import android.support.annotation.Nullable;
-import com.waz.annotations.Store;
 import com.waz.zclient.core.stores.IStore;
 
-@Store
 public interface INetworkStore extends IStore {
 
     void tearDown();
