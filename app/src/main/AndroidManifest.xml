@@ -301,7 +301,6 @@
         <meta-data android:name="AUDIOLINK_ENABLED" android:value="${use_audio_link}" />
         <!-- Internal features from SE -->
         <meta-data android:name="INTERNAL" android:value="${internal_features}"/>
-        <meta-data android:name="GCM_ENABLED" android:value="${gcm_enabled}" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

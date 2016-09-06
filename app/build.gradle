@@ -97,7 +97,6 @@ android {
                                     applicationIcon        : "@drawable/ic_launcher_wire_dev",
                                     sharedUserId           : "",
                                     use_audio_link         : "false",
-                                    gcm_enabled            : "false",
                                     internal_features      : "true",
                                     localyticsAppKey       : getApiKey("localyticsAppKey"),
                                     hockeyAppKey           : getApiKey("hockeyAppKey")]
@@ -127,7 +126,6 @@ android {
                                     applicationIcon        : "@drawable/ic_launcher_wire_candidate",
                                     sharedUserId           : "",
                                     use_audio_link         : "false",
-                                    gcm_enabled            : "true",
                                     internal_features      : "false",
                                     localyticsAppKey       : getApiKey("localyticsAppKey"),
                                     hockeyAppKey           : getApiKey("hockeyAppKeyCand")]
@@ -156,7 +154,6 @@ android {
                                     sharedUserId           : "com.waz.userid",
                                     internal_features      : "false",
                                     use_audio_link         : "false",
-                                    gcm_enabled            : "true",
                                     localyticsAppKey       : getApiKey("localyticsAppKeyProd"),
                                     hockeyAppKey           : getApiKey("hockeyAppKeyProd")]
 
@@ -214,7 +211,6 @@ android {
                                     applicationIcon        : "@drawable/ic_launcher_wire_playground",
                                     sharedUserId           : "",
                                     use_audio_link         : "false",
-                                    gcm_enabled            : "false",
                                     internal_features      : "true",
                                     localyticsAppKey       : getApiKey("localyticsAppKey"),
                                     hockeyAppKey           : getApiKey("hockeyAppKeyAvs")]
@@ -243,7 +239,6 @@ android {
                                     applicationIcon        : "@drawable/ic_launcher_wire_playground",
                                     sharedUserId           : "",
                                     use_audio_link         : "false",
-                                    gcm_enabled            : "false",
                                     internal_features      : "true",
                                     localyticsAppKey       : getApiKey("localyticsAppKey"),
                                     hockeyAppKey           : getApiKey("hockeyAppKeyQaavs")]
@@ -273,7 +268,6 @@ android {
                                     applicationIcon        : "@drawable/ic_launcher_wire_playground",
                                     sharedUserId           : "",
                                     use_audio_link         : "false",
-                                    gcm_enabled            : "false",
                                     internal_features      : "true",
                                     localyticsAppKey       : getApiKey("localyticsAppKey"),
                                     hockeyAppKey           : getApiKey("hockeyAppKeyExperimental")]
