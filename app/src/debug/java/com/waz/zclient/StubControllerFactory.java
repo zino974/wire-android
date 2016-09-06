@@ -36,7 +36,6 @@ import com.waz.zclient.controllers.loadtimelogger.ILoadTimeLoggerController;
 import com.waz.zclient.controllers.location.ILocationController;
 import com.waz.zclient.controllers.mentioning.IMentioningController;
 import com.waz.zclient.controllers.navigation.INavigationController;
-import com.waz.zclient.controllers.notifications.INotificationsController;
 import com.waz.zclient.controllers.onboarding.IOnboardingController;
 import com.waz.zclient.controllers.orientation.IOrientationController;
 import com.waz.zclient.controllers.password.IPasswordController;
@@ -157,11 +156,6 @@ public class StubControllerFactory implements IControllerFactory {
 
     @Override
     public INavigationController getNavigationController() {
-        return null;
-    }
-
-    @Override
-    public INotificationsController getNotificationsController() {
         return null;
     }
 

@@ -62,7 +62,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
   val sharedPreferences = cxt.getSharedPreferences(UserPreferencesController.USER_PREFS_TAG, Context.MODE_PRIVATE)
 
   lazy val clearIntent = PendingIntent.getService(cxt, 9730, PushService.clearNotificationsIntent(cxt), PendingIntent.FLAG_UPDATE_CURRENT)
-
+  
   notifications.on(Threading.Ui) { nots =>
     verbose(s"Notifications updated: $nots")
     if (nots.isEmpty) notManager.cancel(ZETA_MESSAGE_NOTIFICATION_ID)

@@ -128,7 +128,7 @@ import com.waz.zclient.core.stores.inappnotification.KnockingEvent;
 import com.waz.zclient.core.stores.network.DefaultNetworkAction;
 import com.waz.zclient.core.stores.network.NetworkStoreObserver;
 import com.waz.zclient.core.stores.participants.ParticipantsStoreObserver;
-import com.waz.zclient.notifications.controllers.NewNotificationsController;
+import com.waz.zclient.notifications.controllers.ImageNotificationsController;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.pages.extendedcursor.ExtendedCursorContainer;
 import com.waz.zclient.pages.extendedcursor.image.CursorImagesLayout;
@@ -2408,7 +2408,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     return;
                 }
                 ((BaseScalaActivity)getActivity())
-                    .injectJava(NewNotificationsController.class)
+                    .injectJava(ImageNotificationsController.class)
                     .showImageSavedNotification(imageAssetToSave.getId(), uri);
                 Toast.makeText(getContext(), R.string.message_bottom_menu_action_save_ok, Toast.LENGTH_SHORT).show();
                 imageAssetToSave = null;
