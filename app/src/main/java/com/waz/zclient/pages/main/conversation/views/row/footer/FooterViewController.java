@@ -71,10 +71,11 @@ public class FooterViewController implements ConversationItemViewController,
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
         public void updated(Message message) {
+            mainHandler.removeCallbacksAndMessages(null);
             if (message.isLiked()) {
-                showLikeDetails(true);
+                showLikeDetails();
             } else {
-                showMessageStatus(false);
+                showMessageStatus();
             }
 
             if (shouldBeExpanded() && (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0)) {
@@ -96,21 +97,22 @@ public class FooterViewController implements ConversationItemViewController,
 
             updateLikeButton();
             updateMessageStatusLabel();
-            likeDetails.setUsers(message.isLiked() ? message.getLikes() : null);
+            likeDetails.setUsers(message.isLiked() ? message.getLikes() : null,
+                                 !container.getControllerFactory().getUserPreferencesController().hasPerformedAction(IUserPreferencesController.LIKED_MESSAGE));
         }
     };
 
     private Runnable showLikeDetailsRunnable = new Runnable() {
         @Override
         public void run() {
-            showLikeDetails(true);
+            showLikeDetails();
         }
     };
 
     private Runnable showMessageStatusRunnable = new Runnable() {
         @Override
         public void run() {
-            showMessageStatus(true);
+            showMessageStatus();
         }
     };
 
@@ -174,7 +176,7 @@ public class FooterViewController implements ConversationItemViewController,
         likeButton.setVisibility(View.VISIBLE);
         likeButton.setTag(null);
         messageModelObserver.clear();
-        likeDetails.setUsers(null);
+        likeDetails.setUsers(null, false);
         message = null;
         isMyLastMessage = false;
     }
@@ -343,7 +345,7 @@ public class FooterViewController implements ConversationItemViewController,
 
                 @Override
                 public void onAnimationStart(Animator animation) {
-                    showLikeDetails(true);
+                    showLikeDetails();
                 }
             });
         }
@@ -369,30 +371,16 @@ public class FooterViewController implements ConversationItemViewController,
         animator.start();
     }
 
-    private void showLikeDetails(boolean animate) {
-        if (animate) {
-            int height = view.getHeight();
-            getViewTextViewAnimator(messageStatusTextView, false, height).start();
-            getViewTextViewAnimator(likeDetails, true, 0).start();
-        } else {
-            likeDetails.setVisibility(View.VISIBLE);
-            likeDetails.setTranslationY(0);
-            messageStatusTextView.setVisibility(View.INVISIBLE);
-            messageStatusTextView.setTranslationY(height);
-        }
+    private void showLikeDetails() {
+        int height = view.getHeight();
+        getViewTextViewAnimator(messageStatusTextView, false, height).start();
+        getViewTextViewAnimator(likeDetails, true, 0).start();
     }
 
-    private void showMessageStatus(boolean animate) {
-        if (animate) {
-            int height = view.getHeight();
-            getViewTextViewAnimator(messageStatusTextView, true, 0).start();
-            getViewTextViewAnimator(likeDetails, false, -height).start();
-        } else {
-            likeDetails.setVisibility(View.INVISIBLE);
-            likeDetails.setTranslationY(-height);
-            messageStatusTextView.setVisibility(View.VISIBLE);
-            messageStatusTextView.setTranslationY(0);
-        }
+    private void showMessageStatus() {
+        int height = view.getHeight();
+        getViewTextViewAnimator(messageStatusTextView, true, 0).start();
+        getViewTextViewAnimator(likeDetails, false, -height).start();
     }
 
     private ObjectAnimator getViewTextViewAnimator(final View view, boolean animateIn, float to) {
@@ -430,10 +418,10 @@ public class FooterViewController implements ConversationItemViewController,
     private void showTimestampForABit() {
         mainHandler.removeCallbacksAndMessages(null);
         if (likeDetails.getVisibility() == View.VISIBLE) {
-            showMessageStatus(true);
+            showMessageStatus();
             mainHandler.postDelayed(showLikeDetailsRunnable, TIMESTAMP_VISIBILITY_MIL_SEC);
         } else {
-            showLikeDetails(true);
+            showLikeDetails();
         }
     }
 

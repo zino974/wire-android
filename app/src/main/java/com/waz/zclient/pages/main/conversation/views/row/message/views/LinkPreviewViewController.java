@@ -27,6 +27,7 @@ import com.waz.api.LoadHandle;
 import com.waz.api.Message;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
@@ -95,6 +96,7 @@ public class LinkPreviewViewController extends MessageViewController implements 
                                                                                                                            ReactedToMessageEvent.Method.DOUBLE_TAP));
             } else {
                 message.like();
+                messageViewsContainer.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
                                                                                                                          message,
                                                                                                                          ReactedToMessageEvent.Method.DOUBLE_TAP));

@@ -38,6 +38,7 @@ import com.waz.api.ProgressIndicator;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.events.media.PlayedVideoMessageEvent;
 import com.waz.zclient.core.stores.network.DefaultNetworkAction;
@@ -136,6 +137,7 @@ public class VideoMessageViewController extends MessageViewController implements
                                                                                                                            ReactedToMessageEvent.Method.DOUBLE_TAP));
             } else {
                 message.like();
+                messageViewsContainer.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
                                                                                                                          message,
                                                                                                                          ReactedToMessageEvent.Method.DOUBLE_TAP));

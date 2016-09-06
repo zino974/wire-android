@@ -35,6 +35,7 @@ import com.waz.api.PlaybackControls;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.events.media.PlayedAudioMessageEvent;
 import com.waz.zclient.core.stores.network.DefaultNetworkAction;
@@ -112,6 +113,7 @@ public class AudioMessageViewController extends MessageViewController implements
                                                                                                                          ReactedToMessageEvent.Method.DOUBLE_TAP));
             } else {
                 message.like();
+                messageViewsContainer.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
                                                                                                              message,
                                                                                                              ReactedToMessageEvent.Method.DOUBLE_TAP));
@@ -132,6 +134,7 @@ public class AudioMessageViewController extends MessageViewController implements
             if (message.isLikedByThisUser()) {
                 message.unlike();
             } else {
+                messageViewsContainer.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
                 message.like();
             }
         }

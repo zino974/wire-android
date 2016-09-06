@@ -24,6 +24,7 @@ import android.view.View;
 import com.waz.api.Message;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
@@ -36,43 +37,50 @@ public class TextMessageViewController extends MessageViewController {
     private View view;
     private TextMessageLinkTextView textView;
 
+    private final View.OnClickListener onClickListener = new OnDoubleClickListener() {
+        @Override
+        public void onDoubleClick() {
+            if (message.isLikedByThisUser()) {
+                message.unlike();
+                messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
+                                                                                                                           message,
+                                                                                                                           ReactedToMessageEvent.Method.DOUBLE_TAP));
+            } else {
+                message.like();
+                messageViewsContainer.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
+                messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
+                                                                                                                         message,
+                                                                                                                         ReactedToMessageEvent.Method.DOUBLE_TAP));
+            }
+        }
+        @Override
+        public void onSingleClick() {
+            if (footerActionCallback != null) {
+                footerActionCallback.toggleVisibility();
+            }
+        }
+    };
+
+    private final View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            messageViewsContainer.onItemLongClick(message);
+            return true;
+        }
+    };
+
     @SuppressLint("InflateParams")
-    public TextMessageViewController(Context context, final MessageViewsContainer messageViewContainer) {
-        super(context, messageViewContainer);
+    public TextMessageViewController(Context context, final MessageViewsContainer messageViewsContainer) {
+        super(context, messageViewsContainer);
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.row_conversation_text_message, null);
         textView = ViewUtils.getView(view, R.id.tmltv__row_conversation__message);
-        textView.setMessageViewsContainer(messageViewContainer);
+        textView.setMessageViewsContainer(messageViewsContainer);
         View textContainer = ViewUtils.getView(view, R.id.ll__row_conversation__message_container);
-        textContainer.setOnClickListener(new OnDoubleClickListener() {
-            @Override
-            public void onDoubleClick() {
-                if (message.isLikedByThisUser()) {
-                    message.unlike();
-                    messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
-                                                                                                                               message,
-                                                                                                                               ReactedToMessageEvent.Method.DOUBLE_TAP));
-                } else {
-                    message.like();
-                    messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
-                                                                                                                             message,
-                                                                                                                             ReactedToMessageEvent.Method.DOUBLE_TAP));
-                }
-            }
-            @Override
-            public void onSingleClick() {
-                if (footerActionCallback != null) {
-                    footerActionCallback.toggleVisibility();
-                }
-            }
-        });
-        textContainer.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                messageViewContainer.onItemLongClick(message);
-                return true;
-            }
-        });
+        textContainer.setOnClickListener(onClickListener);
+        textContainer.setOnLongClickListener(onLongClickListener);
+        textView.setOnClickListener(onClickListener);
+        textView.setOnLongClickListener(onLongClickListener);
 
         afterInit();
     }

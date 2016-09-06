@@ -44,6 +44,8 @@ public class FooterLikeDetailsLayout extends LinearLayout {
     private ChatheadImageView secondChathead;
     private OnClickListener onClickListener;
 
+    private boolean showHint;
+
     private final ModelObserver<User> descriptionModelObserver = new ModelObserver<User>() {
         @Override
         public void updated(User user) {
@@ -52,6 +54,7 @@ public class FooterLikeDetailsLayout extends LinearLayout {
                 stringBuilder.append(", ").append(secondUser.getDisplayName());
             }
             description.setText(stringBuilder.toString());
+            description.invalidate();
         }
     };
 
@@ -91,7 +94,8 @@ public class FooterLikeDetailsLayout extends LinearLayout {
         this.onClickListener = onClickListener;
     }
 
-    public void setUsers(User[] users) {
+    public void setUsers(User[] users, boolean showHint) {
+        this.showHint = showHint;
         if (users == null || users.length == 0) {
             clearUsers();
             return;
@@ -103,6 +107,7 @@ public class FooterLikeDetailsLayout extends LinearLayout {
         if (users.length >= NUM_LIKE_USERS_TO_SHOW_AVATARS) {
             hintArrow.setVisibility(INVISIBLE);
             description.setText(getResources().getQuantityString(R.plurals.message_footer__number_of_likes, users.length, users.length));
+            description.invalidate();
             chatheadContainer.setVisibility(VISIBLE);
             firstChathead.setUser(firstUser);
             secondChathead.setUser(secondUser);
@@ -120,8 +125,13 @@ public class FooterLikeDetailsLayout extends LinearLayout {
     }
 
     private void clearUsers() {
-        hintArrow.setVisibility(VISIBLE);
-        description.setText(R.string.message_footer__tap_to_like);
+        if (showHint) {
+            hintArrow.setVisibility(INVISIBLE);
+            description.setText(R.string.message_footer__tap_to_like);
+        } else {
+            hintArrow.setVisibility(GONE);
+            description.setText("");
+        }
         descriptionModelObserver.clear();
         firstUser = null;
         secondUser = null;
