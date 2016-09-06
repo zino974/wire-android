@@ -109,6 +109,7 @@ import com.waz.zclient.controllers.tracking.events.conversation.ForwardedMessage
 import com.waz.zclient.controllers.tracking.events.conversation.OpenedMessageActionEvent;
 import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
 import com.waz.zclient.controllers.tracking.events.navigation.OpenedMoreActionsEvent;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.filetransfer.SelectedTooLargeFileEvent;
@@ -219,6 +220,9 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     private static final int AUDIO_PERMISSION_REQUEST_ID = 864;
     private static final int AUDIO_FILTER_PERMISSION_REQUEST_ID = 865;
 
+    private static final String[] SAVE_IMAGE_PERMISSIONS = new String[] {android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private static final int SAVE_IMAGE_PERMISSION_REQUEST_ID = 6;
+
     private ConversationListView listView;
     private MessageAdapter messageAdapter;
     private MessageStreamManager messageStreamManager;
@@ -248,6 +252,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     private boolean isPreviewShown;
     private boolean isVideoMessageButtonClicked;
     private MessageBottomSheetDialog messageBottomSheetDialog;
+    private ImageAsset imageAssetToSave;
 
     public static ConversationFragment newInstance() {
         return new ConversationFragment();
@@ -407,12 +412,15 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                                                                              ReactedToMessageEvent.Method.MENU));
                     } else {
                         message.like();
+                        getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
                         getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
                                                                                                              message,
                                                                                                              ReactedToMessageEvent.Method.MENU));
                     }
                     break;
-
+                case SAVE:
+                    saveMessage(message);
+                    break;
                 default:
                     ExceptionHandler.saveException(new RuntimeException("Unhandled action"), null, null);
             }
@@ -1868,6 +1876,13 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                    Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case SAVE_IMAGE_PERMISSION_REQUEST_ID:
+                if (PermissionUtils.verifyPermissions(grantResults)) {
+                    saveImageAssetToGallery();
+                } else {
+                    unableToSaveImageNoPermissions();
+                }
+                break;
             default:
                 break;
         }
@@ -2368,6 +2383,46 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 }
                 break;
         }
+    }
+
+    private void saveMessage(Message message) {
+        imageAssetToSave = message.getImage();
+        if (PermissionUtils.hasSelfPermissions(getActivity(), SAVE_IMAGE_PERMISSIONS)) {
+            saveImageAssetToGallery();
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), SAVE_IMAGE_PERMISSIONS, SAVE_IMAGE_PERMISSION_REQUEST_ID);
+        }
+    }
+
+    private void saveImageAssetToGallery() {
+        if (imageAssetToSave == null) {
+            return;
+        }
+        imageAssetToSave.saveImageToGallery(new ImageAsset.SaveCallback() {
+
+            @Override
+            public void imageSaved(Uri uri) {
+                if (getControllerFactory() == null ||
+                    getControllerFactory().isTornDown()) {
+                    return;
+                }
+                getControllerFactory()
+                    .getNotificationsController()
+                    .showImageSavedNotification(imageAssetToSave, uri);
+                Toast.makeText(getContext(), R.string.message_bottom_menu_action_save_ok, Toast.LENGTH_SHORT).show();
+                imageAssetToSave = null;
+            }
+
+            @Override
+            public void imageSavingFailed(Exception ex) {
+                unableToSaveImageNoPermissions();
+            }
+        });
+    }
+
+    private void unableToSaveImageNoPermissions() {
+        imageAssetToSave = null;
+        Toast.makeText(getContext(), R.string.message_bottom_menu_action_save_fail, Toast.LENGTH_SHORT).show();
     }
 
     public interface Container {

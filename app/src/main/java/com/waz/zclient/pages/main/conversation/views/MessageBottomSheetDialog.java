@@ -42,6 +42,7 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         DELETE_GLOBAL(R.id.message_bottom_menu_item_delete_global, R.string.glyph__delete_everywhere, R.string.message_bottom_menu_action_delete_global),
         LIKE(R.id.message_bottom_menu_item_like, R.string.glyph__like, R.string.message_bottom_menu_action_like),
         UNLIKE(R.id.message_bottom_menu_item_unlike, R.string.glyph__liked, R.string.message_bottom_menu_action_unlike),
+        SAVE(R.id.message_bottom_menu_item_save, R.string.glyph__download, R.string.message_bottom_menu_action_save),
         EDIT(R.id.message_bottom_menu_item_edit, R.string.glyph__edit, R.string.message_bottom_menu_action_edit);
 
         public int resId;
@@ -75,15 +76,18 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         if (isCopyAllowed()) {
             addAction(view, MessageAction.COPY);
         }
-        if (isForwardAllowed()) {
-            addAction(view, MessageAction.FORWARD);
-        }
         if (isEditAllowed(isMemberOfConversation)) {
             addAction(view, MessageAction.EDIT);
+        }
+        if (isSaveAllowed()) {
+            addAction(view, MessageAction.SAVE);
         }
         addAction(view, MessageAction.DELETE_LOCAL);
         if (isDeleteForEveryoneAllowed(isMemberOfConversation)) {
             addAction(view, MessageAction.DELETE_GLOBAL);
+        }
+        if (isForwardAllowed()) {
+            addAction(view, MessageAction.FORWARD);
         }
         setContentView(view);
     }
@@ -119,6 +123,16 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
             case TEXT_EMOJI_ONLY:
             case RICH_MEDIA:
             case VIDEO_ASSET:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isSaveAllowed() {
+        switch (message.getMessageType()) {
+            // Only image supported ATM, need to handle Audio/File/Video
+            case ASSET:
                 return true;
             default:
                 return false;

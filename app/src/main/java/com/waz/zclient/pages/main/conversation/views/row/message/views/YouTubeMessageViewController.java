@@ -33,6 +33,7 @@ import com.waz.api.Message;
 import com.waz.api.UpdateListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.media.PlayedYouTubeMessageEvent;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
@@ -86,6 +87,7 @@ public class YouTubeMessageViewController extends MessageViewController implemen
                                                                                                                            ReactedToMessageEvent.Method.DOUBLE_TAP));
             } else {
                 message.like();
+                messageViewsContainer.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
                                                                                                                          message,
                                                                                                                          ReactedToMessageEvent.Method.DOUBLE_TAP));

@@ -82,9 +82,6 @@ public class MessageAndSeparatorViewController implements ConversationItemViewCo
     public void recycle() {
         messageViewController.recycle();
         separatorViewController.recycle();
-        if (footerViewController != null) {
-            footerViewController.recycle();
-        }
     }
 
     public Message getMessage() {

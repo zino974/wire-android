@@ -21,4 +21,5 @@ import com.waz.zclient.pages.main.conversation.views.ExpandableView;
 
 public interface FooterActionCallback extends ExpandableView {
     boolean toggleVisibility();
+    void recycle();
 }

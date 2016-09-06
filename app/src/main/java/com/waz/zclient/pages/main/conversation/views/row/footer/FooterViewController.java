@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.TextView;
-import com.waz.api.IConversation;
 import com.waz.api.Message;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessageEvent;
@@ -72,10 +71,11 @@ public class FooterViewController implements ConversationItemViewController,
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
         public void updated(Message message) {
+            mainHandler.removeCallbacksAndMessages(null);
             if (message.isLiked()) {
-                showLikeDetails(true);
+                showLikeDetails();
             } else {
-                showMessageStatus(false);
+                showMessageStatus();
             }
 
             if (shouldBeExpanded() && (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0)) {
@@ -85,9 +85,10 @@ public class FooterViewController implements ConversationItemViewController,
                 container.setExpandedView(FooterViewController.this);
                 container.setExpandedMessageId(message.getId());
                 expand();
-                if (message.isLastMessageFromSelf()) {
-                    likeButton.setVisibility(View.GONE);
-                }
+//                TODO AN-4474 Uncomment to show delivered state
+//                if (message.isLastMessageFromSelf()) {
+//                    likeButton.setVisibility(View.GONE);
+//                }
             } else if (isMyLastMessage && !message.isLastMessageFromSelf()) {
                 collapse();
             }
@@ -96,21 +97,22 @@ public class FooterViewController implements ConversationItemViewController,
 
             updateLikeButton();
             updateMessageStatusLabel();
-            likeDetails.setUsers(message.isLiked() ? message.getLikes() : null);
+            likeDetails.setUsers(message.isLiked() ? message.getLikes() : null,
+                                 !container.getControllerFactory().getUserPreferencesController().hasPerformedAction(IUserPreferencesController.LIKED_MESSAGE));
         }
     };
 
     private Runnable showLikeDetailsRunnable = new Runnable() {
         @Override
         public void run() {
-            showLikeDetails(true);
+            showLikeDetails();
         }
     };
 
     private Runnable showMessageStatusRunnable = new Runnable() {
         @Override
         public void run() {
-            showMessageStatus(true);
+            showMessageStatus();
         }
     };
 
@@ -174,7 +176,7 @@ public class FooterViewController implements ConversationItemViewController,
         likeButton.setVisibility(View.VISIBLE);
         likeButton.setTag(null);
         messageModelObserver.clear();
-        likeDetails.setUsers(null);
+        likeDetails.setUsers(null, false);
         message = null;
         isMyLastMessage = false;
     }
@@ -198,8 +200,9 @@ public class FooterViewController implements ConversationItemViewController,
 
     private boolean shouldBeExpanded() {
         return message.isLiked() ||
-               message.isLastMessageFromOther() ||
-               (message.isLastMessageFromSelf() && message.getConversation().getType() == IConversation.Type.ONE_TO_ONE) ||
+//               TODO AN-4474 Uncomment to show delivered state
+//               message.isLastMessageFromOther() ||
+//               (message.isLastMessageFromSelf() && message.getConversation().getType() == IConversation.Type.ONE_TO_ONE) ||
                message.getMessageStatus() == Message.Status.FAILED ||
                message.getMessageStatus() == Message.Status.FAILED_READ;
     }
@@ -237,11 +240,12 @@ public class FooterViewController implements ConversationItemViewController,
                     status = context.getString(R.string.message_footer__status__deleted, timestamp);
                     break;
                 case DELIVERED:
-                    if (message.getConversation().getType() == IConversation.Type.GROUP) {
+//                    TODO AN-4474 Uncomment to show delivered state
+//                    if (message.getConversation().getType() == IConversation.Type.GROUP) {
                         status = context.getString(R.string.message_footer__status__sent, timestamp);
-                    } else {
-                        status = context.getString(R.string.message_footer__status__delivered, timestamp);
-                    }
+//                    } else {
+//                        status = context.getString(R.string.message_footer__status__delivered, timestamp);
+//                    }
                     break;
                 case FAILED:
                 case FAILED_READ:
@@ -341,7 +345,7 @@ public class FooterViewController implements ConversationItemViewController,
 
                 @Override
                 public void onAnimationStart(Animator animation) {
-                    showLikeDetails(true);
+                    showLikeDetails();
                 }
             });
         }
@@ -367,30 +371,16 @@ public class FooterViewController implements ConversationItemViewController,
         animator.start();
     }
 
-    private void showLikeDetails(boolean animate) {
-        if (animate) {
-            int height = view.getHeight();
-            getViewTextViewAnimator(messageStatusTextView, false, height).start();
-            getViewTextViewAnimator(likeDetails, true, 0).start();
-        } else {
-            likeDetails.setVisibility(View.VISIBLE);
-            likeDetails.setTranslationY(0);
-            messageStatusTextView.setVisibility(View.INVISIBLE);
-            messageStatusTextView.setTranslationY(height);
-        }
+    private void showLikeDetails() {
+        int height = view.getHeight();
+        getViewTextViewAnimator(messageStatusTextView, false, height).start();
+        getViewTextViewAnimator(likeDetails, true, 0).start();
     }
 
-    private void showMessageStatus(boolean animate) {
-        if (animate) {
-            int height = view.getHeight();
-            getViewTextViewAnimator(messageStatusTextView, true, 0).start();
-            getViewTextViewAnimator(likeDetails, false, -height).start();
-        } else {
-            likeDetails.setVisibility(View.INVISIBLE);
-            likeDetails.setTranslationY(-height);
-            messageStatusTextView.setVisibility(View.VISIBLE);
-            messageStatusTextView.setTranslationY(0);
-        }
+    private void showMessageStatus() {
+        int height = view.getHeight();
+        getViewTextViewAnimator(messageStatusTextView, true, 0).start();
+        getViewTextViewAnimator(likeDetails, false, -height).start();
     }
 
     private ObjectAnimator getViewTextViewAnimator(final View view, boolean animateIn, float to) {
@@ -428,10 +418,10 @@ public class FooterViewController implements ConversationItemViewController,
     private void showTimestampForABit() {
         mainHandler.removeCallbacksAndMessages(null);
         if (likeDetails.getVisibility() == View.VISIBLE) {
-            showMessageStatus(true);
+            showMessageStatus();
             mainHandler.postDelayed(showLikeDetailsRunnable, TIMESTAMP_VISIBILITY_MIL_SEC);
         } else {
-            showLikeDetails(true);
+            showLikeDetails();
         }
     }
 

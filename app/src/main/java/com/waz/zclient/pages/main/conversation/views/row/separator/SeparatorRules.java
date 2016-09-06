@@ -18,6 +18,7 @@
 package com.waz.zclient.pages.main.conversation.views.row.separator;
 
 import com.waz.api.Message;
+import com.waz.zclient.BuildConfig;
 import com.waz.zclient.utils.DateConvertUtils;
 import org.threeten.bp.ZonedDateTime;
 import timber.log.Timber;
@@ -27,6 +28,9 @@ public class SeparatorRules {
     private static final String TAG = SeparatorRules.class.getName();
 
     public static boolean shouldHaveName(Message message, Separator separator) {
+        if (message.getMessageType() == Message.Type.UNKNOWN && !BuildConfig.SHOW_DEVELOPER_OPTIONS) {
+            return false;
+        }
         if (message.isEdited()) {
             return true;
         }

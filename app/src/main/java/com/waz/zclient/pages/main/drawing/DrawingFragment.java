@@ -148,7 +148,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         colorLayout = ViewUtils.getView(rootView, R.id.cpdl__color_layout);
         colorLayout.setOnColorSelectedListener(this);
         int[] colors = getResources().getIntArray(R.array.draw_color);
-        colorLayout.setAccentColors(colors, colors[1]);
+        colorLayout.setAccentColors(colors, getControllerFactory().getAccentColorController().getColor());
         colorLayout.getViewTreeObserver().addOnScrollChangedListener(this);
 
         colorPickerScrollBar = ViewUtils.getView(rootView, R.id.cpsb__color_picker_scrollbar);
