@@ -31,10 +31,10 @@ import android.text.style.{ForegroundColorSpan, TextAppearanceSpan}
 import android.text.{SpannableString, Spanned, TextUtils}
 import com.waz.ZLog.ImplicitTag._
 import com.waz.ZLog.verbose
-import com.waz.api.NotificationsHandler.GcmNotification
-import com.waz.api.NotificationsHandler.GcmNotification.Type._
+import com.waz.api.NotificationsHandler.NotificationType
+import com.waz.api.NotificationsHandler.NotificationType._
 import com.waz.service.ZMessaging
-import com.waz.service.push.NotificationService.Notification2
+import com.waz.service.push.NotificationService.NotificationInfo
 import com.waz.threading.Threading
 import com.waz.utils.events.Signal
 import com.waz.zclient._
@@ -43,7 +43,7 @@ import com.waz.zclient.controllers.vibrator.VibratorController
 import com.waz.zclient.utils.ContextUtils._
 import com.waz.zclient.utils.IntentUtils._
 import com.waz.zclient.utils.RingtoneUtils
-import com.waz.zms.GcmHandlerService
+import com.waz.zms.PushService
 
 class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) extends Injectable {
 
@@ -57,7 +57,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
 
   val notManager = inject[NotificationManager]
 
-  val notifications = notsService.flatMap(_.getNotifications2)
+  val notifications = notsService.flatMap(_.getNotifications)
 
   val sharedPreferences = cxt.getSharedPreferences(UserPreferencesController.USER_PREFS_TAG, Context.MODE_PRIVATE)
 
@@ -93,7 +93,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     notification.flags |= Notification.FLAG_SHOW_LIGHTS
   }
 
-  private def attachNotificationSound(notification: Notification, ns: Seq[Notification2]) = {
+  private def attachNotificationSound(notification: Notification, ns: Seq[NotificationInfo]) = {
     val soundSetting = sharedPreferences.getString(context.getString(R.string.pref_options_sounds_key), context.getString(R.string.pref_options_sounds_default))
     notification.sound =
       if (context.getString(R.string.pref_sound_value_none) == soundSetting) null
@@ -101,7 +101,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
       else ns.lastOption.fold(null.asInstanceOf[Uri])(getMessageSoundUri)
   }
 
-  private def getMessageSoundUri(n: Notification2): Uri = {
+  private def getMessageSoundUri(n: NotificationInfo): Uri = {
     n.tpe match {
       case ASSET |
            ANY_ASSET |
@@ -128,7 +128,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     else RingtoneUtils.getUriForRawId(context, returnDefault)
   }
 
-  private def getSingleMessageNotification(n: Notification2): Notification = {
+  private def getSingleMessageNotification(n: NotificationInfo): Notification = {
 
     val spannableString = getMessage(n, multiple = false, singleConversationInBatch = true, singleUserInBatch = true)
     val title = getMessageTitle(n)
@@ -151,7 +151,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
       .setPriority(NotificationCompat.PRIORITY_HIGH)
 
 
-    if (n.tpe != GcmNotification.Type.CONNECT_REQUEST) {
+    if (n.tpe != NotificationType.CONNECT_REQUEST) {
       builder
         .addAction(R.drawable.ic_action_call, getString(R.string.notification__action__call), getNotificationCallIntent(cxt, n.convId.str, requestBase + 1))
         .addAction(R.drawable.ic_action_reply, getString(R.string.notification__action__reply), getNotificationReplyIntent(cxt, n.convId.str, requestBase + 2))
@@ -163,7 +163,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     builder.build
   }
 
-  private def getMultipleMessagesNotification(ns: Seq[Notification2]): Notification = {
+  private def getMultipleMessagesNotification(ns: Seq[NotificationInfo]): Notification = {
 
     val convIds = ns.map(_.convId).toSet
     val users = ns.map(_.userName).toSet
@@ -210,7 +210,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     builder.build
   }
 
-  private def getMessage(n: Notification2, multiple: Boolean, singleConversationInBatch: Boolean, singleUserInBatch: Boolean) = {
+  private def getMessage(n: NotificationInfo, multiple: Boolean, singleConversationInBatch: Boolean, singleUserInBatch: Boolean) = {
     val message = n.message.replaceAll("\\r\\n|\\r|\\n", " ")
 
     def getHeader(testPrefix: Boolean = false, singleUser: Boolean = false) = getDefaultNotificationMessageLineHeader(n, multiple, textPrefix = testPrefix, singleConversationInBatch = singleConversationInBatch, singleUser = singleUser)
@@ -239,7 +239,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     getMessageSpannable(header, body)
   }
 
-  private def getMessageTitle(n: Notification2) = {
+  private def getMessageTitle(n: NotificationInfo) = {
     val userName = n.userName.getOrElse("")
     if (n.isGroupConv) {
       val convName = n.convName.filterNot(_.isEmpty).getOrElse(getString(R.string.notification__message__group__default_conversation_name))
@@ -258,7 +258,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     messageSpannable
   }
 
-  private def getDefaultNotificationMessageLineHeader(n: Notification2, multiple: Boolean, textPrefix: Boolean, singleConversationInBatch: Boolean, singleUser: Boolean) = {
+  private def getDefaultNotificationMessageLineHeader(n: NotificationInfo, multiple: Boolean, textPrefix: Boolean, singleConversationInBatch: Boolean, singleUser: Boolean) = {
     val prefixId = if (multiple) {
       if (n.isGroupConv && !singleConversationInBatch) if (textPrefix) R.string.notification__message__group__prefix__text else R.string.notification__message__group__prefix__other
       else if (!singleUser || n.isGroupConv) if (textPrefix) R.string.notification__message__name__prefix__text else R.string.notification__message__name__prefix__other
