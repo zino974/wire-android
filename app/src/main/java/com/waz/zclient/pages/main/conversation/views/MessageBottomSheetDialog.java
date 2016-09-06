@@ -75,15 +75,15 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         if (isCopyAllowed()) {
             addAction(view, MessageAction.COPY);
         }
-        if (isForwardAllowed()) {
-            addAction(view, MessageAction.FORWARD);
-        }
         if (isEditAllowed(isMemberOfConversation)) {
             addAction(view, MessageAction.EDIT);
         }
         addAction(view, MessageAction.DELETE_LOCAL);
         if (isDeleteForEveryoneAllowed(isMemberOfConversation)) {
             addAction(view, MessageAction.DELETE_GLOBAL);
+        }
+        if (isForwardAllowed()) {
+            addAction(view, MessageAction.FORWARD);
         }
         setContentView(view);
     }
