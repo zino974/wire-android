@@ -25,6 +25,7 @@ import com.waz.zclient.R;
 import com.waz.zclient.camera.CameraFacing;
 import timber.log.Timber;
 
+import java.util.List;
 import java.util.UUID;
 
 public class UserPreferencesController implements IUserPreferencesController {
@@ -47,6 +48,7 @@ public class UserPreferencesController implements IUserPreferencesController {
     private static final String USER_PREF_LOGGED_IN = "USER_PREF_LOGGED_IN_%s";
     private static final String USER_PREF_AB_TESTING_UUID = "USER_PREF_AB_TESTING_UUID";
     private static final String USER_PREF_ACTION_PREFIX = "USER_PREF_ACTION_PREFIX";
+    private static final String USER_PREF_RECENT_EMOJIS = "USER_PREF_RECENT_EMOJIS";
 
     private static final String PREFS_DEVICE_ID = "com.waz.device.id";
 
@@ -293,6 +295,18 @@ public class UserPreferencesController implements IUserPreferencesController {
             userPreferences.edit().putInt(USER_PERFS_AB_TESTING_GROUP, group).apply();
         }
         return group;
+    }
+
+    @Override
+    public void addRecentEmoji(String emoji) {
+        RecentEmojis recentEmojis = new RecentEmojis(userPreferences.getString(USER_PREF_RECENT_EMOJIS, null));
+        recentEmojis.addRecentEmoji(emoji);
+        userPreferences.edit().putString(USER_PREF_RECENT_EMOJIS, recentEmojis.getJson()).apply();
+    }
+
+    @Override
+    public List<String> getRecentEmojis() {
+        return new RecentEmojis(userPreferences.getString(USER_PREF_RECENT_EMOJIS, null)).getRecentEmojis();
     }
 
 }

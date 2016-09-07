@@ -1,0 +1,1316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Wire
+    Copyright (C) 2016 Wire Swiss GmbH
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<resources>
+
+    <string-array name="emoji_flags">
+        <item>\ud83c\udde6\ud83c\udde8</item> <!-- Flag for Ascension Island -->
+        <item>\ud83c\udde6\ud83c\udde9</item> <!-- Flag for Andorra -->
+        <item>\ud83c\udde6\ud83c\uddea</item> <!-- Flag for United Arab Emirates -->
+        <item>\ud83c\udde6\ud83c\uddeb</item> <!-- Flag for Afghanistan -->
+        <item>\ud83c\udde6\ud83c\uddec</item> <!-- Flag for Antigua & Barbuda -->
+        <item>\ud83c\udde6\ud83c\uddee</item> <!-- Flag for Anguilla -->
+        <item>\ud83c\udde6\ud83c\uddf1</item> <!-- Flag for Albania -->
+        <item>\ud83c\udde6\ud83c\uddf2</item> <!-- Flag for Armenia -->
+        <item>\ud83c\udde6\ud83c\uddf4</item> <!-- Flag for Angola -->
+        <item>\ud83c\udde6\ud83c\uddf6</item> <!-- Flag for Antarctica -->
+        <item>\ud83c\udde6\ud83c\uddf7</item> <!-- Flag for Argentina -->
+        <item>\ud83c\udde6\ud83c\uddf8</item> <!-- Flag for American Samoa -->
+        <item>\ud83c\udde6\ud83c\uddf9</item> <!-- Flag for Austria -->
+        <item>\ud83c\udde6\ud83c\uddfa</item> <!-- Flag for Australia -->
+        <item>\ud83c\udde6\ud83c\uddfc</item> <!-- Flag for Aruba -->
+        <item>\ud83c\udde6\ud83c\uddfd</item> <!-- Flag for \u00c5land Islands -->
+        <item>\ud83c\udde6\ud83c\uddff</item> <!-- Flag for Azerbaijan -->
+        <item>\ud83c\udde7\ud83c\udde6</item> <!-- Flag for Bosnia & Herzegovina -->
+        <item>\ud83c\udde7\ud83c\udde7</item> <!-- Flag for Barbados -->
+        <item>\ud83c\udde7\ud83c\udde9</item> <!-- Flag for Bangladesh -->
+        <item>\ud83c\udde7\ud83c\uddea</item> <!-- Flag for Belgium -->
+        <item>\ud83c\udde7\ud83c\uddeb</item> <!-- Flag for Burkina Faso -->
+        <item>\ud83c\udde7\ud83c\uddec</item> <!-- Flag for Bulgaria -->
+        <item>\ud83c\udde7\ud83c\udded</item> <!-- Flag for Bahrain -->
+        <item>\ud83c\udde7\ud83c\uddee</item> <!-- Flag for Burundi -->
+        <item>\ud83c\udde7\ud83c\uddef</item> <!-- Flag for Benin -->
+        <item>\ud83c\udde7\ud83c\uddf1</item> <!-- Flag for St. Barth\u00e9lemy -->
+        <item>\ud83c\udde7\ud83c\uddf2</item> <!-- Flag for Bermuda -->
+        <item>\ud83c\udde7\ud83c\uddf3</item> <!-- Flag for Brunei -->
+        <item>\ud83c\udde7\ud83c\uddf4</item> <!-- Flag for Bolivia -->
+        <item>\ud83c\udde7\ud83c\uddf6</item> <!-- Flag for Caribbean Netherlands -->
+        <item>\ud83c\udde7\ud83c\uddf7</item> <!-- Flag for Brazil -->
+        <item>\ud83c\udde7\ud83c\uddf8</item> <!-- Flag for Bahamas -->
+        <item>\ud83c\udde7\ud83c\uddf9</item> <!-- Flag for Bhutan -->
+        <item>\ud83c\udde7\ud83c\uddfb</item> <!-- Flag for Bouvet Island -->
+        <item>\ud83c\udde7\ud83c\uddfc</item> <!-- Flag for Botswana -->
+        <item>\ud83c\udde7\ud83c\uddfe</item> <!-- Flag for Belarus -->
+        <item>\ud83c\udde7\ud83c\uddff</item> <!-- Flag for Belize -->
+        <item>\ud83c\udde8\ud83c\udde6</item> <!-- Flag for Canada -->
+        <item>\ud83c\udde8\ud83c\udde8</item> <!-- Flag for Cocos Islands -->
+        <item>\ud83c\udde8\ud83c\udde9</item> <!-- Flag for Congo - Kinshasa -->
+        <item>\ud83c\udde8\ud83c\uddeb</item> <!-- Flag for Central African Republic -->
+        <item>\ud83c\udde8\ud83c\uddec</item> <!-- Flag for Congo - Brazzaville -->
+        <item>\ud83c\udde8\ud83c\udded</item> <!-- Flag for Switzerland -->
+        <item>\ud83c\udde8\ud83c\uddee</item> <!-- Flag for C\u00f4te D\u2019Ivoire -->
+        <item>\ud83c\udde8\ud83c\uddf0</item> <!-- Flag for Cook Islands -->
+        <item>\ud83c\udde8\ud83c\uddf1</item> <!-- Flag for Chile -->
+        <item>\ud83c\udde8\ud83c\uddf2</item> <!-- Flag for Cameroon -->
+        <item>\ud83c\udde8\ud83c\uddf3</item> <!-- Flag for China -->
+        <item>\ud83c\udde8\ud83c\uddf4</item> <!-- Flag for Colombia -->
+        <item>\ud83c\udde8\ud83c\uddf5</item> <!-- Flag for Clipperton Island -->
+        <item>\ud83c\udde8\ud83c\uddf7</item> <!-- Flag for Costa Rica -->
+        <item>\ud83c\udde8\ud83c\uddfa</item> <!-- Flag for Cuba -->
+        <item>\ud83c\udde8\ud83c\uddfb</item> <!-- Flag for Cape Verde -->
+        <item>\ud83c\udde8\ud83c\uddfc</item> <!-- Flag for Cura\u00e7ao -->
+        <item>\ud83c\udde8\ud83c\uddfd</item> <!-- Flag for Christmas Island -->
+        <item>\ud83c\udde8\ud83c\uddfe</item> <!-- Flag for Cyprus -->
+        <item>\ud83c\udde8\ud83c\uddff</item> <!-- Flag for Czech Republic -->
+        <item>\ud83c\udde9\ud83c\uddea</item> <!-- Flag for Germany -->
+        <item>\ud83c\udde9\ud83c\uddec</item> <!-- Flag for Diego Garcia -->
+        <item>\ud83c\udde9\ud83c\uddef</item> <!-- Flag for Djibouti -->
+        <item>\ud83c\udde9\ud83c\uddf0</item> <!-- Flag for Denmark -->
+        <item>\ud83c\udde9\ud83c\uddf2</item> <!-- Flag for Dominica -->
+        <item>\ud83c\udde9\ud83c\uddf4</item> <!-- Flag for Dominican Republic -->
+        <item>\ud83c\udde9\ud83c\uddff</item> <!-- Flag for Algeria -->
+        <item>\ud83c\uddea\ud83c\udde6</item> <!-- Flag for Ceuta & Melilla -->
+        <item>\ud83c\uddea\ud83c\udde8</item> <!-- Flag for Ecuador -->
+        <item>\ud83c\uddea\ud83c\uddea</item> <!-- Flag for Estonia -->
+        <item>\ud83c\uddea\ud83c\uddec</item> <!-- Flag for Egypt -->
+        <item>\ud83c\uddea\ud83c\udded</item> <!-- Flag for Western Sahara -->
+        <item>\ud83c\uddea\ud83c\uddf7</item> <!-- Flag for Eritrea -->
+        <item>\ud83c\uddea\ud83c\uddf8</item> <!-- Flag for Spain -->
+        <item>\ud83c\uddea\ud83c\uddf9</item> <!-- Flag for Ethiopia -->
+        <item>\ud83c\uddea\ud83c\uddfa</item> <!-- Flag for European Union -->
+        <item>\ud83c\uddeb\ud83c\uddee</item> <!-- Flag for Finland -->
+        <item>\ud83c\uddeb\ud83c\uddef</item> <!-- Flag for Fiji -->
+        <item>\ud83c\uddeb\ud83c\uddf0</item> <!-- Flag for Falkland Islands -->
+        <item>\ud83c\uddeb\ud83c\uddf2</item> <!-- Flag for Micronesia -->
+        <item>\ud83c\uddeb\ud83c\uddf4</item> <!-- Flag for Faroe Islands -->
+        <item>\ud83c\uddeb\ud83c\uddf7</item> <!-- Flag for France -->
+        <item>\ud83c\uddec\ud83c\udde6</item> <!-- Flag for Gabon -->
+        <item>\ud83c\uddec\ud83c\udde7</item> <!-- Flag for United Kingdom -->
+        <item>\ud83c\uddec\ud83c\udde9</item> <!-- Flag for Grenada -->
+        <item>\ud83c\uddec\ud83c\uddea</item> <!-- Flag for Georgia -->
+        <item>\ud83c\uddec\ud83c\uddeb</item> <!-- Flag for French Guiana -->
+        <item>\ud83c\uddec\ud83c\uddec</item> <!-- Flag for Guernsey -->
+        <item>\ud83c\uddec\ud83c\udded</item> <!-- Flag for Ghana -->
+        <item>\ud83c\uddec\ud83c\uddee</item> <!-- Flag for Gibraltar -->
+        <item>\ud83c\uddec\ud83c\uddf1</item> <!-- Flag for Greenland -->
+        <item>\ud83c\uddec\ud83c\uddf2</item> <!-- Flag for Gambia -->
+        <item>\ud83c\uddec\ud83c\uddf3</item> <!-- Flag for Guinea -->
+        <item>\ud83c\uddec\ud83c\uddf5</item> <!-- Flag for Guadeloupe -->
+        <item>\ud83c\uddec\ud83c\uddf6</item> <!-- Flag for Equatorial Guinea -->
+        <item>\ud83c\uddec\ud83c\uddf7</item> <!-- Flag for Greece -->
+        <item>\ud83c\uddec\ud83c\uddf8</item> <!-- Flag for South Georgia & South Sandwich Islands -->
+        <item>\ud83c\uddec\ud83c\uddf9</item> <!-- Flag for Guatemala -->
+        <item>\ud83c\uddec\ud83c\uddfa</item> <!-- Flag for Guam -->
+        <item>\ud83c\uddec\ud83c\uddfc</item> <!-- Flag for Guinea-Bissau -->
+        <item>\ud83c\uddec\ud83c\uddfe</item> <!-- Flag for Guyana -->
+        <item>\ud83c\udded\ud83c\uddf0</item> <!-- Flag for Hong Kong -->
+        <item>\ud83c\udded\ud83c\uddf2</item> <!-- Flag for Heard & McDonald Islands -->
+        <item>\ud83c\udded\ud83c\uddf3</item> <!-- Flag for Honduras -->
+        <item>\ud83c\udded\ud83c\uddf7</item> <!-- Flag for Croatia -->
+        <item>\ud83c\udded\ud83c\uddf9</item> <!-- Flag for Haiti -->
+        <item>\ud83c\udded\ud83c\uddfa</item> <!-- Flag for Hungary -->
+        <item>\ud83c\uddee\ud83c\udde8</item> <!-- Flag for Canary Islands -->
+        <item>\ud83c\uddee\ud83c\udde9</item> <!-- Flag for Indonesia -->
+        <item>\ud83c\uddee\ud83c\uddea</item> <!-- Flag for Ireland -->
+        <item>\ud83c\uddee\ud83c\uddf1</item> <!-- Flag for Israel -->
+        <item>\ud83c\uddee\ud83c\uddf2</item> <!-- Flag for Isle of Man -->
+        <item>\ud83c\uddee\ud83c\uddf3</item> <!-- Flag for India -->
+        <item>\ud83c\uddee\ud83c\uddf4</item> <!-- Flag for British Indian Ocean Territory -->
+        <item>\ud83c\uddee\ud83c\uddf6</item> <!-- Flag for Iraq -->
+        <item>\ud83c\uddee\ud83c\uddf7</item> <!-- Flag for Iran -->
+        <item>\ud83c\uddee\ud83c\uddf8</item> <!-- Flag for Iceland -->
+        <item>\ud83c\uddee\ud83c\uddf9</item> <!-- Flag for Italy -->
+        <item>\ud83c\uddef\ud83c\uddea</item> <!-- Flag for Jersey -->
+        <item>\ud83c\uddef\ud83c\uddf2</item> <!-- Flag for Jamaica -->
+        <item>\ud83c\uddef\ud83c\uddf4</item> <!-- Flag for Jordan -->
+        <item>\ud83c\uddef\ud83c\uddf5</item> <!-- Flag for Japan -->
+        <item>\ud83c\uddf0\ud83c\uddea</item> <!-- Flag for Kenya -->
+        <item>\ud83c\uddf0\ud83c\uddec</item> <!-- Flag for Kyrgyzstan -->
+        <item>\ud83c\uddf0\ud83c\udded</item> <!-- Flag for Cambodia -->
+        <item>\ud83c\uddf0\ud83c\uddee</item> <!-- Flag for Kiribati -->
+        <item>\ud83c\uddf0\ud83c\uddf2</item> <!-- Flag for Comoros -->
+        <item>\ud83c\uddf0\ud83c\uddf3</item> <!-- Flag for St. Kitts & Nevis -->
+        <item>\ud83c\uddf0\ud83c\uddf5</item> <!-- Flag for North Korea -->
+        <item>\ud83c\uddf0\ud83c\uddf7</item> <!-- Flag for South Korea -->
+        <item>\ud83c\uddf0\ud83c\uddfc</item> <!-- Flag for Kuwait -->
+        <item>\ud83c\uddf0\ud83c\uddfe</item> <!-- Flag for Cayman Islands -->
+        <item>\ud83c\uddf0\ud83c\uddff</item> <!-- Flag for Kazakhstan -->
+        <item>\ud83c\uddf1\ud83c\udde6</item> <!-- Flag for Laos -->
+        <item>\ud83c\uddf1\ud83c\udde7</item> <!-- Flag for Lebanon -->
+        <item>\ud83c\uddf1\ud83c\udde8</item> <!-- Flag for St. Lucia -->
+        <item>\ud83c\uddf1\ud83c\uddee</item> <!-- Flag for Liechtenstein -->
+        <item>\ud83c\uddf1\ud83c\uddf0</item> <!-- Flag for Sri Lanka -->
+        <item>\ud83c\uddf1\ud83c\uddf7</item> <!-- Flag for Liberia -->
+        <item>\ud83c\uddf1\ud83c\uddf8</item> <!-- Flag for Lesotho -->
+        <item>\ud83c\uddf1\ud83c\uddf9</item> <!-- Flag for Lithuania -->
+        <item>\ud83c\uddf1\ud83c\uddfa</item> <!-- Flag for Luxembourg -->
+        <item>\ud83c\uddf1\ud83c\uddfb</item> <!-- Flag for Latvia -->
+        <item>\ud83c\uddf1\ud83c\uddfe</item> <!-- Flag for Libya -->
+        <item>\ud83c\uddf2\ud83c\udde6</item> <!-- Flag for Morocco -->
+        <item>\ud83c\uddf2\ud83c\udde8</item> <!-- Flag for Monaco -->
+        <item>\ud83c\uddf2\ud83c\udde9</item> <!-- Flag for Moldova -->
+        <item>\ud83c\uddf2\ud83c\uddea</item> <!-- Flag for Montenegro -->
+        <item>\ud83c\uddf2\ud83c\uddeb</item> <!-- Flag for St. Martin -->
+        <item>\ud83c\uddf2\ud83c\uddec</item> <!-- Flag for Madagascar -->
+        <item>\ud83c\uddf2\ud83c\udded</item> <!-- Flag for Marshall Islands -->
+        <item>\ud83c\uddf2\ud83c\uddf0</item> <!-- Flag for Macedonia -->
+        <item>\ud83c\uddf2\ud83c\uddf1</item> <!-- Flag for Mali -->
+        <item>\ud83c\uddf2\ud83c\uddf2</item> <!-- Flag for Myanmar -->
+        <item>\ud83c\uddf2\ud83c\uddf3</item> <!-- Flag for Mongolia -->
+        <item>\ud83c\uddf2\ud83c\uddf4</item> <!-- Flag for Macau -->
+        <item>\ud83c\uddf2\ud83c\uddf5</item> <!-- Flag for Northern Mariana Islands -->
+        <item>\ud83c\uddf2\ud83c\uddf6</item> <!-- Flag for Martinique -->
+        <item>\ud83c\uddf2\ud83c\uddf7</item> <!-- Flag for Mauritania -->
+        <item>\ud83c\uddf2\ud83c\uddf8</item> <!-- Flag for Montserrat -->
+        <item>\ud83c\uddf2\ud83c\uddf9</item> <!-- Flag for Malta -->
+        <item>\ud83c\uddf2\ud83c\uddfa</item> <!-- Flag for Mauritius -->
+        <item>\ud83c\uddf2\ud83c\uddfb</item> <!-- Flag for Maldives -->
+        <item>\ud83c\uddf2\ud83c\uddfc</item> <!-- Flag for Malawi -->
+        <item>\ud83c\uddf2\ud83c\uddfd</item> <!-- Flag for Mexico -->
+        <item>\ud83c\uddf2\ud83c\uddfe</item> <!-- Flag for Malaysia -->
+        <item>\ud83c\uddf2\ud83c\uddff</item> <!-- Flag for Mozambique -->
+        <item>\ud83c\uddf3\ud83c\udde6</item> <!-- Flag for Namibia -->
+        <item>\ud83c\uddf3\ud83c\udde8</item> <!-- Flag for New Caledonia -->
+        <item>\ud83c\uddf3\ud83c\uddea</item> <!-- Flag for Niger -->
+        <item>\ud83c\uddf3\ud83c\uddeb</item> <!-- Flag for Norfolk Island -->
+        <item>\ud83c\uddf3\ud83c\uddec</item> <!-- Flag for Nigeria -->
+        <item>\ud83c\uddf3\ud83c\uddee</item> <!-- Flag for Nicaragua -->
+        <item>\ud83c\uddf3\ud83c\uddf1</item> <!-- Flag for Netherlands -->
+        <item>\ud83c\uddf3\ud83c\uddf4</item> <!-- Flag for Norway -->
+        <item>\ud83c\uddf3\ud83c\uddf5</item> <!-- Flag for Nepal -->
+        <item>\ud83c\uddf3\ud83c\uddf7</item> <!-- Flag for Nauru -->
+        <item>\ud83c\uddf3\ud83c\uddfa</item> <!-- Flag for Niue -->
+        <item>\ud83c\uddf3\ud83c\uddff</item> <!-- Flag for New Zealand -->
+        <item>\ud83c\uddf4\ud83c\uddf2</item> <!-- Flag for Oman -->
+        <item>\ud83c\uddf5\ud83c\udde6</item> <!-- Flag for Panama -->
+        <item>\ud83c\uddf5\ud83c\uddea</item> <!-- Flag for Peru -->
+        <item>\ud83c\uddf5\ud83c\uddeb</item> <!-- Flag for French Polynesia -->
+        <item>\ud83c\uddf5\ud83c\uddec</item> <!-- Flag for Papua New Guinea -->
+        <item>\ud83c\uddf5\ud83c\udded</item> <!-- Flag for Philippines -->
+        <item>\ud83c\uddf5\ud83c\uddf0</item> <!-- Flag for Pakistan -->
+        <item>\ud83c\uddf5\ud83c\uddf1</item> <!-- Flag for Poland -->
+        <item>\ud83c\uddf5\ud83c\uddf2</item> <!-- Flag for St. Pierre & Miquelon -->
+        <item>\ud83c\uddf5\ud83c\uddf3</item> <!-- Flag for Pitcairn Islands -->
+        <item>\ud83c\uddf5\ud83c\uddf7</item> <!-- Flag for Puerto Rico -->
+        <item>\ud83c\uddf5\ud83c\uddf8</item> <!-- Flag for Palestinian Territories -->
+        <item>\ud83c\uddf5\ud83c\uddf9</item> <!-- Flag for Portugal -->
+        <item>\ud83c\uddf5\ud83c\uddfc</item> <!-- Flag for Palau -->
+        <item>\ud83c\uddf5\ud83c\uddfe</item> <!-- Flag for Paraguay -->
+        <item>\ud83c\uddf6\ud83c\udde6</item> <!-- Flag for Qatar -->
+        <item>\ud83c\uddf7\ud83c\uddea</item> <!-- Flag for R\u00e9union -->
+        <item>\ud83c\uddf7\ud83c\uddf4</item> <!-- Flag for Romania -->
+        <item>\ud83c\uddf7\ud83c\uddf8</item> <!-- Flag for Serbia -->
+        <item>\ud83c\uddf7\ud83c\uddfa</item> <!-- Flag for Russia -->
+        <item>\ud83c\uddf7\ud83c\uddfc</item> <!-- Flag for Rwanda -->
+        <item>\ud83c\uddf8\ud83c\udde6</item> <!-- Flag for Saudi Arabia -->
+        <item>\ud83c\uddf8\ud83c\udde7</item> <!-- Flag for Solomon Islands -->
+        <item>\ud83c\uddf8\ud83c\udde8</item> <!-- Flag for Seychelles -->
+        <item>\ud83c\uddf8\ud83c\udde9</item> <!-- Flag for Sudan -->
+        <item>\ud83c\uddf8\ud83c\uddea</item> <!-- Flag for Sweden -->
+        <item>\ud83c\uddf8\ud83c\uddec</item> <!-- Flag for Singapore -->
+        <item>\ud83c\uddf8\ud83c\udded</item> <!-- Flag for St. Helena -->
+        <item>\ud83c\uddf8\ud83c\uddee</item> <!-- Flag for Slovenia -->
+        <item>\ud83c\uddf8\ud83c\uddef</item> <!-- Flag for Svalbard & Jan Mayen -->
+        <item>\ud83c\uddf8\ud83c\uddf0</item> <!-- Flag for Slovakia -->
+        <item>\ud83c\uddf8\ud83c\uddf1</item> <!-- Flag for Sierra Leone -->
+        <item>\ud83c\uddf8\ud83c\uddf2</item> <!-- Flag for San Marino -->
+        <item>\ud83c\uddf8\ud83c\uddf3</item> <!-- Flag for Senegal -->
+        <item>\ud83c\uddf8\ud83c\uddf4</item> <!-- Flag for Somalia -->
+        <item>\ud83c\uddf8\ud83c\uddf7</item> <!-- Flag for Suriname -->
+        <item>\ud83c\uddf8\ud83c\uddf8</item> <!-- Flag for South Sudan -->
+        <item>\ud83c\uddf8\ud83c\uddf9</item> <!-- Flag for S\u00e3o Tom\u00e9 & Pr\u00edncipe -->
+        <item>\ud83c\uddf8\ud83c\uddfb</item> <!-- Flag for El Salvador -->
+        <item>\ud83c\uddf8\ud83c\uddfd</item> <!-- Flag for Sint Maarten -->
+        <item>\ud83c\uddf8\ud83c\uddfe</item> <!-- Flag for Syria -->
+        <item>\ud83c\uddf8\ud83c\uddff</item> <!-- Flag for Swaziland -->
+        <item>\ud83c\uddf9\ud83c\udde6</item> <!-- Flag for Tristan Da Cunha -->
+        <item>\ud83c\uddf9\ud83c\udde8</item> <!-- Flag for Turks & Caicos Islands -->
+        <item>\ud83c\uddf9\ud83c\udde9</item> <!-- Flag for Chad -->
+        <item>\ud83c\uddf9\ud83c\uddeb</item> <!-- Flag for French Southern Territories -->
+        <item>\ud83c\uddf9\ud83c\uddec</item> <!-- Flag for Togo -->
+        <item>\ud83c\uddf9\ud83c\udded</item> <!-- Flag for Thailand -->
+        <item>\ud83c\uddf9\ud83c\uddef</item> <!-- Flag for Tajikistan -->
+        <item>\ud83c\uddf9\ud83c\uddf0</item> <!-- Flag for Tokelau -->
+        <item>\ud83c\uddf9\ud83c\uddf1</item> <!-- Flag for Timor-Leste -->
+        <item>\ud83c\uddf9\ud83c\uddf2</item> <!-- Flag for Turkmenistan -->
+        <item>\ud83c\uddf9\ud83c\uddf3</item> <!-- Flag for Tunisia -->
+        <item>\ud83c\uddf9\ud83c\uddf4</item> <!-- Flag for Tonga -->
+        <item>\ud83c\uddf9\ud83c\uddf7</item> <!-- Flag for Turkey -->
+        <item>\ud83c\uddf9\ud83c\uddf9</item> <!-- Flag for Trinidad & Tobago -->
+        <item>\ud83c\uddf9\ud83c\uddfb</item> <!-- Flag for Tuvalu -->
+        <item>\ud83c\uddf9\ud83c\uddfc</item> <!-- Flag for Taiwan -->
+        <item>\ud83c\uddf9\ud83c\uddff</item> <!-- Flag for Tanzania -->
+        <item>\ud83c\uddfa\ud83c\udde6</item> <!-- Flag for Ukraine -->
+        <item>\ud83c\uddfa\ud83c\uddec</item> <!-- Flag for Uganda -->
+        <item>\ud83c\uddfa\ud83c\uddf2</item> <!-- Flag for U.S. Outlying Islands -->
+        <item>\ud83c\uddfa\ud83c\uddf8</item> <!-- Flag for United States -->
+        <item>\ud83c\uddfa\ud83c\uddfe</item> <!-- Flag for Uruguay -->
+        <item>\ud83c\uddfa\ud83c\uddff</item> <!-- Flag for Uzbekistan -->
+        <item>\ud83c\uddfb\ud83c\udde6</item> <!-- Flag for Vatican City -->
+        <item>\ud83c\uddfb\ud83c\udde8</item> <!-- Flag for St. Vincent & Grenadines -->
+        <item>\ud83c\uddfb\ud83c\uddea</item> <!-- Flag for Venezuela -->
+        <item>\ud83c\uddfb\ud83c\uddec</item> <!-- Flag for British Virgin Islands -->
+        <item>\ud83c\uddfb\ud83c\uddee</item> <!-- Flag for U.S. Virgin Islands -->
+        <item>\ud83c\uddfb\ud83c\uddf3</item> <!-- Flag for Vietnam -->
+        <item>\ud83c\uddfb\ud83c\uddfa</item> <!-- Flag for Vanuatu -->
+        <item>\ud83c\uddfc\ud83c\uddeb</item> <!-- Flag for Wallis & Futuna -->
+        <item>\ud83c\uddfc\ud83c\uddf8</item> <!-- Flag for Samoa -->
+        <item>\ud83c\uddfd\ud83c\uddf0</item> <!-- Flag for Kosovo -->
+        <item>\ud83c\uddfe\ud83c\uddea</item> <!-- Flag for Yemen -->
+        <item>\ud83c\uddfe\ud83c\uddf9</item> <!-- Flag for Mayotte -->
+        <item>\ud83c\uddff\ud83c\udde6</item> <!-- Flag for South Africa -->
+        <item>\ud83c\uddff\ud83c\uddf2</item> <!-- Flag for Zambia -->
+        <item>\ud83c\uddff\ud83c\uddfc</item> <!-- Flag for Zimbabwe -->
+        <item>\ud83c\uddfd\ud83c\uddea</item> <!-- Flag for England -->
+        <item>\ud83c\uddfd\ud83c\uddf8</item> <!-- Flag for Scotland -->
+        <item>\ud83c\uddfd\ud83c\uddfc</item> <!-- Flag for Wales -->
+    </string-array>
+
+    <string-array name="emoji_activity">
+        <item>\ud83d\udc7e</item> <!-- Alien Monster -->
+        <item>\ud83d\udd74</item> <!-- Man in Business Suit Levitating -->
+        <item>\ud83c\udfaa</item> <!-- Circus Tent -->
+        <item>\ud83c\udfad</item> <!-- Performing Arts -->
+        <item>\ud83c\udfa8</item> <!-- Artist Palette -->
+        <item>\ud83c\udfb0</item> <!-- Slot Machine -->
+        <item>\ud83d\udea3</item> <!-- Rowboat -->
+        <item>\ud83d\udec0</item> <!-- Bath -->
+        <item>\ud83c\udf97</item> <!-- Reminder Ribbon -->
+        <item>\ud83c\udf9f</item> <!-- Admission Tickets -->
+        <item>\ud83c\udfab</item> <!-- Ticket -->
+        <item>\ud83c\udf96</item> <!-- Military Medal -->
+        <item>\ud83c\udfc6</item> <!-- Trophy -->
+        <item>\ud83c\udfc5</item> <!-- Sports Medal -->
+        <item>\u26bd</item> <!-- Soccer Ball -->
+        <item>\u26be</item> <!-- Baseball -->
+        <item>\ud83c\udfc0</item> <!-- Basketball and Hoop -->
+        <item>\ud83c\udfd0</item> <!-- Volleyball -->
+        <item>\ud83c\udfc8</item> <!-- American Football -->
+        <item>\ud83c\udfc9</item> <!-- Rugby Football -->
+        <item>\ud83c\udfbe</item> <!-- Tennis Racquet and Ball -->
+        <item>\ud83c\udfb1</item> <!-- Billiards -->
+        <item>\ud83c\udfb3</item> <!-- Bowling -->
+        <item>\ud83c\udfcf</item> <!-- Cricket Bat and Ball -->
+        <item>\ud83c\udfd1</item> <!-- Field Hockey Stick and Ball -->
+        <item>\ud83c\udfd2</item> <!-- Ice Hockey Stick and Puck -->
+        <item>\ud83c\udfd3</item> <!-- Table Tennis Paddle and Ball -->
+        <item>\ud83c\udff8</item> <!-- Badminton Racquet and Shuttlecock -->
+        <item>\u26f3</item> <!-- Flag in Hole -->
+        <item>\ud83c\udfcc</item> <!-- Golfer -->
+        <item>\u26f8</item> <!-- Ice Skate -->
+        <item>\ud83c\udfa3</item> <!-- Fishing Pole and Fish -->
+        <item>\ud83c\udfbd</item> <!-- Running Shirt With Sash -->
+        <item>\ud83c\udfbf</item> <!-- Ski and Ski Boot -->
+        <item>\u26f7</item> <!-- Skier -->
+        <item>\ud83c\udfc2</item> <!-- Snowboarder -->
+        <item>\ud83c\udfc4</item> <!-- Surfer -->
+        <item>\ud83c\udfc7</item> <!-- Horse Racing -->
+        <item>\ud83c\udfca</item> <!-- Swimmer -->
+        <item>\u26f9</item> <!-- Person With Ball -->
+        <item>\ud83c\udfcb</item> <!-- Weight Lifter -->
+        <item>\ud83d\udeb4</item> <!-- Bicyclist -->
+        <item>\ud83d\udeb5</item> <!-- Mountain Bicyclist -->
+        <item>\ud83c\udfaf</item> <!-- Direct Hit -->
+        <item>\ud83c\udfae</item> <!-- Video Game -->
+        <item>\ud83c\udfb2</item> <!-- Game Die -->
+        <item>\ud83c\udfb7</item> <!-- Saxophone -->
+        <item>\ud83c\udfb8</item> <!-- Guitar -->
+        <item>\ud83c\udfba</item> <!-- Trumpet -->
+        <item>\ud83c\udfbb</item> <!-- Violin -->
+        <item>\ud83c\udfac</item> <!-- Clapper Board -->
+        <item>\ud83c\udff9</item> <!-- Bow and Arrow -->
+    </string-array>
+
+    <string-array name="emoji_food_drink">
+        <item>\ud83c\udf47</item> <!-- Grapes -->
+        <item>\ud83c\udf48</item> <!-- Melon -->
+        <item>\ud83c\udf49</item> <!-- Watermelon -->
+        <item>\ud83c\udf4a</item> <!-- Tangerine -->
+        <item>\ud83c\udf4b</item> <!-- Lemon -->
+        <item>\ud83c\udf4c</item> <!-- Banana -->
+        <item>\ud83c\udf4d</item> <!-- Pineapple -->
+        <item>\ud83c\udf4e</item> <!-- Red Apple -->
+        <item>\ud83c\udf4f</item> <!-- Green Apple -->
+        <item>\ud83c\udf50</item> <!-- Pear -->
+        <item>\ud83c\udf51</item> <!-- Peach -->
+        <item>\ud83c\udf52</item> <!-- Cherries -->
+        <item>\ud83c\udf53</item> <!-- Strawberry -->
+        <item>\ud83c\udf45</item> <!-- Tomato -->
+        <item>\ud83c\udf46</item> <!-- Aubergine -->
+        <item>\ud83c\udf3d</item> <!-- Ear of Maize -->
+        <item>\ud83c\udf36</item> <!-- Hot Pepper -->
+        <item>\ud83c\udf44</item> <!-- Mushroom -->
+        <item>\ud83c\udf30</item> <!-- Chestnut -->
+        <item>\ud83c\udf5e</item> <!-- Bread -->
+        <item>\ud83e\uddc0</item> <!-- Cheese Wedge -->
+        <item>\ud83c\udf56</item> <!-- Meat on Bone -->
+        <item>\ud83c\udf57</item> <!-- Poultry Leg -->
+        <item>\ud83c\udf54</item> <!-- Hamburger -->
+        <item>\ud83c\udf5f</item> <!-- French Fries -->
+        <item>\ud83c\udf55</item> <!-- Slice of Pizza -->
+        <item>\ud83c\udf2d</item> <!-- Hot Dog -->
+        <item>\ud83c\udf2e</item> <!-- Taco -->
+        <item>\ud83c\udf2f</item> <!-- Burrito -->
+        <item>\ud83c\udf73</item> <!-- Cooking -->
+        <item>\ud83c\udf72</item> <!-- Pot of Food -->
+        <item>\ud83c\udf7f</item> <!-- Popcorn -->
+        <item>\ud83c\udf71</item> <!-- Bento Box -->
+        <item>\ud83c\udf58</item> <!-- Rice Cracker -->
+        <item>\ud83c\udf59</item> <!-- Rice Ball -->
+        <item>\ud83c\udf5a</item> <!-- Cooked Rice -->
+        <item>\ud83c\udf5b</item> <!-- Curry and Rice -->
+        <item>\ud83c\udf5c</item> <!-- Steaming Bowl -->
+        <item>\ud83c\udf5d</item> <!-- Spaghetti -->
+        <item>\ud83c\udf60</item> <!-- Roasted Sweet Potato -->
+        <item>\ud83c\udf62</item> <!-- Oden -->
+        <item>\ud83c\udf63</item> <!-- Sushi -->
+        <item>\ud83c\udf64</item> <!-- Fried Shrimp -->
+        <item>\ud83c\udf65</item> <!-- Fish Cake With Swirl Design -->
+        <item>\ud83c\udf61</item> <!-- Dango -->
+        <item>\ud83c\udf66</item> <!-- Soft Ice Cream -->
+        <item>\ud83c\udf67</item> <!-- Shaved Ice -->
+        <item>\ud83c\udf68</item> <!-- Ice Cream -->
+        <item>\ud83c\udf69</item> <!-- Doughnut -->
+        <item>\ud83c\udf6a</item> <!-- Cookie -->
+        <item>\ud83c\udf82</item> <!-- Birthday Cake -->
+        <item>\ud83c\udf70</item> <!-- Shortcake -->
+        <item>\ud83c\udf6b</item> <!-- Chocolate Bar -->
+        <item>\ud83c\udf6c</item> <!-- Candy -->
+        <item>\ud83c\udf6d</item> <!-- Lollipop -->
+        <item>\ud83c\udf6e</item> <!-- Custard -->
+        <item>\ud83c\udf6f</item> <!-- Honey Pot -->
+        <item>\ud83c\udf7c</item> <!-- Baby Bottle -->
+        <item>\u2615</item> <!-- Hot Beverage -->
+        <item>\ud83c\udf75</item> <!-- Teacup Without Handle -->
+        <item>\ud83c\udf76</item> <!-- Sake Bottle and Cup -->
+        <item>\ud83c\udf7e</item> <!-- Bottle With Popping Cork -->
+        <item>\ud83c\udf77</item> <!-- Wine Glass -->
+        <item>\ud83c\udf78</item> <!-- Cocktail Glass -->
+        <item>\ud83c\udf79</item> <!-- Tropical Drink -->
+        <item>\ud83c\udf7a</item> <!-- Beer Mug -->
+        <item>\ud83c\udf7b</item> <!-- Clinking Beer Mugs -->
+        <item>\ud83c\udf7d</item> <!-- Fork and Knife With Plate -->
+        <item>\ud83c\udf74</item> <!-- Fork and Knife -->
+    </string-array>
+
+    <string-array name="emoji_nature">
+        <item>\ud83d\ude48</item> <!-- See-No-Evil Monkey -->
+        <item>\ud83d\ude49</item> <!-- Hear-No-Evil Monkey -->
+        <item>\ud83d\ude4a</item> <!-- Speak-No-Evil Monkey -->
+        <item>\ud83d\udca6</item> <!-- Splashing Sweat Symbol -->
+        <item>\ud83d\udca8</item> <!-- Dash Symbol -->
+        <item>\ud83d\udc35</item> <!-- Monkey Face -->
+        <item>\ud83d\udc12</item> <!-- Monkey -->
+        <item>\ud83d\udc36</item> <!-- Dog Face -->
+        <item>\ud83d\udc15</item> <!-- Dog -->
+        <item>\ud83d\udc29</item> <!-- Poodle -->
+        <item>\ud83d\udc3a</item> <!-- Wolf Face -->
+        <item>\ud83d\udc31</item> <!-- Cat Face -->
+        <item>\ud83d\udc08</item> <!-- Cat -->
+        <item>\ud83e\udd81</item> <!-- Lion Face -->
+        <item>\ud83d\udc2f</item> <!-- Tiger Face -->
+        <item>\ud83d\udc05</item> <!-- Tiger -->
+        <item>\ud83d\udc06</item> <!-- Leopard -->
+        <item>\ud83d\udc34</item> <!-- Horse Face -->
+        <item>\ud83d\udc0e</item> <!-- Horse -->
+        <item>\ud83e\udd84</item> <!-- Unicorn Face -->
+        <item>\ud83d\udc2e</item> <!-- Cow Face -->
+        <item>\ud83d\udc02</item> <!-- Ox -->
+        <item>\ud83d\udc03</item> <!-- Water Buffalo -->
+        <item>\ud83d\udc04</item> <!-- Cow -->
+        <item>\ud83d\udc37</item> <!-- Pig Face -->
+        <item>\ud83d\udc16</item> <!-- Pig -->
+        <item>\ud83d\udc17</item> <!-- Boar -->
+        <item>\ud83d\udc3d</item> <!-- Pig Nose -->
+        <item>\ud83d\udc0f</item> <!-- Ram -->
+        <item>\ud83d\udc11</item> <!-- Sheep -->
+        <item>\ud83d\udc10</item> <!-- Goat -->
+        <item>\ud83d\udc2a</item> <!-- Dromedary Camel -->
+        <item>\ud83d\udc2b</item> <!-- Bactrian Camel -->
+        <item>\ud83d\udc18</item> <!-- Elephant -->
+        <item>\ud83d\udc2d</item> <!-- Mouse Face -->
+        <item>\ud83d\udc01</item> <!-- Mouse -->
+        <item>\ud83d\udc00</item> <!-- Rat -->
+        <item>\ud83d\udc39</item> <!-- Hamster Face -->
+        <item>\ud83d\udc30</item> <!-- Rabbit Face -->
+        <item>\ud83d\udc07</item> <!-- Rabbit -->
+        <item>\ud83d\udc3f</item> <!-- Chipmunk -->
+        <item>\ud83d\udc3b</item> <!-- Bear Face -->
+        <item>\ud83d\udc28</item> <!-- Koala -->
+        <item>\ud83d\udc3c</item> <!-- Panda Face -->
+        <item>\ud83d\udc3e</item> <!-- Paw Prints -->
+        <item>\ud83e\udd83</item> <!-- Turkey -->
+        <item>\ud83d\udc14</item> <!-- Chicken -->
+        <item>\ud83d\udc13</item> <!-- Rooster -->
+        <item>\ud83d\udc23</item> <!-- Hatching Chick -->
+        <item>\ud83d\udc24</item> <!-- Baby Chick -->
+        <item>\ud83d\udc25</item> <!-- Front-Facing Baby Chick -->
+        <item>\ud83d\udc26</item> <!-- Bird -->
+        <item>\ud83d\udc27</item> <!-- Penguin -->
+        <item>\ud83d\udd4a</item> <!-- Dove of Peace -->
+        <item>\ud83d\udc38</item> <!-- Frog Face -->
+        <item>\ud83d\udc0a</item> <!-- Crocodile -->
+        <item>\ud83d\udc22</item> <!-- Turtle -->
+        <item>\ud83d\udc0d</item> <!-- Snake -->
+        <item>\ud83d\udc32</item> <!-- Dragon Face -->
+        <item>\ud83d\udc09</item> <!-- Dragon -->
+        <item>\ud83d\udc33</item> <!-- Spouting Whale -->
+        <item>\ud83d\udc0b</item> <!-- Whale -->
+        <item>\ud83d\udc2c</item> <!-- Dolphin -->
+        <item>\ud83d\udc1f</item> <!-- Fish -->
+        <item>\ud83d\udc20</item> <!-- Tropical Fish -->
+        <item>\ud83d\udc21</item> <!-- Blowfish -->
+        <item>\ud83d\udc19</item> <!-- Octopus -->
+        <item>\ud83d\udc1a</item> <!-- Spiral Shell -->
+        <item>\ud83e\udd80</item> <!-- Crab -->
+        <item>\ud83d\udc0c</item> <!-- Snail -->
+        <item>\ud83d\udc1b</item> <!-- Bug -->
+        <item>\ud83d\udc1c</item> <!-- Ant -->
+        <item>\ud83d\udc1d</item> <!-- Honeybee -->
+        <item>\ud83d\udc1e</item> <!-- Lady Beetle -->
+        <item>\ud83d\udd77</item> <!-- Spider -->
+        <item>\ud83d\udd78</item> <!-- Spider Web -->
+        <item>\ud83e\udd82</item> <!-- Scorpion -->
+        <item>\ud83d\udc90</item> <!-- Bouquet -->
+        <item>\ud83c\udf38</item> <!-- Cherry Blossom -->
+        <item>\ud83d\udcae</item> <!-- White Flower -->
+        <item>\ud83c\udff5</item> <!-- Rosette -->
+        <item>\ud83c\udf39</item> <!-- Rose -->
+        <item>\ud83c\udf3a</item> <!-- Hibiscus -->
+        <item>\ud83c\udf3b</item> <!-- Sunflower -->
+        <item>\ud83c\udf3c</item> <!-- Blossom -->
+        <item>\ud83c\udf37</item> <!-- Tulip -->
+        <item>\ud83c\udf31</item> <!-- Seedling -->
+        <item>\ud83c\udf32</item> <!-- Evergreen Tree -->
+        <item>\ud83c\udf33</item> <!-- Deciduous Tree -->
+        <item>\ud83c\udf34</item> <!-- Palm Tree -->
+        <item>\ud83c\udf35</item> <!-- Cactus -->
+        <item>\ud83c\udf3e</item> <!-- Ear of Rice -->
+        <item>\ud83c\udf3f</item> <!-- Herb -->
+        <item>\u2618</item> <!-- Shamrock -->
+        <item>\ud83c\udf40</item> <!-- Four Leaf Clover -->
+        <item>\ud83c\udf41</item> <!-- Maple Leaf -->
+        <item>\ud83c\udf42</item> <!-- Fallen Leaf -->
+        <item>\ud83c\udf43</item> <!-- Leaf Fluttering in Wind -->
+        <item>\ud83c\udf0d</item> <!-- Earth Globe Europe-Africa -->
+        <item>\ud83c\udf0e</item> <!-- Earth Globe Americas -->
+        <item>\ud83c\udf0f</item> <!-- Earth Globe Asia-Australia -->
+        <item>\ud83c\udf10</item> <!-- Globe With Meridians -->
+        <item>\ud83c\udf11</item> <!-- New Moon Symbol -->
+        <item>\ud83c\udf12</item> <!-- Waxing Crescent Moon Symbol -->
+        <item>\ud83c\udf13</item> <!-- First Quarter Moon Symbol -->
+        <item>\ud83c\udf14</item> <!-- Waxing Gibbous Moon Symbol -->
+        <item>\ud83c\udf15</item> <!-- Full Moon Symbol -->
+        <item>\ud83c\udf16</item> <!-- Waning Gibbous Moon Symbol -->
+        <item>\ud83c\udf17</item> <!-- Last Quarter Moon Symbol -->
+        <item>\ud83c\udf18</item> <!-- Waning Crescent Moon Symbol -->
+        <item>\ud83c\udf19</item> <!-- Crescent Moon -->
+        <item>\ud83c\udf1a</item> <!-- New Moon With Face -->
+        <item>\ud83c\udf1b</item> <!-- First Quarter Moon With Face -->
+        <item>\ud83c\udf1c</item> <!-- Last Quarter Moon With Face -->
+        <item>\u2600</item> <!-- Black Sun With Rays -->
+        <item>\ud83c\udf1d</item> <!-- Full Moon With Face -->
+        <item>\ud83c\udf1e</item> <!-- Sun With Face -->
+        <item>\u2b50</item> <!-- White Medium Star -->
+        <item>\ud83c\udf1f</item> <!-- Glowing Star -->
+        <item>\ud83c\udf20</item> <!-- Shooting Star -->
+        <item>\u2601</item> <!-- Cloud -->
+        <item>\u26c5</item> <!-- Sun Behind Cloud -->
+        <item>\u26c8</item> <!-- Thunder Cloud and Rain -->
+        <item>\ud83c\udf24</item> <!-- White Sun With Small Cloud -->
+        <item>\ud83c\udf25</item> <!-- White Sun Behind Cloud -->
+        <item>\ud83c\udf26</item> <!-- White Sun Behind Cloud With Rain -->
+        <item>\ud83c\udf27</item> <!-- Cloud With Rain -->
+        <item>\ud83c\udf28</item> <!-- Cloud With Snow -->
+        <item>\ud83c\udf29</item> <!-- Cloud With Lightning -->
+        <item>\ud83c\udf2a</item> <!-- Cloud With Tornado -->
+        <item>\ud83c\udf2b</item> <!-- Fog -->
+        <item>\ud83c\udf2c</item> <!-- Wind Blowing Face -->
+        <item>\u2602</item> <!-- Umbrella -->
+        <item>\u2614</item> <!-- Umbrella With Rain Drops -->
+        <item>\u26a1</item> <!-- High Voltage Sign -->
+        <item>\u2744</item> <!-- Snowflake -->
+        <item>\u2603</item> <!-- Snowman -->
+        <item>\u2604</item> <!-- Comet -->
+        <item>\ud83d\udd25</item> <!-- Fire -->
+        <item>\ud83d\udca7</item> <!-- Droplet -->
+        <item>\ud83c\udf0a</item> <!-- Water Wave -->
+    </string-array>
+
+    <string-array name="emoji_objects">
+        <item>\u2620</item> <!-- Skull and Crossbones -->
+        <item>\ud83d\udc8c</item> <!-- Love Letter -->
+        <item>\ud83d\udca3</item> <!-- Bomb -->
+        <item>\ud83d\udd73</item> <!-- Hole -->
+        <item>\ud83d\udecd</item> <!-- Shopping Bags -->
+        <item>\ud83d\udcff</item> <!-- Prayer Beads -->
+        <item>\ud83d\udc8e</item> <!-- Gem Stone -->
+        <item>\ud83d\udd2a</item> <!-- Hocho -->
+        <item>\ud83c\udffa</item> <!-- Amphora -->
+        <item>\ud83d\uddfa</item> <!-- World Map -->
+        <item>\ud83d\udc88</item> <!-- Barber Pole -->
+        <item>\ud83d\uddbc</item> <!-- Frame With Picture -->
+        <item>\ud83d\udece</item> <!-- Bellhop Bell -->
+        <item>\ud83d\udeaa</item> <!-- Door -->
+        <item>\ud83d\udecc</item> <!-- Sleeping Accommodation -->
+        <item>\ud83d\udecf</item> <!-- Bed -->
+        <item>\ud83d\udecb</item> <!-- Couch and Lamp -->
+        <item>\ud83d\udebd</item> <!-- Toilet -->
+        <item>\ud83d\udebf</item> <!-- Shower -->
+        <item>\ud83d\udec1</item> <!-- Bathtub -->
+        <item>\u231b</item> <!-- Hourglass -->
+        <item>\u23f3</item> <!-- Hourglass With Flowing Sand -->
+        <item>\u231a</item> <!-- Watch -->
+        <item>\u23f0</item> <!-- Alarm Clock -->
+        <item>\u23f1</item> <!-- Stopwatch -->
+        <item>\u23f2</item> <!-- Timer Clock -->
+        <item>\ud83d\udd70</item> <!-- Mantelpiece Clock -->
+        <item>\ud83c\udf21</item> <!-- Thermometer -->
+        <item>\u26f1</item> <!-- Umbrella on Ground -->
+        <item>\ud83c\udf88</item> <!-- Balloon -->
+        <item>\ud83c\udf89</item> <!-- Party Popper -->
+        <item>\ud83c\udf8a</item> <!-- Confetti Ball -->
+        <item>\ud83c\udf8e</item> <!-- Japanese Dolls -->
+        <item>\ud83c\udf8f</item> <!-- Carp Streamer -->
+        <item>\ud83c\udf90</item> <!-- Wind Chime -->
+        <item>\ud83c\udf80</item> <!-- Ribbon -->
+        <item>\ud83c\udf81</item> <!-- Wrapped Present -->
+        <item>\ud83d\udd79</item> <!-- Joystick -->
+        <item>\ud83d\udcef</item> <!-- Postal Horn -->
+        <item>\ud83c\udf99</item> <!-- Studio Microphone -->
+        <item>\ud83c\udf9a</item> <!-- Level Slider -->
+        <item>\ud83c\udf9b</item> <!-- Control Knobs -->
+        <item>\ud83d\udcfb</item> <!-- Radio -->
+        <item>\ud83d\udcf1</item> <!-- Mobile Phone -->
+        <item>\ud83d\udcf2</item> <!-- Mobile Phone With Rightwards Arrow at Left -->
+        <item>\u260e</item> <!-- Black Telephone -->
+        <item>\ud83d\udcde</item> <!-- Telephone Receiver -->
+        <item>\ud83d\udcdf</item> <!-- Pager -->
+        <item>\ud83d\udce0</item> <!-- Fax Machine -->
+        <item>\ud83d\udd0b</item> <!-- Battery -->
+        <item>\ud83d\udd0c</item> <!-- Electric Plug -->
+        <item>\ud83d\udcbb</item> <!-- Personal Computer -->
+        <item>\ud83d\udda5</item> <!-- Desktop Computer -->
+        <item>\ud83d\udda8</item> <!-- Printer -->
+        <item>\u2328</item> <!-- Keyboard -->
+        <item>\ud83d\uddb1</item> <!-- Three Button Mouse -->
+        <item>\ud83d\uddb2</item> <!-- Trackball -->
+        <item>\ud83d\udcbd</item> <!-- Minidisc -->
+        <item>\ud83d\udcbe</item> <!-- Floppy Disk -->
+        <item>\ud83d\udcbf</item> <!-- Optical Disc -->
+        <item>\ud83d\udcc0</item> <!-- DVD -->
+        <item>\ud83c\udfa5</item> <!-- Movie Camera -->
+        <item>\ud83c\udf9e</item> <!-- Film Frames -->
+        <item>\ud83d\udcfd</item> <!-- Film Projector -->
+        <item>\ud83d\udcfa</item> <!-- Television -->
+        <item>\ud83d\udcf7</item> <!-- Camera -->
+        <item>\ud83d\udcf8</item> <!-- Camera With Flash -->
+        <item>\ud83d\udcf9</item> <!-- Video Camera -->
+        <item>\ud83d\udcfc</item> <!-- Videocassette -->
+        <item>\ud83d\udd0d</item> <!-- Left-Pointing Magnifying Glass -->
+        <item>\ud83d\udd0e</item> <!-- Right-Pointing Magnifying Glass -->
+        <item>\ud83d\udd2c</item> <!-- Microscope -->
+        <item>\ud83d\udd2d</item> <!-- Telescope -->
+        <item>\ud83d\udce1</item> <!-- Satellite Antenna -->
+        <item>\ud83d\udd6f</item> <!-- Candle -->
+        <item>\ud83d\udca1</item> <!-- Electric Light Bulb -->
+        <item>\ud83d\udd26</item> <!-- Electric Torch -->
+        <item>\ud83c\udfee</item> <!-- Izakaya Lantern -->
+        <item>\ud83d\udcd4</item> <!-- Notebook With Decorative Cover -->
+        <item>\ud83d\udcd5</item> <!-- Closed Book -->
+        <item>\ud83d\udcd6</item> <!-- Open Book -->
+        <item>\ud83d\udcd7</item> <!-- Green Book -->
+        <item>\ud83d\udcd8</item> <!-- Blue Book -->
+        <item>\ud83d\udcd9</item> <!-- Orange Book -->
+        <item>\ud83d\udcda</item> <!-- Books -->
+        <item>\ud83d\udcd3</item> <!-- Notebook -->
+        <item>\ud83d\udcc3</item> <!-- Page With Curl -->
+        <item>\ud83d\udcdc</item> <!-- Scroll -->
+        <item>\ud83d\udcc4</item> <!-- Page Facing Up -->
+        <item>\ud83d\udcf0</item> <!-- Newspaper -->
+        <item>\ud83d\uddde</item> <!-- Rolled-Up Newspaper -->
+        <item>\ud83d\udcd1</item> <!-- Bookmark Tabs -->
+        <item>\ud83d\udd16</item> <!-- Bookmark -->
+        <item>\ud83c\udff7</item> <!-- Label -->
+        <item>\ud83d\udcb0</item> <!-- Money Bag -->
+        <item>\ud83d\udcb4</item> <!-- Banknote With Yen Sign -->
+        <item>\ud83d\udcb5</item> <!-- Banknote With Dollar Sign -->
+        <item>\ud83d\udcb6</item> <!-- Banknote With Euro Sign -->
+        <item>\ud83d\udcb7</item> <!-- Banknote With Pound Sign -->
+        <item>\ud83d\udcb8</item> <!-- Money With Wings -->
+        <item>\ud83d\udcb3</item> <!-- Credit Card -->
+        <item>\u2709</item> <!-- Envelope -->
+        <item>\ud83d\udce7</item> <!-- E-Mail Symbol -->
+        <item>\ud83d\udce8</item> <!-- Incoming Envelope -->
+        <item>\ud83d\udce9</item> <!-- Envelope With Downwards Arrow Above -->
+        <item>\ud83d\udce4</item> <!-- Outbox Tray -->
+        <item>\ud83d\udce5</item> <!-- Inbox Tray -->
+        <item>\ud83d\udce6</item> <!-- Package -->
+        <item>\ud83d\udceb</item> <!-- Closed Mailbox With Raised Flag -->
+        <item>\ud83d\udcea</item> <!-- Closed Mailbox With Lowered Flag -->
+        <item>\ud83d\udcec</item> <!-- Open Mailbox With Raised Flag -->
+        <item>\ud83d\udced</item> <!-- Open Mailbox With Lowered Flag -->
+        <item>\ud83d\udcee</item> <!-- Postbox -->
+        <item>\ud83d\uddf3</item> <!-- Ballot Box With Ballot -->
+        <item>\u270f</item> <!-- Pencil -->
+        <item>\u2712</item> <!-- Black Nib -->
+        <item>\ud83d\udd8b</item> <!-- Lower Left Fountain Pen -->
+        <item>\ud83d\udd8a</item> <!-- Lower Left Ballpoint Pen -->
+        <item>\ud83d\udd8c</item> <!-- Lower Left Paintbrush -->
+        <item>\ud83d\udd8d</item> <!-- Lower Left Crayon -->
+        <item>\ud83d\udcdd</item> <!-- Memo -->
+        <item>\ud83d\udcc1</item> <!-- File Folder -->
+        <item>\ud83d\udcc2</item> <!-- Open File Folder -->
+        <item>\ud83d\uddc2</item> <!-- Card Index Dividers -->
+        <item>\ud83d\udcc5</item> <!-- Calendar -->
+        <item>\ud83d\udcc6</item> <!-- Tear-Off Calendar -->
+        <item>\ud83d\uddd2</item> <!-- Spiral Note Pad -->
+        <item>\ud83d\uddd3</item> <!-- Spiral Calendar Pad -->
+        <item>\ud83d\udcc7</item> <!-- Card Index -->
+        <item>\ud83d\udcc8</item> <!-- Chart With Upwards Trend -->
+        <item>\ud83d\udcc9</item> <!-- Chart With Downwards Trend -->
+        <item>\ud83d\udcca</item> <!-- Bar Chart -->
+        <item>\ud83d\udccb</item> <!-- Clipboard -->
+        <item>\ud83d\udccc</item> <!-- Pushpin -->
+        <item>\ud83d\udccd</item> <!-- Round Pushpin -->
+        <item>\ud83d\udcce</item> <!-- Paperclip -->
+        <item>\ud83d\udd87</item> <!-- Linked Paperclips -->
+        <item>\ud83d\udccf</item> <!-- Straight Ruler -->
+        <item>\ud83d\udcd0</item> <!-- Triangular Ruler -->
+        <item>\u2702</item> <!-- Black Scissors -->
+        <item>\ud83d\uddc3</item> <!-- Card File Box -->
+        <item>\ud83d\uddc4</item> <!-- File Cabinet -->
+        <item>\ud83d\uddd1</item> <!-- Wastebasket -->
+        <item>\ud83d\udd12</item> <!-- Lock -->
+        <item>\ud83d\udd13</item> <!-- Open Lock -->
+        <item>\ud83d\udd0f</item> <!-- Lock With Ink Pen -->
+        <item>\ud83d\udd10</item> <!-- Closed Lock With Key -->
+        <item>\ud83d\udd11</item> <!-- Key -->
+        <item>\ud83d\udddd</item> <!-- Old Key -->
+        <item>\ud83d\udd28</item> <!-- Hammer -->
+        <item>\u26cf</item> <!-- Pick -->
+        <item>\u2692</item> <!-- Hammer and Pick -->
+        <item>\ud83d\udee0</item> <!-- Hammer and Wrench -->
+        <item>\ud83d\udde1</item> <!-- Dagger Knife -->
+        <item>\u2694</item> <!-- Crossed Swords -->
+        <item>\ud83d\udd2b</item> <!-- Pistol -->
+        <item>\ud83d\udee1</item> <!-- Shield -->
+        <item>\ud83d\udd27</item> <!-- Wrench -->
+        <item>\ud83d\udd29</item> <!-- Nut and Bolt -->
+        <item>\u2699</item> <!-- Gear -->
+        <item>\ud83d\udddc</item> <!-- Compression -->
+        <item>\u2697</item> <!-- Alembic -->
+        <item>\u2696</item> <!-- Scales -->
+        <item>\ud83d\udd17</item> <!-- Link Symbol -->
+        <item>\u26d3</item> <!-- Chains -->
+        <item>\ud83d\udc89</item> <!-- Syringe -->
+        <item>\ud83d\udc8a</item> <!-- Pill -->
+        <item>\ud83d\udeac</item> <!-- Smoking Symbol -->
+        <item>\u26b0</item> <!-- Coffin -->
+        <item>\u26b1</item> <!-- Funeral Urn -->
+        <item>\ud83d\uddff</item> <!-- Moyai -->
+        <item>\ud83d\udee2</item> <!-- Oil Drum -->
+        <item>\ud83d\udd2e</item> <!-- Crystal Ball -->
+        <item>\ud83d\udea9</item> <!-- Triangular Flag on Post -->
+        <item>\ud83c\udf8c</item> <!-- Crossed Flags -->
+        <item>\ud83c\udff4</item> <!-- Waving Black Flag -->
+        <item>\ud83c\udff3</item> <!-- Waving White Flag -->
+        <item>\ud83c\udff3\ufe0f\u200d\ud83c\udf08</item> <!-- Rainbow Flag -->
+    </string-array>
+
+    <string-array name="emoji_people">
+        <item>\ud83d\ude00</item> <!-- Grinning Face -->
+        <item>\ud83d\ude01</item> <!-- Grinning Face With Smiling Eyes -->
+        <item>\ud83d\ude02</item> <!-- Face With Tears of Joy -->
+        <item>\ud83d\ude03</item> <!-- Smiling Face With Open Mouth -->
+        <item>\ud83d\ude04</item> <!-- Smiling Face With Open Mouth and Smiling Eyes -->
+        <item>\ud83d\ude05</item> <!-- Smiling Face With Open Mouth and Cold Sweat -->
+        <item>\ud83d\ude06</item> <!-- Smiling Face With Open Mouth and Tightly-Closed Eyes -->
+        <item>\ud83d\ude09</item> <!-- Winking Face -->
+        <item>\ud83d\ude0a</item> <!-- Smiling Face With Smiling Eyes -->
+        <item>\ud83d\ude0b</item> <!-- Face Savouring Delicious Food -->
+        <item>\ud83d\ude0e</item> <!-- Smiling Face With Sunglasses -->
+        <item>\ud83d\ude0d</item> <!-- Smiling Face With Heart-Shaped Eyes -->
+        <item>\ud83d\ude18</item> <!-- Face Throwing a Kiss -->
+        <item>\ud83d\ude17</item> <!-- Kissing Face -->
+        <item>\ud83d\ude19</item> <!-- Kissing Face With Smiling Eyes -->
+        <item>\ud83d\ude1a</item> <!-- Kissing Face With Closed Eyes -->
+        <item>\u263a</item> <!-- White Smiling Face -->
+        <item>\ud83d\ude42</item> <!-- Slightly Smiling Face -->
+        <item>\ud83e\udd17</item> <!-- Hugging Face -->
+        <item>\ud83d\ude07</item> <!-- Smiling Face With Halo -->
+        <item>\ud83e\udd13</item> <!-- Nerd Face -->
+        <item>\ud83e\udd14</item> <!-- Thinking Face -->
+        <item>\ud83d\ude10</item> <!-- Neutral Face -->
+        <item>\ud83d\ude11</item> <!-- Expressionless Face -->
+        <item>\ud83d\ude36</item> <!-- Face Without Mouth -->
+        <item>\ud83d\ude44</item> <!-- Face With Rolling Eyes -->
+        <item>\ud83d\ude0f</item> <!-- Smirking Face -->
+        <item>\ud83d\ude23</item> <!-- Persevering Face -->
+        <item>\ud83d\ude25</item> <!-- Disappointed but Relieved Face -->
+        <item>\ud83d\ude2e</item> <!-- Face With Open Mouth -->
+        <item>\ud83e\udd10</item> <!-- Zipper-Mouth Face -->
+        <item>\ud83d\ude2f</item> <!-- Hushed Face -->
+        <item>\ud83d\ude2a</item> <!-- Sleepy Face -->
+        <item>\ud83d\ude2b</item> <!-- Tired Face -->
+        <item>\ud83d\ude34</item> <!-- Sleeping Face -->
+        <item>\ud83d\ude0c</item> <!-- Relieved Face -->
+        <item>\ud83d\ude1b</item> <!-- Face With Stuck-Out Tongue -->
+        <item>\ud83d\ude1c</item> <!-- Face With Stuck-Out Tongue and Winking Eye -->
+        <item>\ud83d\ude1d</item> <!-- Face With Stuck-Out Tongue and Tightly-Closed Eyes -->
+        <item>\ud83d\ude12</item> <!-- Unamused Face -->
+        <item>\ud83d\ude13</item> <!-- Face With Cold Sweat -->
+        <item>\ud83d\ude14</item> <!-- Pensive Face -->
+        <item>\ud83d\ude15</item> <!-- Confused Face -->
+        <item>\ud83d\ude43</item> <!-- Upside-Down Face -->
+        <item>\ud83e\udd11</item> <!-- Money-Mouth Face -->
+        <item>\ud83d\ude32</item> <!-- Astonished Face -->
+        <item>\ud83d\ude37</item> <!-- Face With Medical Mask -->
+        <item>\ud83e\udd12</item> <!-- Face With Thermometer -->
+        <item>\ud83e\udd15</item> <!-- Face With Head-Bandage -->
+        <item>\u2639</item> <!-- White Frowning Face -->
+        <item>\ud83d\ude41</item> <!-- Slightly Frowning Face -->
+        <item>\ud83d\ude16</item> <!-- Confounded Face -->
+        <item>\ud83d\ude1e</item> <!-- Disappointed Face -->
+        <item>\ud83d\ude1f</item> <!-- Worried Face -->
+        <item>\ud83d\ude24</item> <!-- Face With Look of Triumph -->
+        <item>\ud83d\ude22</item> <!-- Crying Face -->
+        <item>\ud83d\ude2d</item> <!-- Loudly Crying Face -->
+        <item>\ud83d\ude26</item> <!-- Frowning Face With Open Mouth -->
+        <item>\ud83d\ude27</item> <!-- Anguished Face -->
+        <item>\ud83d\ude28</item> <!-- Fearful Face -->
+        <item>\ud83d\ude29</item> <!-- Weary Face -->
+        <item>\ud83d\ude2c</item> <!-- Grimacing Face -->
+        <item>\ud83d\ude30</item> <!-- Face With Open Mouth and Cold Sweat -->
+        <item>\ud83d\ude31</item> <!-- Face Screaming in Fear -->
+        <item>\ud83d\ude33</item> <!-- Flushed Face -->
+        <item>\ud83d\ude35</item> <!-- Dizzy Face -->
+        <item>\ud83d\ude21</item> <!-- Pouting Face -->
+        <item>\ud83d\ude20</item> <!-- Angry Face -->
+        <item>\ud83d\ude08</item> <!-- Smiling Face With Horns -->
+        <item>\ud83d\udc7f</item> <!-- Imp -->
+        <item>\ud83d\udc79</item> <!-- Japanese Ogre -->
+        <item>\ud83d\udc7a</item> <!-- Japanese Goblin -->
+        <item>\ud83d\udc80</item> <!-- Skull -->
+        <item>\ud83d\udc7b</item> <!-- Ghost -->
+        <item>\ud83d\udc7d</item> <!-- Extraterrestrial Alien -->
+        <item>\ud83e\udd16</item> <!-- Robot Face -->
+        <item>\ud83d\udca9</item> <!-- Pile of Poo -->
+        <item>\ud83d\ude3a</item> <!-- Smiling Cat Face With Open Mouth -->
+        <item>\ud83d\ude38</item> <!-- Grinning Cat Face With Smiling Eyes -->
+        <item>\ud83d\ude39</item> <!-- Cat Face With Tears of Joy -->
+        <item>\ud83d\ude3b</item> <!-- Smiling Cat Face With Heart-Shaped Eyes -->
+        <item>\ud83d\ude3c</item> <!-- Cat Face With Wry Smile -->
+        <item>\ud83d\ude3d</item> <!-- Kissing Cat Face With Closed Eyes -->
+        <item>\ud83d\ude40</item> <!-- Weary Cat Face -->
+        <item>\ud83d\ude3f</item> <!-- Crying Cat Face -->
+        <item>\ud83d\ude3e</item> <!-- Pouting Cat Face -->
+        <item>\ud83d\udc66</item> <!-- Boy -->
+        <item>\ud83d\udc67</item> <!-- Girl -->
+        <item>\ud83d\udc68</item> <!-- Man -->
+        <item>\ud83d\udc69</item> <!-- Woman -->
+        <item>\ud83d\udc74</item> <!-- Older Man -->
+        <item>\ud83d\udc75</item> <!-- Older Woman -->
+        <item>\ud83d\udc76</item> <!-- Baby -->
+        <item>\ud83d\udc71</item> <!-- Person With Blond Hair -->
+        <item>\ud83d\udc6e</item> <!-- Police Officer -->
+        <item>\ud83d\udc72</item> <!-- Man With Gua Pi Mao -->
+        <item>\ud83d\udc73</item> <!-- Man With Turban -->
+        <item>\ud83d\udc77</item> <!-- Construction Worker -->
+        <item>\u26d1</item> <!-- Helmet With White Cross -->
+        <item>\ud83d\udc78</item> <!-- Princess -->
+        <item>\ud83d\udc82</item> <!-- Guardsman -->
+        <item>\ud83d\udd75</item> <!-- Sleuth or Spy -->
+        <item>\ud83c\udf85</item> <!-- Father Christmas -->
+        <item>\ud83d\udc70</item> <!-- Bride With Veil -->
+        <item>\ud83d\udc7c</item> <!-- Baby Angel -->
+        <item>\ud83d\udc86</item> <!-- Face Massage -->
+        <item>\ud83d\udc87</item> <!-- Haircut -->
+        <item>\ud83d\ude4d</item> <!-- Person Frowning -->
+        <item>\ud83d\ude4e</item> <!-- Person With Pouting Face -->
+        <item>\ud83d\ude45</item> <!-- Face With No Good Gesture -->
+        <item>\ud83d\ude46</item> <!-- Face With OK Gesture -->
+        <item>\ud83d\udc81</item> <!-- Information Desk Person -->
+        <item>\ud83d\ude4b</item> <!-- Happy Person Raising One Hand -->
+        <item>\ud83d\ude47</item> <!-- Person Bowing Deeply -->
+        <item>\ud83d\ude4c</item> <!-- Person Raising Both Hands in Celebration -->
+        <item>\ud83d\ude4f</item> <!-- Person With Folded Hands -->
+        <item>\ud83d\udde3</item> <!-- Speaking Head in Silhouette -->
+        <item>\ud83d\udc64</item> <!-- Bust in Silhouette -->
+        <item>\ud83d\udc65</item> <!-- Busts in Silhouette -->
+        <item>\ud83d\udeb6</item> <!-- Pedestrian -->
+        <item>\ud83c\udfc3</item> <!-- Runner -->
+        <item>\ud83d\udc6f</item> <!-- Woman With Bunny Ears -->
+        <item>\ud83d\udc83</item> <!-- Dancer -->
+        <item>\ud83d\udd74</item> <!-- Man in Business Suit Levitating -->
+        <item>\ud83d\udc6b</item> <!-- Man and Woman Holding Hands -->
+        <item>\ud83d\udc6c</item> <!-- Two Men Holding Hands -->
+        <item>\ud83d\udc6d</item> <!-- Two Women Holding Hands -->
+        <item>\ud83d\udc8f</item> <!-- Kiss -->
+        <item>\ud83d\udc68\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68</item> <!-- Kiss (Man, Man) -->
+        <item>\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69</item> <!-- Kiss (Woman, Woman) -->
+        <item>\ud83d\udc91</item> <!-- Couple With Heart -->
+        <item>\ud83d\udc68\u200d\u2764\ufe0f\u200d\ud83d\udc68</item> <!-- Couple With Heart (Man, Man) -->
+        <item>\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc69</item> <!-- Couple With Heart (Woman, Woman) -->
+        <item>\ud83d\udc6a</item> <!-- Family -->
+        <item>\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67</item> <!-- Family -->
+        <item>\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66</item> <!-- Family -->
+        <item>\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc66\u200d\ud83d\udc66</item> <!-- Family -->
+        <item>\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc67</item> <!-- Family -->
+        <item>\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc66</item> <!-- Family -->
+        <item>\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc67</item> <!-- Family -->
+        <item>\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc67\u200d\ud83d\udc66</item> <!-- Family -->
+        <item>\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc66\u200d\ud83d\udc66</item> <!-- Family -->
+        <item>\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc67\u200d\ud83d\udc67</item> <!-- Family -->
+        <item>\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc66</item> <!-- Family -->
+        <item>\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc67</item> <!-- Family -->
+        <item>\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66</item> <!-- Family -->
+        <item>\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc66\u200d\ud83d\udc66</item> <!-- Family -->
+        <item>\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc67</item> <!-- Family -->
+        <item>\ud83d\udcaa</item> <!-- Flexed Biceps -->
+        <item>\ud83d\udc48</item> <!-- White Left Pointing Backhand Index -->
+        <item>\ud83d\udc49</item> <!-- White Right Pointing Backhand Index -->
+        <item>\u261d</item> <!-- White Up Pointing Index -->
+        <item>\ud83d\udc46</item> <!-- White Up Pointing Backhand Index -->
+        <item>\ud83d\udd95</item> <!-- Reversed Hand With Middle Finger Extended -->
+        <item>\ud83d\udc47</item> <!-- White Down Pointing Backhand Index -->
+        <item>\u270c</item> <!-- Victory Hand -->
+        <item>\ud83d\udd96</item> <!-- Raised Hand With Part Between Middle and Ring Fingers -->
+        <item>\ud83e\udd18</item> <!-- Sign of the Horns -->
+        <item>\ud83d\udd90</item> <!-- Raised Hand With Fingers Splayed -->
+        <item>\u270b</item> <!-- Raised Hand -->
+        <item>\ud83d\udc4c</item> <!-- OK Hand Sign -->
+        <item>\ud83d\udc4d</item> <!-- Thumbs Up Sign -->
+        <item>\ud83d\udc4e</item> <!-- Thumbs Down Sign -->
+        <item>\u270a</item> <!-- Raised Fist -->
+        <item>\ud83d\udc4a</item> <!-- Fisted Hand Sign -->
+        <item>\ud83d\udc4b</item> <!-- Waving Hand Sign -->
+        <item>\ud83d\udc4f</item> <!-- Clapping Hands Sign -->
+        <item>\ud83d\udc50</item> <!-- Open Hands Sign -->
+        <item>\u270d</item> <!-- Writing Hand -->
+        <item>\ud83d\udc85</item> <!-- Nail Polish -->
+        <item>\ud83d\udc42</item> <!-- Ear -->
+        <item>\ud83d\udc43</item> <!-- Nose -->
+        <item>\ud83d\udc63</item> <!-- Footprints -->
+        <item>\ud83d\udc40</item> <!-- Eyes -->
+        <item>\ud83d\udc41</item> <!-- Eye -->
+        <item>\ud83d\udc45</item> <!-- Tongue -->
+        <item>\ud83d\udc44</item> <!-- Mouth -->
+        <item>\ud83d\udc8b</item> <!-- Kiss Mark -->
+        <item>\ud83d\udc53</item> <!-- Eyeglasses -->
+        <item>\ud83d\udd76</item> <!-- Dark Sunglasses -->
+        <item>\ud83d\udc54</item> <!-- Necktie -->
+        <item>\ud83d\udc55</item> <!-- T-Shirt -->
+        <item>\ud83d\udc56</item> <!-- Jeans -->
+        <item>\ud83d\udc57</item> <!-- Dress -->
+        <item>\ud83d\udc58</item> <!-- Kimono -->
+        <item>\ud83d\udc59</item> <!-- Bikini -->
+        <item>\ud83d\udc5a</item> <!-- Womans Clothes -->
+        <item>\ud83d\udc5b</item> <!-- Purse -->
+        <item>\ud83d\udc5c</item> <!-- Handbag -->
+        <item>\ud83d\udc5d</item> <!-- Pouch -->
+        <item>\ud83c\udf92</item> <!-- School Satchel -->
+        <item>\ud83d\udc5e</item> <!-- Mans Shoe -->
+        <item>\ud83d\udc5f</item> <!-- Athletic Shoe -->
+        <item>\ud83d\udc60</item> <!-- High-Heeled Shoe -->
+        <item>\ud83d\udc61</item> <!-- Womans Sandal -->
+        <item>\ud83d\udc62</item> <!-- Womans Boots -->
+        <item>\ud83d\udc51</item> <!-- Crown -->
+        <item>\ud83d\udc52</item> <!-- Womans Hat -->
+        <item>\ud83c\udfa9</item> <!-- Top Hat -->
+        <item>\ud83c\udf93</item> <!-- Graduation Cap -->
+        <item>\ud83d\udc84</item> <!-- Lipstick -->
+        <item>\ud83d\udc8d</item> <!-- Ring -->
+        <item>\ud83c\udf02</item> <!-- Closed Umbrella -->
+        <item>\ud83d\udcbc</item> <!-- Briefcase -->
+    </string-array>
+
+    <string-array name="emoji_symbols">
+        <item>\ud83d\udc41\u200d\ud83d\udde8</item> <!-- Eye in Speech Bubble -->
+        <item>\ud83d\udc98</item> <!-- Heart With Arrow -->
+        <item>\u2764</item> <!-- Heavy Black Heart -->
+        <item>\ud83d\udc93</item> <!-- Beating Heart -->
+        <item>\ud83d\udc94</item> <!-- Broken Heart -->
+        <item>\ud83d\udc95</item> <!-- Two Hearts -->
+        <item>\ud83d\udc96</item> <!-- Sparkling Heart -->
+        <item>\ud83d\udc97</item> <!-- Growing Heart -->
+        <item>\ud83d\udc99</item> <!-- Blue Heart -->
+        <item>\ud83d\udc9a</item> <!-- Green Heart -->
+        <item>\ud83d\udc9b</item> <!-- Yellow Heart -->
+        <item>\ud83d\udc9c</item> <!-- Purple Heart -->
+        <item>\ud83d\udc9d</item> <!-- Heart With Ribbon -->
+        <item>\ud83d\udc9e</item> <!-- Revolving Hearts -->
+        <item>\ud83d\udc9f</item> <!-- Heart Decoration -->
+        <item>\u2763</item> <!-- Heavy Heart Exclamation Mark Ornament -->
+        <item>\ud83d\udca4</item> <!-- Sleeping Symbol -->
+        <item>\ud83d\udca2</item> <!-- Anger Symbol -->
+        <item>\ud83d\udcac</item> <!-- Speech Balloon -->
+        <item>\ud83d\uddef</item> <!-- Right Anger Bubble -->
+        <item>\ud83d\udcad</item> <!-- Thought Balloon -->
+        <item>\ud83d\udcae</item> <!-- White Flower -->
+        <item>\u2668</item> <!-- Hot Springs -->
+        <item>\ud83d\udc88</item> <!-- Barber Pole -->
+        <item>\ud83d\udd5b</item> <!-- Clock Face Twelve O'Clock -->
+        <item>\ud83d\udd67</item> <!-- Clock Face Twelve-Thirty -->
+        <item>\ud83d\udd50</item> <!-- Clock Face One O'Clock -->
+        <item>\ud83d\udd5c</item> <!-- Clock Face One-Thirty -->
+        <item>\ud83d\udd51</item> <!-- Clock Face Two O'Clock -->
+        <item>\ud83d\udd5d</item> <!-- Clock Face Two-Thirty -->
+        <item>\ud83d\udd52</item> <!-- Clock Face Three O'Clock -->
+        <item>\ud83d\udd5e</item> <!-- Clock Face Three-Thirty -->
+        <item>\ud83d\udd53</item> <!-- Clock Face Four O'Clock -->
+        <item>\ud83d\udd5f</item> <!-- Clock Face Four-Thirty -->
+        <item>\ud83d\udd54</item> <!-- Clock Face Five O'Clock -->
+        <item>\ud83d\udd60</item> <!-- Clock Face Five-Thirty -->
+        <item>\ud83d\udd55</item> <!-- Clock Face Six O'Clock -->
+        <item>\ud83d\udd61</item> <!-- Clock Face Six-Thirty -->
+        <item>\ud83d\udd56</item> <!-- Clock Face Seven O'Clock -->
+        <item>\ud83d\udd62</item> <!-- Clock Face Seven-Thirty -->
+        <item>\ud83d\udd57</item> <!-- Clock Face Eight O'Clock -->
+        <item>\ud83d\udd63</item> <!-- Clock Face Eight-Thirty -->
+        <item>\ud83d\udd58</item> <!-- Clock Face Nine O'Clock -->
+        <item>\ud83d\udd64</item> <!-- Clock Face Nine-Thirty -->
+        <item>\ud83d\udd59</item> <!-- Clock Face Ten O'Clock -->
+        <item>\ud83d\udd65</item> <!-- Clock Face Ten-Thirty -->
+        <item>\ud83d\udd5a</item> <!-- Clock Face Eleven O'Clock -->
+        <item>\ud83d\udd66</item> <!-- Clock Face Eleven-Thirty -->
+        <item>\ud83c\udf00</item> <!-- Cyclone -->
+        <item>\u2660</item> <!-- Black Spade Suit -->
+        <item>\u2665</item> <!-- Black Heart Suit -->
+        <item>\u2666</item> <!-- Black Diamond Suit -->
+        <item>\u2663</item> <!-- Black Club Suit -->
+        <item>\ud83c\udc04</item> <!-- Mahjong Tile Red Dragon -->
+        <item>\ud83c\udfb4</item> <!-- Flower Playing Cards -->
+        <item>\ud83d\udd07</item> <!-- Speaker With Cancellation Stroke -->
+        <item>\ud83d\udd08</item> <!-- Speaker -->
+        <item>\ud83d\udd09</item> <!-- Speaker With One Sound Wave -->
+        <item>\ud83d\udd0a</item> <!-- Speaker With Three Sound Waves -->
+        <item>\ud83d\udce2</item> <!-- Public Address Loudspeaker -->
+        <item>\ud83d\udce3</item> <!-- Cheering Megaphone -->
+        <item>\ud83d\udcef</item> <!-- Postal Horn -->
+        <item>\ud83d\udd14</item> <!-- Bell -->
+        <item>\ud83d\udd15</item> <!-- Bell With Cancellation Stroke -->
+        <item>\ud83c\udfe7</item> <!-- Automated Teller Machine -->
+        <item>\ud83d\udeae</item> <!-- Put Litter in Its Place Symbol -->
+        <item>\ud83d\udeb0</item> <!-- Potable Water Symbol -->
+        <item>\u267f</item> <!-- Wheelchair Symbol -->
+        <item>\ud83d\udeb9</item> <!-- Mens Symbol -->
+        <item>\ud83d\udeba</item> <!-- Womens Symbol -->
+        <item>\ud83d\udebb</item> <!-- Restroom -->
+        <item>\ud83d\udebc</item> <!-- Baby Symbol -->
+        <item>\ud83d\udebe</item> <!-- Water Closet -->
+        <item>\u26a0</item> <!-- Warning Sign -->
+        <item>\ud83d\udeb8</item> <!-- Children Crossing -->
+        <item>\u26d4</item> <!-- No Entry -->
+        <item>\ud83d\udeab</item> <!-- No Entry Sign -->
+        <item>\ud83d\udeb3</item> <!-- No Bicycles -->
+        <item>\ud83d\udead</item> <!-- No Smoking Symbol -->
+        <item>\ud83d\udeaf</item> <!-- Do Not Litter Symbol -->
+        <item>\ud83d\udeb1</item> <!-- Non-Potable Water Symbol -->
+        <item>\ud83d\udeb7</item> <!-- No Pedestrians -->
+        <item>\ud83d\udd1e</item> <!-- No One Under Eighteen Symbol -->
+        <item>\u2622</item> <!-- Radioactive Sign -->
+        <item>\u2623</item> <!-- Biohazard Sign -->
+        <item>\u2b06</item> <!-- Upwards Black Arrow -->
+        <item>\u2197</item> <!-- North East Arrow -->
+        <item>\u27a1</item> <!-- Black Rightwards Arrow -->
+        <item>\u2198</item> <!-- South East Arrow -->
+        <item>\u2b07</item> <!-- Downwards Black Arrow -->
+        <item>\u2199</item> <!-- South West Arrow -->
+        <item>\u2b05</item> <!-- Leftwards Black Arrow -->
+        <item>\u2196</item> <!-- North West Arrow -->
+        <item>\u2195</item> <!-- Up Down Arrow -->
+        <item>\u2194</item> <!-- Left Right Arrow -->
+        <item>\u21a9</item> <!-- Leftwards Arrow With Hook -->
+        <item>\u21aa</item> <!-- Rightwards Arrow With Hook -->
+        <item>\u2934</item> <!-- Arrow Pointing Rightwards Then Curving Upwards -->
+        <item>\u2935</item> <!-- Arrow Pointing Rightwards Then Curving Downwards -->
+        <item>\ud83d\udd03</item> <!-- Clockwise Downwards and Upwards Open Circle Arrows -->
+        <item>\ud83d\udd04</item> <!-- Anticlockwise Downwards and Upwards Open Circle Arrows -->
+        <item>\ud83d\udd19</item> <!-- Back With Leftwards Arrow Above -->
+        <item>\ud83d\udd1a</item> <!-- End With Leftwards Arrow Above -->
+        <item>\ud83d\udd1b</item> <!-- On With Exclamation Mark With Left Right Arrow Above -->
+        <item>\ud83d\udd1c</item> <!-- Soon With Rightwards Arrow Above -->
+        <item>\ud83d\udd1d</item> <!-- Top With Upwards Arrow Above -->
+        <item>\ud83d\uded0</item> <!-- Place of Worship -->
+        <item>\u269b</item> <!-- Atom Symbol -->
+        <item>\ud83d\udd49</item> <!-- Om Symbol -->
+        <item>\u2721</item> <!-- Star of David -->
+        <item>\u2638</item> <!-- Wheel of Dharma -->
+        <item>\u262f</item> <!-- Yin Yang -->
+        <item>\u271d</item> <!-- Latin Cross -->
+        <item>\u2626</item> <!-- Orthodox Cross -->
+        <item>\u262a</item> <!-- Star and Crescent -->
+        <item>\u262e</item> <!-- Peace Symbol -->
+        <item>\ud83d\udd4e</item> <!-- Menorah With Nine Branches -->
+        <item>\ud83d\udd2f</item> <!-- Six Pointed Star With Middle Dot -->
+        <item>\u267b</item> <!-- Black Universal Recycling Symbol -->
+        <item>\ud83d\udcdb</item> <!-- Name Badge -->
+        <item>\ud83d\udd30</item> <!-- Japanese Symbol for Beginner -->
+        <item>\ud83d\udd31</item> <!-- Trident Emblem -->
+        <item>\u2b55</item> <!-- Heavy Large Circle -->
+        <item>\u2705</item> <!-- White Heavy Check Mark -->
+        <item>\u2611</item> <!-- Ballot Box With Check -->
+        <item>\u2714</item> <!-- Heavy Check Mark -->
+        <item>\u2716</item> <!-- Heavy Multiplication X -->
+        <item>\u274c</item> <!-- Cross Mark -->
+        <item>\u274e</item> <!-- Negative Squared Cross Mark -->
+        <item>\u2795</item> <!-- Heavy Plus Sign -->
+        <item>\u2796</item> <!-- Heavy Minus Sign -->
+        <item>\u2797</item> <!-- Heavy Division Sign -->
+        <item>\u27b0</item> <!-- Curly Loop -->
+        <item>\u27bf</item> <!-- Double Curly Loop -->
+        <item>\u303d</item> <!-- Part Alternation Mark -->
+        <item>\u2733</item> <!-- Eight Spoked Asterisk -->
+        <item>\u2734</item> <!-- Eight Pointed Black Star -->
+        <item>\u2747</item> <!-- Sparkle -->
+        <item>\u203c</item> <!-- Double Exclamation Mark -->
+        <item>\u2049</item> <!-- Exclamation Question Mark -->
+        <item>\u2753</item> <!-- Black Question Mark Ornament -->
+        <item>\u2754</item> <!-- White Question Mark Ornament -->
+        <item>\u2755</item> <!-- White Exclamation Mark Ornament -->
+        <item>\u2757</item> <!-- Heavy Exclamation Mark Symbol -->
+        <item>\u00a9</item> <!-- Copyright Sign -->
+        <item>\u00ae</item> <!-- Registered Sign -->
+        <item>\u2122</item> <!-- Trade Mark Sign -->
+        <item>\u2648</item> <!-- Aries -->
+        <item>\u2649</item> <!-- Taurus -->
+        <item>\u264a</item> <!-- Gemini -->
+        <item>\u264b</item> <!-- Cancer -->
+        <item>\u264c</item> <!-- Leo -->
+        <item>\u264d</item> <!-- Virgo -->
+        <item>\u264e</item> <!-- Libra -->
+        <item>\u264f</item> <!-- Scorpius -->
+        <item>\u2650</item> <!-- Sagittarius -->
+        <item>\u2651</item> <!-- Capricorn -->
+        <item>\u2652</item> <!-- Aquarius -->
+        <item>\u2653</item> <!-- Pisces -->
+        <item>\u26ce</item> <!-- Ophiuchus -->
+        <item>\ud83d\udd00</item> <!-- Twisted Rightwards Arrows -->
+        <item>\ud83d\udd01</item> <!-- Clockwise Rightwards and Leftwards Open Circle Arrows -->
+        <item>\ud83d\udd02</item> <!-- Clockwise Rightwards and Leftwards Open Circle Arrows With Circled One Overlay -->
+        <item>\u25b6</item> <!-- Black Right-Pointing Triangle -->
+        <item>\u23e9</item> <!-- Black Right-Pointing Double Triangle -->
+        <item>\u25c0</item> <!-- Black Left-Pointing Triangle -->
+        <item>\u23ea</item> <!-- Black Left-Pointing Double Triangle -->
+        <item>\ud83d\udd3c</item> <!-- Up-Pointing Small Red Triangle -->
+        <item>\u23eb</item> <!-- Black Up-Pointing Double Triangle -->
+        <item>\ud83d\udd3d</item> <!-- Down-Pointing Small Red Triangle -->
+        <item>\u23ec</item> <!-- Black Down-Pointing Double Triangle -->
+        <item>\u23f9</item> <!-- Black Square for Stop -->
+        <item>\ud83c\udfa6</item> <!-- Cinema -->
+        <item>\ud83d\udd05</item> <!-- Low Brightness Symbol -->
+        <item>\ud83d\udd06</item> <!-- High Brightness Symbol -->
+        <item>\ud83d\udcf6</item> <!-- Antenna With Bars -->
+        <item>\ud83d\udcf3</item> <!-- Vibration Mode -->
+        <item>\ud83d\udcf4</item> <!-- Mobile Phone Off -->
+        <item>#\ufe0f\u20e3</item> <!-- Keycap Number Sign -->
+        <item>0\ufe0f\u20e3</item> <!-- Keycap Digit Zero -->
+        <item>1\ufe0f\u20e3</item> <!-- Keycap Digit One -->
+        <item>2\ufe0f\u20e3</item> <!-- Keycap Digit Two -->
+        <item>3\ufe0f\u20e3</item> <!-- Keycap Digit Three -->
+        <item>4\ufe0f\u20e3</item> <!-- Keycap Digit Four -->
+        <item>5\ufe0f\u20e3</item> <!-- Keycap Digit Five -->
+        <item>6\ufe0f\u20e3</item> <!-- Keycap Digit Six -->
+        <item>7\ufe0f\u20e3</item> <!-- Keycap Digit Seven -->
+        <item>8\ufe0f\u20e3</item> <!-- Keycap Digit Eight -->
+        <item>9\ufe0f\u20e3</item> <!-- Keycap Digit Nine -->
+        <item>\ud83d\udd1f</item> <!-- Keycap Ten -->
+        <item>\ud83d\udcaf</item> <!-- Hundred Points Symbol -->
+        <item>\ud83d\udd20</item> <!-- Input Symbol for Latin Capital Letters -->
+        <item>\ud83d\udd21</item> <!-- Input Symbol for Latin Small Letters -->
+        <item>\ud83d\udd22</item> <!-- Input Symbol for Numbers -->
+        <item>\ud83d\udd23</item> <!-- Input Symbol for Symbols -->
+        <item>\ud83d\udd24</item> <!-- Input Symbol for Latin Letters -->
+        <item>\ud83c\udd70</item> <!-- Negative Squared Latin Capital Letter A -->
+        <item>\ud83c\udd8e</item> <!-- Negative Squared AB -->
+        <item>\ud83c\udd71</item> <!-- Negative Squared Latin Capital Letter B -->
+        <item>\ud83c\udd91</item> <!-- Squared CL -->
+        <item>\ud83c\udd92</item> <!-- Squared Cool -->
+        <item>\ud83c\udd93</item> <!-- Squared Free -->
+        <item>\u2139</item> <!-- Information Source -->
+        <item>\ud83c\udd94</item> <!-- Squared ID -->
+        <item>\u24c2</item> <!-- Circled Latin Capital Letter M -->
+        <item>\ud83c\udd95</item> <!-- Squared New -->
+        <item>\ud83c\udd96</item> <!-- Squared NG -->
+        <item>\ud83c\udd7e</item> <!-- Negative Squared Latin Capital Letter O -->
+        <item>\ud83c\udd97</item> <!-- Squared OK -->
+        <item>\ud83c\udd7f</item> <!-- Negative Squared Latin Capital Letter P -->
+        <item>\ud83c\udd98</item> <!-- Squared SOS -->
+        <item>\ud83c\udd99</item> <!-- Squared Up With Exclamation Mark -->
+        <item>\ud83c\udd9a</item> <!-- Squared Vs -->
+        <item>\ud83c\ude01</item> <!-- Squared Katakana Koko -->
+        <item>\ud83c\ude02</item> <!-- Squared Katakana Sa -->
+        <item>\ud83c\ude37</item> <!-- Squared CJK Unified Ideograph-6708 -->
+        <item>\ud83c\ude36</item> <!-- Squared CJK Unified Ideograph-6709 -->
+        <item>\ud83c\ude2f</item> <!-- Squared CJK Unified Ideograph-6307 -->
+        <item>\ud83c\ude50</item> <!-- Circled Ideograph Advantage -->
+        <item>\ud83c\ude39</item> <!-- Squared CJK Unified Ideograph-5272 -->
+        <item>\ud83c\ude1a</item> <!-- Squared CJK Unified Ideograph-7121 -->
+        <item>\ud83c\ude32</item> <!-- Squared CJK Unified Ideograph-7981 -->
+        <item>\ud83c\ude51</item> <!-- Circled Ideograph Accept -->
+        <item>\ud83c\ude38</item> <!-- Squared CJK Unified Ideograph-7533 -->
+        <item>\ud83c\ude34</item> <!-- Squared CJK Unified Ideograph-5408 -->
+        <item>\ud83c\ude33</item> <!-- Squared CJK Unified Ideograph-7a7a -->
+        <item>\u3297</item> <!-- Circled Ideograph Congratulation -->
+        <item>\u3299</item> <!-- Circled Ideograph Secret -->
+        <item>\ud83c\ude3a</item> <!-- Squared CJK Unified Ideograph-55b6 -->
+        <item>\ud83c\ude35</item> <!-- Squared CJK Unified Ideograph-6e80 -->
+        <item>\u25aa</item> <!-- Black Small Square -->
+        <item>\u25ab</item> <!-- White Small Square -->
+        <item>\u25fb</item> <!-- White Medium Square -->
+        <item>\u25fc</item> <!-- Black Medium Square -->
+        <item>\u25fd</item> <!-- White Medium Small Square -->
+        <item>\u25fe</item> <!-- Black Medium Small Square -->
+        <item>\u2b1b</item> <!-- Black Large Square -->
+        <item>\u2b1c</item> <!-- White Large Square -->
+        <item>\ud83d\udd36</item> <!-- Large Orange Diamond -->
+        <item>\ud83d\udd37</item> <!-- Large Blue Diamond -->
+        <item>\ud83d\udd38</item> <!-- Small Orange Diamond -->
+        <item>\ud83d\udd39</item> <!-- Small Blue Diamond -->
+        <item>\ud83d\udd3a</item> <!-- Up-Pointing Red Triangle -->
+        <item>\ud83d\udd3b</item> <!-- Down-Pointing Red Triangle -->
+        <item>\ud83d\udca0</item> <!-- Diamond Shape With a Dot Inside -->
+        <item>\ud83d\udd32</item> <!-- Black Square Button -->
+        <item>\ud83d\udd33</item> <!-- White Square Button -->
+        <item>\u26aa</item> <!-- Medium White Circle -->
+        <item>\u26ab</item> <!-- Medium Black Circle -->
+        <item>\ud83d\udd34</item> <!-- Large Red Circle -->
+        <item>\ud83d\udd35</item> <!-- Large Blue Circle -->
+    </string-array>
+
+    <string-array name="emoji_travel_places">
+        <item>\ud83c\udfd4</item> <!-- Snow Capped Mountain -->
+        <item>\u26f0</item> <!-- Mountain -->
+        <item>\ud83c\udf0b</item> <!-- Volcano -->
+        <item>\ud83d\uddfb</item> <!-- Mount Fuji -->
+        <item>\ud83c\udfd5</item> <!-- Camping -->
+        <item>\ud83c\udfd6</item> <!-- Beach With Umbrella -->
+        <item>\ud83c\udfdc</item> <!-- Desert -->
+        <item>\ud83c\udfdd</item> <!-- Desert Island -->
+        <item>\ud83c\udfde</item> <!-- National Park -->
+        <item>\ud83c\udfdf</item> <!-- Stadium -->
+        <item>\ud83c\udfdb</item> <!-- Classical Building -->
+        <item>\ud83c\udfd7</item> <!-- Building Construction -->
+        <item>\ud83c\udfd8</item> <!-- House Buildings -->
+        <item>\ud83c\udfd9</item> <!-- Cityscape -->
+        <item>\ud83c\udfda</item> <!-- Derelict House Building -->
+        <item>\ud83c\udfe0</item> <!-- House Building -->
+        <item>\ud83c\udfe1</item> <!-- House With Garden -->
+        <item>\ud83c\udfe2</item> <!-- Office Building -->
+        <item>\ud83c\udfe3</item> <!-- Japanese Post Office -->
+        <item>\ud83c\udfe4</item> <!-- European Post Office -->
+        <item>\ud83c\udfe5</item> <!-- Hospital -->
+        <item>\ud83c\udfe6</item> <!-- Bank -->
+        <item>\ud83c\udfe8</item> <!-- Hotel -->
+        <item>\ud83c\udfe9</item> <!-- Love Hotel -->
+        <item>\ud83c\udfea</item> <!-- Convenience Store -->
+        <item>\ud83c\udfeb</item> <!-- School -->
+        <item>\ud83c\udfec</item> <!-- Department Store -->
+        <item>\ud83c\udfed</item> <!-- Factory -->
+        <item>\ud83c\udfef</item> <!-- Japanese Castle -->
+        <item>\ud83c\udff0</item> <!-- European Castle -->
+        <item>\ud83d\udc92</item> <!-- Wedding -->
+        <item>\ud83d\uddfc</item> <!-- Tokyo Tower -->
+        <item>\ud83d\uddfd</item> <!-- Statue of Liberty -->
+        <item>\u26ea</item> <!-- Church -->
+        <item>\ud83d\udd4c</item> <!-- Mosque -->
+        <item>\ud83d\udd4d</item> <!-- Synagogue -->
+        <item>\u26e9</item> <!-- Shinto Shrine -->
+        <item>\ud83d\udd4b</item> <!-- Kaaba -->
+        <item>\u26f2</item> <!-- Fountain -->
+        <item>\ud83c\udf01</item> <!-- Foggy -->
+        <item>\ud83c\udf03</item> <!-- Night With Stars -->
+        <item>\ud83c\udf06</item> <!-- Cityscape at Dusk -->
+        <item>\ud83c\udf07</item> <!-- Sunset Over Buildings -->
+        <item>\ud83c\udf09</item> <!-- Bridge at Night -->
+        <item>\ud83c\udf0c</item> <!-- Milky Way -->
+        <item>\ud83c\udfa0</item> <!-- Carousel Horse -->
+        <item>\ud83c\udfa1</item> <!-- Ferris Wheel -->
+        <item>\ud83c\udfa2</item> <!-- Roller Coaster -->
+        <item>\ud83d\ude82</item> <!-- Steam Locomotive -->
+        <item>\ud83d\ude83</item> <!-- Railway Car -->
+        <item>\ud83d\ude84</item> <!-- High-Speed Train -->
+        <item>\ud83d\ude85</item> <!-- High-Speed Train With Bullet Nose -->
+        <item>\ud83d\ude86</item> <!-- Train -->
+        <item>\ud83d\ude87</item> <!-- Metro -->
+        <item>\ud83d\ude88</item> <!-- Light Rail -->
+        <item>\ud83d\ude89</item> <!-- Station -->
+        <item>\ud83d\ude8a</item> <!-- Tram -->
+        <item>\ud83d\ude9d</item> <!-- Monorail -->
+        <item>\ud83d\ude9e</item> <!-- Mountain Railway -->
+        <item>\ud83d\ude8b</item> <!-- Tram Car -->
+        <item>\ud83d\ude8c</item> <!-- Bus -->
+        <item>\ud83d\ude8d</item> <!-- Oncoming Bus -->
+        <item>\ud83d\ude8e</item> <!-- Trolleybus -->
+        <item>\ud83d\ude8f</item> <!-- Bus Stop -->
+        <item>\ud83d\ude90</item> <!-- Minibus -->
+        <item>\ud83d\ude91</item> <!-- Ambulance -->
+        <item>\ud83d\ude92</item> <!-- Fire Engine -->
+        <item>\ud83d\ude93</item> <!-- Police Car -->
+        <item>\ud83d\ude94</item> <!-- Oncoming Police Car -->
+        <item>\ud83d\ude95</item> <!-- Taxi -->
+        <item>\ud83d\ude96</item> <!-- Oncoming Taxi -->
+        <item>\ud83d\ude97</item> <!-- Automobile -->
+        <item>\ud83d\ude98</item> <!-- Oncoming Automobile -->
+        <item>\ud83d\ude9a</item> <!-- Delivery Truck -->
+        <item>\ud83d\ude9b</item> <!-- Articulated Lorry -->
+        <item>\ud83d\ude9c</item> <!-- Tractor -->
+        <item>\ud83d\udeb2</item> <!-- Bicycle -->
+        <item>\u26fd</item> <!-- Fuel Pump -->
+        <item>\ud83d\udee4</item> <!-- Railway Track -->
+        <item>\ud83d\udea8</item> <!-- Police Cars Revolving Light -->
+        <item>\ud83d\udea5</item> <!-- Horizontal Traffic Light -->
+        <item>\ud83d\udea6</item> <!-- Vertical Traffic Light -->
+        <item>\ud83d\udea7</item> <!-- Construction Sign -->
+        <item>\u2693</item> <!-- Anchor -->
+        <item>\u26f5</item> <!-- Sailboat -->
+        <item>\ud83d\udea3</item> <!-- Rowboat -->
+        <item>\ud83d\udea4</item> <!-- Speedboat -->
+        <item>\ud83d\udef3</item> <!-- Passenger Ship -->
+        <item>\u26f4</item> <!-- Ferry -->
+        <item>\ud83d\udee5</item> <!-- Motor Boat -->
+        <item>\ud83d\udea2</item> <!-- Ship -->
+        <item>\u2708</item> <!-- Airplane -->
+        <item>\ud83d\udee9</item> <!-- Small Airplane -->
+        <item>\ud83d\udeeb</item> <!-- Airplane Departure -->
+        <item>\ud83d\udeec</item> <!-- Airplane Arriving -->
+        <item>\ud83d\udcba</item> <!-- Seat -->
+        <item>\ud83d\ude81</item> <!-- Helicopter -->
+        <item>\ud83d\ude9f</item> <!-- Suspension Railway -->
+        <item>\ud83d\udea0</item> <!-- Mountain Cableway -->
+        <item>\ud83d\udea1</item> <!-- Aerial Tramway -->
+        <item>\ud83d\ude80</item> <!-- Rocket -->
+        <item>\ud83d\udef0</item> <!-- Satellite -->
+        <item>\ud83c\udf91</item> <!-- Moon Viewing Ceremony -->
+        <item>\ud83c\udfce</item> <!-- Racing Car -->
+        <item>\ud83c\udfcd</item> <!-- Racing Motorcycle -->
+        <item>\ud83d\udcb4</item> <!-- Banknote With Yen Sign -->
+        <item>\ud83d\udcb5</item> <!-- Banknote With Dollar Sign -->
+        <item>\ud83d\udcb6</item> <!-- Banknote With Euro Sign -->
+        <item>\ud83d\udcb7</item> <!-- Banknote With Pound Sign -->
+        <item>\ud83d\uddff</item> <!-- Moyai -->
+        <item>\ud83d\udec2</item> <!-- Passport Control -->
+        <item>\ud83d\udec3</item> <!-- Customs -->
+        <item>\ud83d\udec4</item> <!-- Baggage Claim -->
+        <item>\ud83d\udec5</item> <!-- Left Luggage -->
+    </string-array>
+
+</resources>

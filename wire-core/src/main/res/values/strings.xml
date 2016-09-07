@@ -840,6 +840,9 @@
     <string name="drawing__tip__picture__message">TAP COLOR TO CHANGE THE BRUSH SIZE.\n\nSHAKE TO REMOVE PHOTOS.</string>
     <string name="drawing__tip__message">TAP COLOR TO CHANGE THE BRUSH SIZE.\n\nPRESS AND HOLD TO FILL AN AREA.</string>
     <string name="add_a_sketch">Add a sketch</string>
+    <string name="sketch__emoji_keyboard__size_label__small">SMALL</string>
+    <string name="sketch__emoji_keyboard__size_label__medium">MEDIUM</string>
+    <string name="sketch__emoji_keyboard__size_label__large">LARGE</string>
 
     <!-- Location sharing -->
     <string name="location_sharing__tip">Drag the map to change location</string>

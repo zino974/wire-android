@@ -42,6 +42,8 @@ import com.waz.zclient.controllers.drawing.DrawingController;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.ui.colorpicker.ColorPickerLayout;
 import com.waz.zclient.ui.colorpicker.ColorPickerScrollView;
+import com.waz.zclient.ui.colorpicker.EmojiBottomSheetDialog;
+import com.waz.zclient.ui.colorpicker.EmojiSize;
 import com.waz.zclient.ui.sketch.DrawingCanvasView;
 import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.utils.LayoutSpec;
@@ -87,6 +89,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
 
     private DrawingController.DrawingDestination drawingDestination;
     private boolean includeBackgroundImage;
+    private EmojiSize currentEmojiSize = EmojiSize.SMALL;
 
     public static DrawingFragment newInstance(ImageAsset backgroundAsset, DrawingController.DrawingDestination drawingDestination) {
         DrawingFragment fragment = new DrawingFragment();
@@ -119,6 +122,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         View rootView = inflater.inflate(R.layout.fragment_drawing, container, false);
         drawingCanvasView = ViewUtils.getView(rootView, R.id.dcv__canvas);
         drawingCanvasView.setDrawingCanvasCallback(this);
+        drawingCanvasView.setDrawingColor(getControllerFactory().getAccentColorController().getColor());
         drawingCanvasView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -391,6 +395,22 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     @Override
     public void onEmojiSelected(String emoji, int size) {
         drawingCanvasView.setEmoji(emoji, size);
+    }
+
+    @Override
+    public void onMoreClick() {
+        final EmojiBottomSheetDialog dialog = new EmojiBottomSheetDialog(getContext(),
+                                                                         currentEmojiSize,
+                                                                         new EmojiBottomSheetDialog.EmojiDialogListener() {
+                                                                             @Override
+                                                                             public void onEmojiSelected(String emoji, EmojiSize emojiSize) {
+                                                                                 colorLayout.setCurrentEmoji(emoji, emojiSize);
+                                                                                 currentEmojiSize = emojiSize;
+                                                                                 getControllerFactory().getUserPreferencesController().addRecentEmoji(emoji);
+                                                                             }
+                                                                         },
+                                                                         getControllerFactory().getUserPreferencesController().getRecentEmojis());
+        dialog.show();
     }
 
     @Override

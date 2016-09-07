@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.waz.zclient.ui.R;
+import com.waz.zclient.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +98,14 @@ public class TabIndicatorLayout extends LinearLayout implements ViewPager.OnPage
         }
 
         setLabels(labels);
+    }
+
+    public void setLabelHeight(int height) {
+        ViewGroup.LayoutParams params = textViewContainer.getLayoutParams();
+        params.height = height;
+        ViewUtils.setMarginBottom(textViewContainer, getResources().getDimensionPixelSize(R.dimen.wire__divider__height));
+        textViewContainer.setLayoutParams(params);
+        textViewContainer.invalidate();
     }
 
 

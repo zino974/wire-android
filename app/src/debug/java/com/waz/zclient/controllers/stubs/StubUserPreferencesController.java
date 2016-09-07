@@ -19,8 +19,8 @@ package com.waz.zclient.controllers.stubs;
 
 import com.waz.zclient.camera.CameraFacing;
 import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
-import java.lang.Override;
-import java.lang.String;
+
+import java.util.List;
 
 public class StubUserPreferencesController implements IUserPreferencesController {
   @Override
@@ -116,6 +116,16 @@ public class StubUserPreferencesController implements IUserPreferencesController
   @Override
   public int getABTestingGroup() {
     return 0;
+  }
+
+  @Override
+  public void addRecentEmoji(String emoji) {
+
+  }
+
+  @Override
+  public List<String> getRecentEmojis() {
+    return null;
   }
 
   @Override
