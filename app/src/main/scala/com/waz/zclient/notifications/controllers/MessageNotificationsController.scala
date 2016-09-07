@@ -18,7 +18,7 @@
 package com.waz.zclient.notifications.controllers
 
 import android.annotation.TargetApi
-import android.app.{Notification, NotificationManager, PendingIntent}
+import android.app.{Notification, NotificationManager}
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.{BitmapDrawable, Drawable}
@@ -43,7 +43,10 @@ import com.waz.zclient.controllers.vibrator.VibratorController
 import com.waz.zclient.utils.ContextUtils._
 import com.waz.zclient.utils.IntentUtils._
 import com.waz.zclient.utils.RingtoneUtils
-import com.waz.zms.PushService
+import com.waz.zms.NotificationsAndroidService
+import org.threeten.bp.Instant
+
+import scala.concurrent.duration._
 
 class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) extends Injectable {
 
@@ -57,29 +60,36 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
 
   val notManager = inject[NotificationManager]
 
-  val notifications = notsService.flatMap(_.getNotifications)
+  val notifications = notsService.flatMap(_.notifications)
+
+  val shouldBeSilent = notsService.flatMap(_.otherDeviceActiveTime).map { t =>
+    val timeDiff = Instant.now.toEpochMilli - t.toEpochMilli
+    verbose(s"otherDeviceActiveTime: $t, current time: ${Instant.now}, timeDiff: ${timeDiff.millis.toSeconds}")
+    timeDiff < NotificationsAndroidService.checkNotificationsTimeout.toMillis
+  }
 
   val sharedPreferences = cxt.getSharedPreferences(UserPreferencesController.USER_PREFS_TAG, Context.MODE_PRIVATE)
 
-  lazy val clearIntent = PendingIntent.getService(cxt, 9730, PushService.clearNotificationsIntent(cxt), PendingIntent.FLAG_UPDATE_CURRENT)
-  
-  notifications.on(Threading.Ui) { nots =>
-    verbose(s"Notifications updated: $nots")
-    if (nots.isEmpty) notManager.cancel(ZETA_MESSAGE_NOTIFICATION_ID)
-    else {
-      val notification =
-        if (nots.size == 1) getSingleMessageNotification(nots.head)
-        else getMultipleMessagesNotification(nots)
+  lazy val clearIntent = NotificationsAndroidService.clearNotificationsIntent(context)
 
-      notification.priority = Notification.PRIORITY_HIGH
-      notification.flags |= Notification.FLAG_AUTO_CANCEL
-      notification.deleteIntent = clearIntent
+  notifications.zip(shouldBeSilent).on(Threading.Ui) {
+    case (nots, silent) =>
+      verbose(s"Notifications updated: shouldBeSilent: $silent, $nots")
+      if (nots.isEmpty) notManager.cancel(ZETA_MESSAGE_NOTIFICATION_ID)
+      else {
+        val notification =
+          if (nots.size == 1) getSingleMessageNotification(nots.head, silent)
+          else getMultipleMessagesNotification(nots, silent)
 
-      attachNotificationLed(notification)
-      attachNotificationSound(notification, nots)
+        notification.priority = Notification.PRIORITY_HIGH
+        notification.flags |= Notification.FLAG_AUTO_CANCEL
+        notification.deleteIntent = clearIntent
 
-      notManager.notify(ZETA_MESSAGE_NOTIFICATION_ID, notification)
-    }
+        attachNotificationLed(notification)
+        attachNotificationSound(notification, nots, silent)
+
+        notManager.notify(ZETA_MESSAGE_NOTIFICATION_ID, notification)
+      }
   }
 
   private def attachNotificationLed(notification: Notification) = {
@@ -93,10 +103,10 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     notification.flags |= Notification.FLAG_SHOW_LIGHTS
   }
 
-  private def attachNotificationSound(notification: Notification, ns: Seq[NotificationInfo]) = {
+  private def attachNotificationSound(notification: Notification, ns: Seq[NotificationInfo], silent: Boolean) = {
     val soundSetting = sharedPreferences.getString(context.getString(R.string.pref_options_sounds_key), context.getString(R.string.pref_options_sounds_default))
     notification.sound =
-      if (context.getString(R.string.pref_sound_value_none) == soundSetting) null
+      if (context.getString(R.string.pref_sound_value_none) == soundSetting || silent) null
       else if ((context.getString(R.string.pref_sound_value_some) == soundSetting) && ns.size > 1) null
       else ns.lastOption.fold(null.asInstanceOf[Uri])(getMessageSoundUri)
   }
@@ -128,7 +138,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     else RingtoneUtils.getUriForRawId(context, returnDefault)
   }
 
-  private def getSingleMessageNotification(n: NotificationInfo): Notification = {
+  private def getSingleMessageNotification(n: NotificationInfo, silent: Boolean): Notification = {
 
     val spannableString = getMessage(n, multiple = false, singleConversationInBatch = true, singleUserInBatch = true)
     val title = getMessageTitle(n)
@@ -157,13 +167,13 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
         .addAction(R.drawable.ic_action_reply, getString(R.string.notification__action__reply), getNotificationReplyIntent(cxt, n.convId.str, requestBase + 2))
     }
 
-    if (VibratorController.isEnabledInPreferences(cxt)) {
+    if (VibratorController.isEnabledInPreferences(cxt) && !silent) {
       builder.setVibrate(VibratorController.resolveResource(cxt.getResources, R.array.new_message_gcm))
     }
     builder.build
   }
 
-  private def getMultipleMessagesNotification(ns: Seq[NotificationInfo]): Notification = {
+  private def getMultipleMessagesNotification(ns: Seq[NotificationInfo], silent: Boolean): Notification = {
 
     val convIds = ns.map(_.convId).toSet
     val users = ns.map(_.userName).toSet
@@ -190,7 +200,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
       .setCategory(NotificationCompat.CATEGORY_MESSAGE)
       .setPriority(NotificationCompat.PRIORITY_HIGH)
 
-    if (VibratorController.isEnabledInPreferences(cxt)) {
+    if (VibratorController.isEnabledInPreferences(cxt) && !silent) {
       builder.setVibrate(VibratorController.resolveResource(cxt.getResources, R.array.new_message_gcm))
     }
     if (isSingleConv) {
