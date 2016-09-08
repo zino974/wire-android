@@ -2407,7 +2407,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     getControllerFactory().isTornDown()) {
                     return;
                 }
-                ((BaseScalaActivity)getActivity())
+                ((BaseScalaActivity) getActivity())
                     .injectJava(ImageNotificationsController.class)
                     .showImageSavedNotification(imageAssetToSave.getId(), uri);
                 Toast.makeText(getContext(), R.string.message_bottom_menu_action_save_ok, Toast.LENGTH_SHORT).show();
