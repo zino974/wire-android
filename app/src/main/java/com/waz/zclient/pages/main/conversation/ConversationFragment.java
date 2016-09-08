@@ -1549,6 +1549,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                           R.string.asset_upload_error__not_found__button,
                                           null,
                                           true);
+                errorDescription.dismiss();
                 break;
             case CANNOT_SEND_ASSET_TOO_LARGE:
                 AlertDialog dialog = ViewUtils.showAlertDialog(getActivity(),
@@ -1563,6 +1564,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     dialog.setMessage(getString(R.string.asset_upload_error__file_too_large__message, maxFileSize));
                 }
 
+                errorDescription.dismiss();
                 getControllerFactory().getTrackingController().tagEvent(new SelectedTooLargeFileEvent());
                 break;
             case RECORDING_FAILURE:
@@ -1572,6 +1574,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                           R.string.alert_dialog__confirmation,
                                           null,
                                           true);
+                errorDescription.dismiss();
 
                 break;
             case CANNOT_SEND_MESSAGE_TO_UNVERIFIED_CONVERSATION:
