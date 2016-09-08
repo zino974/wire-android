@@ -929,7 +929,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
                 UserSearchResult usersSearchResult = getStoreFactory().getZMessagingApiStore()
                                                                        .getApi()
                                                                        .search()
-                                                                       .getConnections(filter, NUM_SEARCH_RESULTS_ADD_TO_CONV, excludedUsers, false);
+                                                                       .getConnectionsByName(filter, NUM_SEARCH_RESULTS_ADD_TO_CONV, excludedUsers);
                 usersSearchModelObserver.setAndUpdate(usersSearchResult);
                 break;
             case SHOW_SEARCH_RESULTS:

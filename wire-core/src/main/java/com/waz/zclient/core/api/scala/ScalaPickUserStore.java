@@ -92,7 +92,7 @@ public class ScalaPickUserStore extends PickUserStore {
         if (connectionsResults != null) {
             connectionsResults.removeUpdateListener(searchListener);
         }
-        connectionsResults = zMessagingApi.search().getConnections(searchTerm, numberOfResults, excludes, true);
+        connectionsResults = zMessagingApi.search().getConnectionsByNameOrEmailIncludingBlocked(searchTerm, numberOfResults, excludes);
         connectionsResults.addUpdateListener(searchListener);
 
         if (recommendedResults != null) {
