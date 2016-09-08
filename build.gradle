@@ -137,7 +137,7 @@ ext {
             spotifyAuth          : 'com.wire:spotify-auth:1.0.0-beta13@aar',
 
             // Internal
-            audioNotifications   : "com.wire.avs:audio-notifications:$audioVersion",
+            audioNotifications   : "com.wire:audio-notifications:$audioVersion",
 
             // Test dependencies
             junit               : 'junit:junit:4.12',
