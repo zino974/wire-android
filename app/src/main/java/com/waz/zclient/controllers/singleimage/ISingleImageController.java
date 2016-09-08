@@ -18,11 +18,9 @@
 package com.waz.zclient.controllers.singleimage;
 
 import android.view.View;
-import com.waz.annotations.Controller;
 import com.waz.api.Message;
 import com.waz.api.User;
 
-@Controller
 public interface ISingleImageController {
     void addSingleImageObserver(SingleImageObserver observer);
 

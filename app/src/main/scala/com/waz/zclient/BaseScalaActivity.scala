@@ -18,6 +18,7 @@
 package com.waz.zclient
 
 import android.support.v7.app.AppCompatActivity
+import com.waz.zclient.common.controllers.PermissionActivity
 
 class BaseScalaActivity extends AppCompatActivity with PermissionActivity {
 

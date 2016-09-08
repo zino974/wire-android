@@ -23,6 +23,7 @@ import _root_.com.waz.RobolectricUtils
 import _root_.com.waz.testutils.TestWireContext
 import android.app.Activity
 import android.content.Context
+import com.waz.zclient.common.controllers._
 import junit.framework.Assert.{assertFalse, assertTrue}
 import org.junit.runner.RunWith
 import org.junit.{Before, Test}

@@ -25,7 +25,7 @@
                                                                android:background="@color/graphite"
     >
 
-    <com.waz.zclient.camera.CameraPreviewTextureView
+    <com.waz.zclient.camera.views.CameraPreviewTextureView
         android:id="@+id/cp__small_camera_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

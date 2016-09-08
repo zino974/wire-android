@@ -17,11 +17,9 @@
  */
 package com.waz.zclient.controllers.camera;
 
-import com.waz.annotations.Controller;
 import com.waz.api.ImageAsset;
 import com.waz.zclient.pages.main.profile.camera.CameraContext;
 
-@Controller
 public interface ICameraController {
     CameraContext getCameraContext();
 

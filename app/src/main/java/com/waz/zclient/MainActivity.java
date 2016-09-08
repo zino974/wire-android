@@ -17,7 +17,6 @@
  */
 package com.waz.zclient;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -50,14 +49,13 @@ import com.waz.api.User;
 import com.waz.api.Verification;
 import com.waz.api.VoiceChannel;
 import com.waz.model.ConvId;
-import com.waz.zclient.calling.CallPermissionsController;
 import com.waz.zclient.calling.CallingActivity;
+import com.waz.zclient.calling.controllers.CallPermissionsController;
 import com.waz.zclient.controllers.accentcolor.AccentColorChangeRequester;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.calling.CallingObserver;
 import com.waz.zclient.controllers.navigation.NavigationControllerObserver;
 import com.waz.zclient.controllers.navigation.Page;
-import com.waz.zclient.controllers.notifications.NotificationsController;
 import com.waz.zclient.controllers.tracking.events.connect.AcceptedGenericInviteEvent;
 import com.waz.zclient.controllers.tracking.events.exception.ExceptionEvent;
 import com.waz.zclient.controllers.tracking.events.otr.VerifiedConversationEvent;
@@ -208,7 +206,6 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         getControllerFactory().getNavigationController().addNavigationControllerObserver(this);
         getControllerFactory().getCallingController().addCallingObserver(this);
         getStoreFactory().getConversationStore().addConversationStoreObserver(this);
-        dismissAndroidNotifications();
         handleInvite();
         handleReferral();
 
@@ -372,11 +369,6 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
 
         // Here comes code for adding other dependencies to controllers...
         getControllerFactory().getNavigationController().setIsLandscape(ViewUtils.isInLandscape(this));
-    }
-
-    private void dismissAndroidNotifications() {
-        ((NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE)).cancel(
-            NotificationsController.ZETA_MESSAGE_NOTIFICATION_ID);
     }
 
     private void verifyGooglePlayServicesStatus() {

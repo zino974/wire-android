@@ -48,7 +48,7 @@ android {
             // All the usual Gradle options.
             testLogging {
                 events "passed", "skipped", "failed", "standardOut", "standardError"
-                outputs.upToDateWhen {false}
+                outputs.upToDateWhen { false }
                 showStandardStreams = true
             }
         }
@@ -176,15 +176,15 @@ android {
             applicationId "com.wire.internal"
             versionName majorVersion + android.defaultConfig.versionCode + "-internal"
             proguardFile 'proguard-rules-test.txt'
-            manifestPlaceholders = [applicationLabel       : "Wire Internal",
-                                    allowBackup            : "true",
-                                    applicationIcon        : "@drawable/ic_launcher_wire_internal",
-                                    sharedUserId           : "",
-                                    use_audio_link         : "false",
-                                    gcm_enabled            : "false",
-                                    internal_features      : "true",
-                                    localyticsAppKey       : getApiKey("localyticsAppKey"),
-                                    hockeyAppKey           : getApiKey("hockeyAppKeyInternal")]
+            manifestPlaceholders = [applicationLabel : "Wire Internal",
+                                    allowBackup      : "true",
+                                    applicationIcon  : "@drawable/ic_launcher_wire_internal",
+                                    sharedUserId     : "",
+                                    use_audio_link   : "false",
+                                    gcm_enabled      : "false",
+                                    internal_features: "true",
+                                    localyticsAppKey : getApiKey("localyticsAppKey"),
+                                    hockeyAppKey     : getApiKey("hockeyAppKeyInternal")]
 
             buildConfigField 'boolean', 'USE_HOCKEY_UPDATE', 'false'
             buildConfigField 'boolean', 'USE_EDGE_BACKEND', 'false'
@@ -339,8 +339,6 @@ def patchKeepSpecs() {
     }
 
 
-
-
 }
 
 afterEvaluate {
@@ -389,7 +387,6 @@ dexinfo {
 }
 
 dependencies {
-    apt project(':annotations-processor')
     compile project(':wire-core')
     compile project(':wire-ui')
     compile project(':lintlib')
@@ -475,7 +472,7 @@ def getDate() {
     return formattedDate
 }
 
-def getApiKey(String property){
+def getApiKey(String property) {
     if (file("$projectDir/api-keys.properties").exists()) {
         Properties properties = new Properties()
         properties.load(new FileInputStream("$projectDir/api-keys.properties"))
@@ -490,8 +487,13 @@ def getApiKey(String property){
 // Same values as in log_levels.xml
 // (workaround for R not being available in BuildConfig for test flavor)
 def logLevelVerbose() { return '2' }
+
 def logLevelDebug() { return '3' }
+
 def logLevelInfo() { return '4' }
+
 def logLevelWarn() { return '5' }
+
 def logLevelError() { return '6' }
+
 def logLevelSupress() { return '99' }

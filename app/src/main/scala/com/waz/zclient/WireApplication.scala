@@ -18,14 +18,18 @@
 package com.waz.zclient
 
 import android.content.Context
-import android.media.AudioManager
-import android.os.{PowerManager, Vibrator}
 import android.support.multidex.MultiDexApplication
 import com.waz.api.{NetworkMode, ZMessagingApi, ZMessagingApiFactory}
 import com.waz.service.{MediaManagerService, PreferenceService, ZMessaging}
 import com.waz.utils.events.{EventContext, Signal, Subscription}
-import com.waz.zclient.calling.{CallPermissionsController, CurrentCallController}
-import com.waz.zclient.camera.{AndroidCameraFactory, GlobalCameraController}
+import com.waz.zclient.api.scala.ScalaStoreFactory
+import com.waz.zclient.calling.controllers.{CallPermissionsController, CurrentCallController, GlobalCallingController}
+import com.waz.zclient.camera.controllers.{AndroidCameraFactory, GlobalCameraController}
+import com.waz.zclient.common.controllers.{PermissionActivity, PermissionsController, PermissionsWrapper}
+import com.waz.zclient.controllers.{DefaultControllerFactory, IControllerFactory}
+import com.waz.zclient.core.stores.IStoreFactory
+import com.waz.zclient.notifications.controllers.{CallingNotificationsController, ImageNotificationsController, MessageNotificationsController}
+import com.waz.zclient.utils.{BackendPicker, BuildConfigUtils, Callback}
 
 object WireApplication {
   var APP_INSTANCE: WireApplication = _
@@ -37,10 +41,10 @@ object WireApplication {
     bind[GlobalCameraController] to new GlobalCameraController(inject[Context], new AndroidCameraFactory)(EventContext.Global)
     bind[MediaManagerService] to ZMessaging.currentGlobal.mediaManager
 
-    //Global android services
-    bind[PowerManager] to inject[Context].getSystemService(Context.POWER_SERVICE).asInstanceOf[PowerManager]
-    bind[Vibrator] to inject[Context].getSystemService(Context.VIBRATOR_SERVICE).asInstanceOf[Vibrator]
-    bind[AudioManager] to inject[Context].getSystemService(Context.AUDIO_SERVICE).asInstanceOf[AudioManager]
+    //notifications
+    bind[MessageNotificationsController] to new MessageNotificationsController(inject[Context])
+    bind[ImageNotificationsController] to new ImageNotificationsController(inject[Context])
+    bind[CallingNotificationsController] to new CallingNotificationsController(inject[Context])
   }
 
   def services(ctx: WireContext) = new Module {
@@ -52,7 +56,6 @@ object WireApplication {
   def controllers(implicit ctx: WireContext) = new Module {
     bind[CurrentCallController] to new CurrentCallController()
     bind[CallPermissionsController] to new CallPermissionsController()
-
     bind[PermissionActivity] to ctx.asInstanceOf[PermissionActivity]
     bind[PermissionsController] to new PermissionsController(new PermissionsWrapper)
   }
@@ -67,7 +70,39 @@ class WireApplication extends MultiDexApplication with WireContext with Injectab
 
   lazy val module: Injector = Global :: AppModule
 
+  protected var controllerFactory: IControllerFactory = _
+  protected var storeFactory: IStoreFactory = _
+
   def contextModule(ctx: WireContext): Injector = controllers(ctx) :: services(ctx) :: ContextModule(ctx)
+
+  override def onCreate(): Unit = {
+    super.onCreate()
+    controllerFactory = new DefaultControllerFactory(getApplicationContext)
+
+    new BackendPicker(this).withBackend(new Callback[Void]() {
+      def callback(aVoid: Void) = ensureInitialized()
+    })
+  }
+
+  def ensureInitialized() = {
+    if (storeFactory == null) {
+      storeFactory = new ScalaStoreFactory(getApplicationContext)
+      //TODO initialization of ZMessaging happens here - make this more explicit?
+      storeFactory.getZMessagingApiStore.getAvs.setLogLevel(BuildConfigUtils.getLogLevelAVS(this))
+    }
+
+    inject[MessageNotificationsController]
+    inject[ImageNotificationsController]
+    inject[CallingNotificationsController]
+  }
+
+  override def onTerminate(): Unit = {
+    controllerFactory.tearDown()
+    storeFactory.tearDown()
+    storeFactory = null
+    controllerFactory = null
+    super.onTerminate()
+  }
 }
 
 class ZMessagingApiProvider(ctx: WireContext) {

@@ -28,19 +28,13 @@ import com.waz.api.LogLevel;
 import com.waz.api.NotificationsHandler;
 import com.waz.api.TrackingEventsHandler;
 import com.waz.api.impl.AccentColors;
-import com.waz.service.ZMessaging;
-import com.waz.zclient.api.scala.ScalaStoreFactory;
-import com.waz.zclient.controllers.DefaultControllerFactory;
 import com.waz.zclient.controllers.IControllerFactory;
 import com.waz.zclient.controllers.notifications.AppTrackingEventsHandler;
 import com.waz.zclient.controllers.notifications.CallingTrackingEventsHandler;
-import com.waz.zclient.controllers.notifications.INotificationsController;
 import com.waz.zclient.core.stores.IStoreFactory;
 import com.waz.zclient.ui.text.TypefaceFactory;
 import com.waz.zclient.ui.text.TypefaceLoader;
-import com.waz.zclient.utils.BackendPicker;
 import com.waz.zclient.utils.BuildConfigUtils;
-import com.waz.zclient.utils.Callback;
 import com.waz.zclient.utils.WireLoggerTree;
 import timber.log.Timber;
 
@@ -59,8 +53,6 @@ public class ZApplication extends WireApplication implements NotificationsHandle
     private CallingEventsHandler callingEventsHandler;
     private TrackingEventsHandler trackingEventsHandler;
 
-    private IControllerFactory controllerFactory;
-    private IStoreFactory storeFactory;
     private TypefaceLoader typefaceloader = new TypefaceLoader() {
 
         private Map<String, Typeface> typefaceMap = new HashMap<>();
@@ -117,8 +109,6 @@ public class ZApplication extends WireApplication implements NotificationsHandle
     public void onCreate() {
         super.onCreate();
 
-        ZMessaging.useBackend(BuildConfigUtils.defaultBackend());
-
         if (com.waz.zclient.BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
             LogLevel.setMinimumLogLevel(LogLevel.VERBOSE);
@@ -138,27 +128,6 @@ public class ZApplication extends WireApplication implements NotificationsHandle
         // Register LocalyticsActivityLifecycleCallbacks
         registerActivityLifecycleCallbacks(new LocalyticsActivityLifecycleCallbacks(this));
         Localytics.setPushDisabled(false);
-
-        controllerFactory = new DefaultControllerFactory(getApplicationContext());
-
-        new BackendPicker(this).withBackend(new Callback<Void>() {
-            @Override
-            public void callback(Void aVoid) {
-                ensureInitialized();
-            }
-        });
-    }
-
-    public void ensureInitialized() {
-        if (storeFactory == null) {
-            storeFactory = new ScalaStoreFactory(getApplicationContext());
-            storeFactory.getZMessagingApiStore().getAvs().setLogLevel(BuildConfigUtils.getLogLevelAVS(this));
-        }
-    }
-
-    @Override
-    public INotificationsController getNotificationsHandler() {
-        return getControllerFactory().getNotificationsController();
     }
 
     @Override
@@ -181,22 +150,13 @@ public class ZApplication extends WireApplication implements NotificationsHandle
     }
 
     @Override
-    public void onTerminate() {
-        getControllerFactory().tearDown();
-        getStoreFactory().tearDown();
-        storeFactory = null;
-        controllerFactory = null;
-        super.onTerminate();
-    }
-
-    @Override
     public IStoreFactory getStoreFactory() {
-        return storeFactory;
+        return storeFactory();
     }
 
     @Override
     public IControllerFactory getControllerFactory() {
-        return controllerFactory;
+        return controllerFactory();
     }
 
 }

@@ -25,7 +25,7 @@
              xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-    <com.waz.zclient.camera.CameraPreviewTextureView
+    <com.waz.zclient.camera.views.CameraPreviewTextureView
         android:id="@+id/cptv__camera_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
