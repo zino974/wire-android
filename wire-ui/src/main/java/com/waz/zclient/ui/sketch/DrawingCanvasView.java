@@ -30,7 +30,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import com.waz.zclient.ui.R;
-import com.waz.zclient.utils.SquareOrientation;
 import net.hockeyapp.android.ExceptionHandler;
 
 import java.util.LinkedList;
@@ -45,7 +44,6 @@ public class DrawingCanvasView extends View {
     private Paint drawingPaint;
     private Paint emojiPaint;
     private Paint whitePaint;
-    private SquareOrientation backgroundImageRotation = SquareOrientation.NONE;
     private DrawingCanvasCallback drawingCanvasCallback;
 
     //used for drawing path
@@ -138,20 +136,7 @@ public class DrawingCanvasView extends View {
         }
         backgroundBitmap = bitmap;
         if (backgroundBitmap.getWidth() > backgroundBitmap.getHeight()) {
-            // Flip the image in landscape
             isBackgroundBitmapLandscape = true;
-            switch (backgroundImageRotation) {
-                case LANDSCAPE_RIGHT:
-                    backgroundImageRotation = SquareOrientation.LANDSCAPE_RIGHT;
-                    break;
-                case LANDSCAPE_LEFT:
-                    backgroundImageRotation = SquareOrientation.LANDSCAPE_LEFT;
-                    break;
-                default:
-                    //if we dont have a side, set one
-                    backgroundImageRotation = SquareOrientation.LANDSCAPE_LEFT;
-                    break;
-            }
         }
         drawBackgroundBitmap();
     }
@@ -258,12 +243,25 @@ public class DrawingCanvasView extends View {
         }
     }
 
+    public float getBackgroundBitmapToCanvasWidthRatio() {
+        return (float) canvas.getWidth() / backgroundBitmap.getWidth();
+    }
+
+    public int getBackgroundBitmapTop() {
+        float ratio = getBackgroundBitmapToCanvasWidthRatio();
+        return (int) ((canvas.getHeight() - (ratio * backgroundBitmap.getHeight())) / 2);
+    }
+
+    public int getLandscapeBackgroundBitmapHeight() {
+        return (int) (backgroundBitmap.getHeight() * getBackgroundBitmapToCanvasWidthRatio());
+    }
+
     public int getTopTrimValue(boolean isLandscape) {
-        if (includeBackgroundImage) {
+        if (!isLandscape) {
             return 0;
         }
 
-        int topTrimValue = isLandscape ? bitmap.getWidth() : bitmap.getHeight();
+        int topTrimValue = bitmap.getHeight();
 
         for (HistoryItem historyItem: historyItems) {
             if (historyItem instanceof FilledScreen) {
@@ -272,7 +270,7 @@ public class DrawingCanvasView extends View {
             } else if (historyItem instanceof Stroke) {
                 RectF bounds = ((Stroke) historyItem).getBounds();
                 if (isLandscape) {
-                    topTrimValue = Math.min(topTrimValue, (int) bounds.left);
+                    topTrimValue = Math.min(topTrimValue, (int) bounds.top);
                 } else {
                     topTrimValue = Math.min(topTrimValue, (int) bounds.top);
                 }
@@ -285,18 +283,19 @@ public class DrawingCanvasView extends View {
     }
 
     public int getBottomTrimValue(boolean isLandscape) {
-        if (includeBackgroundImage) {
-            return isLandscape ? bitmap.getWidth() : bitmap.getHeight();
+        if (!isLandscape) {
+            return bitmap.getHeight();
         }
+
         int bottomTrimValue = 0;
         for (HistoryItem historyItem: historyItems) {
             if (historyItem instanceof FilledScreen) {
-                bottomTrimValue = isLandscape ? bitmap.getWidth() : bitmap.getHeight();
+                bottomTrimValue = bitmap.getHeight();
                 break;
             } else if (historyItem instanceof Stroke) {
                 RectF bounds = ((Stroke) historyItem).getBounds();
                 if (isLandscape) {
-                    bottomTrimValue = Math.max(bottomTrimValue, (int) bounds.right);
+                    bottomTrimValue = Math.max(bottomTrimValue, (int) bounds.bottom);
                 } else {
                     bottomTrimValue = Math.max(bottomTrimValue, (int) bounds.bottom);
                 }
@@ -304,7 +303,7 @@ public class DrawingCanvasView extends View {
                 bottomTrimValue = (int) Math.max(bottomTrimValue, ((Emoji) historyItem).y);
             }
         }
-        return Math.min(bottomTrimValue + trimBuffer, isLandscape ? bitmap.getWidth() : bitmap.getHeight());
+        return Math.min(bottomTrimValue + trimBuffer, bitmap.getHeight());
     }
 
     public boolean isBackgroundImageLandscape() {
@@ -369,7 +368,6 @@ public class DrawingCanvasView extends View {
             return;
         }
         includeBackgroundImage = true;
-        canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), whitePaint);
 
         RectF src;
         RectF dest;
@@ -379,11 +377,10 @@ public class DrawingCanvasView extends View {
         float ratio;
 
         if (isBackgroundBitmapLandscape) {
-            ratio = (float) canvas.getHeight() / backgroundBitmap.getWidth();
+            horizontalMargin = 0;
+            imageWidth = canvas.getWidth();
             imageHeight = canvas.getHeight();
-            imageWidth = (int) (backgroundBitmap.getHeight() * ratio);
-            horizontalMargin = (canvas.getWidth() / 2) - (imageWidth / 2);
-            src = new RectF(0, 0, backgroundBitmap.getHeight() - 1, backgroundBitmap.getWidth() - 1);
+            src = new RectF(0, 0, backgroundBitmap.getWidth(), backgroundBitmap.getHeight());
             dest = new RectF(0, 0, imageWidth, imageHeight);
         } else {
             ratio = (float) canvas.getHeight() / backgroundBitmap.getHeight();
@@ -397,18 +394,12 @@ public class DrawingCanvasView extends View {
         Matrix matrix = new Matrix();
         matrix.setRectToRect(src, dest, Matrix.ScaleToFit.CENTER);
 
-        if (isBackgroundBitmapLandscape) {
-            matrix.postTranslate(-imageHeight / 2, -imageWidth / 2); // Centers image
-            matrix.postRotate(-backgroundImageRotation.orientation);
-            matrix.postTranslate(imageWidth / 2, imageHeight / 2);
-        }
         matrix.postTranslate(horizontalMargin, 0);
 
         canvas.drawBitmap(backgroundBitmap, matrix, null);
         for (HistoryItem item : historyItems) {
             item.draw(canvas);
         }
-        drawingCanvasCallback.setRotation(backgroundImageRotation.orientation);
         invalidate();
     }
 
@@ -419,18 +410,6 @@ public class DrawingCanvasView extends View {
             item.draw(canvas);
         }
         invalidate();
-    }
-
-    public void setConfigOrientation(SquareOrientation configOrientation) {
-        if (configOrientation.equals(backgroundImageRotation) || !isBackgroundBitmapLandscape || backgroundBitmap == null) {
-            return;
-        }
-        if (configOrientation == SquareOrientation.LANDSCAPE_LEFT || configOrientation == SquareOrientation.LANDSCAPE_RIGHT) {
-            this.backgroundImageRotation = configOrientation;
-            if (includeBackgroundImage) {
-                drawBackgroundBitmap();
-            }
-        }
     }
 
     public boolean isEmpty() {
@@ -520,8 +499,6 @@ public class DrawingCanvasView extends View {
         void drawingAdded();
 
         void drawingCleared();
-
-        void setRotation(int rotation);
 
         void reserveBitmapMemory(int width, int height);
     }
