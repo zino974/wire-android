@@ -187,7 +187,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
       }
       else (convIds.size.toString, R.plurals.notification__new_messages__multiple)
 
-    val title = getQuantityString(headerRes, ns.size, ns.size.toString, convDesc)
+    val title = getQuantityString(headerRes, ns.size, Integer.valueOf(ns.size), convDesc)
 
     val inboxStyle = new NotificationCompat.InboxStyle()
       .setBigContentTitle(title)

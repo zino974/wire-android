@@ -626,15 +626,15 @@
     <string name="lockscreen__talk">IS CALLING</string>
     <plurals name="notification__new_messages">
         <item quantity="one">Message from %2$s</item>
-        <item quantity="other">%1$s messages from %2$s</item>
+        <item quantity="other">%1$d messages from %2$s</item>
     </plurals>
     <plurals name="notification__new_messages_groups">
         <item quantity="one">Message in %2$s</item>
-        <item quantity="other">%1$s messages in %2$s</item>
+        <item quantity="other">%1$d messages in %2$s</item>
     </plurals>
     <plurals name="notification__new_messages__multiple">
         <item quantity="one">Message in %2$s conversations</item>
-        <item quantity="other">%1$s messages in %2$s conversations</item>
+        <item quantity="other">%1$d messages in %2$s conversations</item>
     </plurals>
 
     <!-- %1$s == username, %2$s == conversation -->

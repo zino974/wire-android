@@ -49,7 +49,7 @@ package object utils {
     def getStringOrEmpty(resId: Int)(implicit context: Context): String = if (resId > 0) getString(resId) else ""
     def getStringOrEmpty(resId: Int, args: String*)(implicit context: Context): String = if (resId > 0) getString(resId, args:_*) else ""
 
-    def getQuantityString(resId: Int, quantity: Int, args: String*)(implicit context: Context): String = context.getResources.getQuantityString(resId, quantity, args:_*)
+    def getQuantityString(resId: Int, quantity: Int, args: AnyRef*)(implicit context: Context): String = context.getResources.getQuantityString(resId, quantity, args:_*)
 
     def getDimenPx(resId: Int)(implicit context: Context) = context.getResources.getDimensionPixelSize(resId)
     def getDimen(resId: Int)(implicit context: Context) = context.getResources.getDimension(resId)
