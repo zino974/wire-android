@@ -134,17 +134,17 @@ public class AssetIntentsManager {
             return true;
         }
 
-        if ((type == IntentType.CAMERA || type == IntentType.VIDEO || type == IntentType.VIDEO_CURSOR_BUTTON) && pendingFileUri != null) {
-            File possibleFile = new File(pendingFileUri.getPath());
-            if (possibleFile.exists() && possibleFile.length() > 0) {
+        File possibleFile = null;
+        if (pendingFileUri != null) {
+            possibleFile = new File(pendingFileUri.getPath());
+        }
+        if ((type == IntentType.CAMERA || type == IntentType.VIDEO || type == IntentType.VIDEO_CURSOR_BUTTON) &&
+            possibleFile != null &&
+            possibleFile.exists() &&
+            possibleFile.length() > 0) {
                 callback.onDataReceived(type, pendingFileUri);
-                pendingFileUri = null;
-            } else {
-                callback.onFailed(type);
-            }
-        } else if (data == null) {
-                callback.onFailed(type);
-        } else {
+            pendingFileUri = null;
+        } else if (data != null) {
             Uri uri;
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
                 uri = Uri.parse(data.getDataString());
@@ -156,6 +156,8 @@ public class AssetIntentsManager {
             } else {
                 callback.onDataReceived(type, uri);
             }
+        } else {
+            callback.onFailed(type);
         }
 
         return true;
