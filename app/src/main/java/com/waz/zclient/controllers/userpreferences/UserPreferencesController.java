@@ -26,6 +26,7 @@ import com.waz.zclient.camera.CameraFacing;
 import timber.log.Timber;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class UserPreferencesController implements IUserPreferencesController {
@@ -49,6 +50,8 @@ public class UserPreferencesController implements IUserPreferencesController {
     private static final String USER_PREF_AB_TESTING_UUID = "USER_PREF_AB_TESTING_UUID";
     private static final String USER_PREF_ACTION_PREFIX = "USER_PREF_ACTION_PREFIX";
     private static final String USER_PREF_RECENT_EMOJIS = "USER_PREF_RECENT_EMOJIS";
+    private static final String USER_PREF_UNSUPPORTED_EMOJIS = "USER_PREF_UNSUPPORTED_EMOJIS";
+    private static final String USER_PREF_UNSUPPORTED_EMOJIS_CHECKED = "USER_PREF_UNSUPPORTED_EMOJIS_CHECKED";
 
     private static final String PREFS_DEVICE_ID = "com.waz.device.id";
 
@@ -307,6 +310,29 @@ public class UserPreferencesController implements IUserPreferencesController {
     @Override
     public List<String> getRecentEmojis() {
         return new RecentEmojis(userPreferences.getString(USER_PREF_RECENT_EMOJIS, null)).getRecentEmojis();
+    }
+
+    @Override
+    public void addUnsupportedEmoji(String emoji) {
+        UnsupportedEmojis emojis = new UnsupportedEmojis(userPreferences.getString(USER_PREF_UNSUPPORTED_EMOJIS, null));
+        if (emojis.addUnsupportedEmoji(emoji)) {
+            userPreferences.edit().putString(USER_PREF_UNSUPPORTED_EMOJIS, emojis.getJson()).apply();
+        }
+    }
+
+    @Override
+    public Set<String> getUnsupportedEmojis() {
+        return new UnsupportedEmojis(userPreferences.getString(USER_PREF_UNSUPPORTED_EMOJIS, null)).getUnsupportedEmojis();
+    }
+
+    @Override
+    public boolean hasCheckedForUnsupportedEmojis(int version) {
+        return userPreferences.getInt(USER_PREF_UNSUPPORTED_EMOJIS_CHECKED, 0) >= version;
+    }
+
+    @Override
+    public void setCheckedForUnsupportedEmojis(int version) {
+        userPreferences.edit().putInt(USER_PREF_UNSUPPORTED_EMOJIS_CHECKED, version).apply();
     }
 
 }

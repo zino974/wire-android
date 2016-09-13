@@ -103,7 +103,7 @@ public class TabIndicatorLayout extends LinearLayout implements ViewPager.OnPage
     public void setLabelHeight(int height) {
         ViewGroup.LayoutParams params = textViewContainer.getLayoutParams();
         params.height = height;
-        ViewUtils.setMarginBottom(textViewContainer, getResources().getDimensionPixelSize(R.dimen.wire__divider__height));
+        ViewUtils.setPaddingBottom(textViewContainer, getResources().getDimensionPixelSize(R.dimen.wire__divider__height));
         textViewContainer.setLayoutParams(params);
         textViewContainer.invalidate();
     }

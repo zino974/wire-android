@@ -17,11 +17,37 @@
  */
 package com.waz.zclient.utils;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * There seems to be an issue with decoding XML with emojis on some devices
  * https://code.google.com/p/android/issues/detail?id=81341
+ *
+ * Emojis fetched from
+ * http://unicode.org/emoji/charts/full-emoji-list.html
+ * http://unicode.org/emoji/charts/emoji-ordering.html
+ *
+ * Converted to using unicode escapes with command
+ * native2ascii -encoding utf8 input.txt output.txt
+ *
  */
 public class Emojis {
+
+    public static List<String[]> getAllEmojisSortedByCategory() {
+        List<String[]> all = new LinkedList<>();
+        all.add(PEOPLE);
+        all.add(NATURE);
+        all.add(FOOD_AND_DRINK);
+        all.add(ACTIVITY);
+        all.add(TRAVEL_AND_PLACES);
+        all.add(OBJECTS);
+        all.add(SYMBOLS);
+        all.add(FLAGS);
+        return all;
+    }
+
+    public static final int VERSION = 1;
 
     public static final String[] ACTIVITY = new String[] {
         "\ud83d\udc7e", // Alien Monster

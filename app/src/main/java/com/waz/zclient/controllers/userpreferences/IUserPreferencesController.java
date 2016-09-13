@@ -21,6 +21,7 @@ import android.support.annotation.IntDef;
 import com.waz.zclient.camera.CameraFacing;
 
 import java.util.List;
+import java.util.Set;
 
 public interface IUserPreferencesController {
 
@@ -107,4 +108,13 @@ public interface IUserPreferencesController {
     void addRecentEmoji(String emoji);
 
     List<String> getRecentEmojis();
+
+    void addUnsupportedEmoji(String emoji);
+
+    Set<String> getUnsupportedEmojis();
+
+    boolean hasCheckedForUnsupportedEmojis(int version);
+
+    void setCheckedForUnsupportedEmojis(int version);
+
 }

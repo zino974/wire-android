@@ -31,7 +31,9 @@ import com.waz.zclient.utils.Emojis;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class EmojiBottomSheetDialog extends BottomSheetDialog {
 
@@ -41,15 +43,19 @@ public class EmojiBottomSheetDialog extends BottomSheetDialog {
     private List<String> emojis;
     private List<Integer> spaces;
 
-    public EmojiBottomSheetDialog(@NonNull Context context, EmojiSize currentEmojiSize, EmojiDialogListener listener, List<String> recent) {
+    public EmojiBottomSheetDialog(@NonNull Context context,
+                                  EmojiSize currentEmojiSize,
+                                  EmojiDialogListener listener,
+                                  List<String> recent,
+                                  Set<String> unsupported) {
         super(context);
         this.currentEmojiSize = currentEmojiSize;
         this.listener = listener;
-        init(recent);
+        init(recent, unsupported);
     }
 
-    private void init(List<String> recent) {
-        populateEmojis(recent);
+    private void init(List<String> recent, Set<String> unsupported) {
+        populateEmojis(recent, unsupported);
         final RecyclerView recyclerView = new RecyclerView(getContext());
         final EmojiAdapter adapter = new EmojiAdapter(getContext());
         final GridLayoutManager layoutManager = new GridLayoutManager(getContext(),
@@ -106,7 +112,7 @@ public class EmojiBottomSheetDialog extends BottomSheetDialog {
         setContentView(ll);
     }
 
-    private void populateEmojis(List<String> recent) {
+    private void populateEmojis(List<String> recent, Set<String> unsupported) {
         spaces = new ArrayList<>();
         emojis = new ArrayList<>();
         if (recent != null && recent.size() > 0) {
@@ -114,28 +120,21 @@ public class EmojiBottomSheetDialog extends BottomSheetDialog {
             spaces.add(emojis.size());
             emojis.add(EmojiAdapter.SPACE);
         }
-        emojis.addAll(Arrays.asList(Emojis.PEOPLE));
-        spaces.add(emojis.size());
-        emojis.add(EmojiAdapter.SPACE);
-        emojis.addAll(Arrays.asList(Emojis.NATURE));
-        spaces.add(emojis.size());
-        emojis.add(EmojiAdapter.SPACE);
-        emojis.addAll(Arrays.asList(Emojis.FOOD_AND_DRINK));
-        spaces.add(emojis.size());
-        emojis.add(EmojiAdapter.SPACE);
-        emojis.addAll(Arrays.asList(Emojis.ACTIVITY));
-        spaces.add(emojis.size());
-        emojis.add(EmojiAdapter.SPACE);
-        emojis.addAll(Arrays.asList(Emojis.TRAVEL_AND_PLACES));
-        spaces.add(emojis.size());
-        emojis.add(EmojiAdapter.SPACE);
-        emojis.addAll(Arrays.asList(Emojis.OBJECTS));
-        spaces.add(emojis.size());
-        emojis.add(EmojiAdapter.SPACE);
-        emojis.addAll(Arrays.asList(Emojis.SYMBOLS));
-        spaces.add(emojis.size());
-        emojis.add(EmojiAdapter.SPACE);
-        emojis.addAll(Arrays.asList(Emojis.FLAGS));
+        for (String[] emojiArray : Emojis.getAllEmojisSortedByCategory()) {
+            emojis.addAll(getFilteredList(emojiArray, unsupported));
+            spaces.add(emojis.size());
+            emojis.add(EmojiAdapter.SPACE);
+        }
+    }
+
+    private List<String> getFilteredList(String[] strings, Set<String> unsupported) {
+        List<String> list = Arrays.asList(strings);
+        if (unsupported == null || unsupported.size() == 0) {
+            return list;
+        }
+        LinkedList<String> filteredList = new LinkedList<>(list);
+        filteredList.removeAll(unsupported);
+        return filteredList;
     }
 
     private void setRecyclerViewPadding(RecyclerView recyclerView) {
