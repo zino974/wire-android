@@ -44,4 +44,6 @@
     <item name="message_bottom_menu_item_save" type="id" />
 
     <item name="video_calling_view" type="id" />
+
+    <item name="emoji_keyboard_item" type="id" />
 </resources>

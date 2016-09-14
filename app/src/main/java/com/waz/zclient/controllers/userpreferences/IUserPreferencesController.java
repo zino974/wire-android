@@ -20,6 +20,9 @@ package com.waz.zclient.controllers.userpreferences;
 import android.support.annotation.IntDef;
 import com.waz.zclient.camera.CameraFacing;
 
+import java.util.List;
+import java.util.Set;
+
 public interface IUserPreferencesController {
 
     @IntDef(SEND_LOCATION_MESSAGE)
@@ -101,4 +104,17 @@ public interface IUserPreferencesController {
      * We return a group number between 1 and 6. Always the same.
      */
     int getABTestingGroup();
+
+    void addRecentEmoji(String emoji);
+
+    List<String> getRecentEmojis();
+
+    void addUnsupportedEmoji(String emoji);
+
+    Set<String> getUnsupportedEmojis();
+
+    boolean hasCheckedForUnsupportedEmojis(int version);
+
+    void setCheckedForUnsupportedEmojis(int version);
+
 }

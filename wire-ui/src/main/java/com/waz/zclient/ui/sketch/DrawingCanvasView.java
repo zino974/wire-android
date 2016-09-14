@@ -79,7 +79,7 @@ public class DrawingCanvasView extends View {
 
     private void init() {
         path = new Path();
-        bitmapConfig = Bitmap.Config.ARGB_8888;
+        bitmapConfig = Bitmap.Config.RGB_565;
         historyItems = new LinkedList<>();
         bitmapPaint = new Paint(Paint.DITHER_FLAG);
         drawingPaint = new Paint(Paint.DITHER_FLAG | Paint.ANTI_ALIAS_FLAG);
@@ -182,7 +182,7 @@ public class DrawingCanvasView extends View {
 
     private final GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
         public void onLongPress(MotionEvent e) {
-            if (backgroundBitmap != null) {
+            if (backgroundBitmap != null || drawEmoji) {
                 return;
             }
             drawingPaint.setStyle(Paint.Style.FILL);

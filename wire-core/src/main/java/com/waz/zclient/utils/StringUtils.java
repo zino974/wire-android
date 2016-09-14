@@ -17,11 +17,18 @@
  */
 package com.waz.zclient.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.net.Uri;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Locale;
 
 public class StringUtils {
+
+    private static Paint paint = new Paint();
 
     public static boolean isBlank(CharSequence cs) {
         int strLen;
@@ -109,4 +116,25 @@ public class StringUtils {
         return directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT ||
                directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
     }
+
+    private static Bitmap drawBitmap(String text) {
+        Bitmap b = Bitmap.createBitmap(50, 50, Bitmap.Config.ALPHA_8);
+        Canvas c = new Canvas(b);
+        c.drawText(text, 0, 50 / 2, paint);
+        return b;
+    }
+
+    private static byte[] getPixels(Bitmap b) {
+        ByteBuffer buffer = ByteBuffer.allocate(b.getByteCount());
+        b.copyPixelsToBuffer(buffer);
+        return buffer.array();
+    }
+
+    public static boolean isCharacterMissingInFont(String string) {
+        String missingChar = "\uFFFF";
+        byte[] b1 = getPixels(drawBitmap(string));
+        byte[] b2 = getPixels(drawBitmap(missingChar));
+        return Arrays.equals(b1, b2);
+    }
+
 }

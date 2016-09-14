@@ -20,6 +20,6 @@
 -->
 <com.waz.zclient.ui.colorpicker.ColorPickerEmojiView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/color_picker_dot_size"
-    android:layout_height="@dimen/color_picker_dot_size"
+    android:layout_width="@dimen/color_picker_emoji_dot_width"
+    android:layout_height="@dimen/color_picker_emoji_dot_height"
     />

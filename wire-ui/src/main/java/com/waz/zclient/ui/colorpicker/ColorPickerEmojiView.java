@@ -25,17 +25,7 @@ import com.waz.zclient.ui.R;
 
 public class ColorPickerEmojiView extends TextView implements ColorPickerView {
 
-    private final int iconSizeUnselected = getResources().getDimensionPixelSize(R.dimen.sketch__emoji__icon_size__unselected);
-    private final int iconSizeSmall = getResources().getDimensionPixelSize(R.dimen.sketch__emoji__icon_size__small);
-    private final int iconSizeMedium = getResources().getDimensionPixelSize(R.dimen.sketch__emoji__icon_size__medium);
-    private final int iconSizeLarge = getResources().getDimensionPixelSize(R.dimen.sketch__emoji__icon_size__large);
-
-    private final int emojiSizeSmall = getResources().getDimensionPixelSize(R.dimen.sketch__emoji__size__small);
-    private final int emojiSizeMedium = getResources().getDimensionPixelSize(R.dimen.sketch__emoji__size__medium);
-    private final int emojiSizeLarge = getResources().getDimensionPixelSize(R.dimen.sketch__emoji__size__large);
-
-    private boolean selected;
-    private int iconSize = iconSizeUnselected;
+    private EmojiSize emojiSize;
     private String emoji;
 
     public ColorPickerEmojiView(Context context) {
@@ -52,43 +42,29 @@ public class ColorPickerEmojiView extends TextView implements ColorPickerView {
     }
 
     private void init() {
+        emojiSize = EmojiSize.NONE;
         setGravity(Gravity.CENTER);
-        setTextSize(iconSize);
+        setTextSize(emojiSize.getColorPickerIconSize(getContext()));
+        setTextColor(getResources().getColor(R.color.text__primary_light));
     }
 
     @Override
     public void setSelected(int size) {
-        if (selected) {
-            iconSize = getNextSize();
-        } else {
-            iconSize = size;
-            selected = true;
-        }
-        setTextSize(iconSize);
+        emojiSize = EmojiSize.values()[size];
+        setTextSize(emojiSize.getColorPickerIconSize(getContext()));
         invalidate();
     }
 
     @Override
     public void setUnselected() {
-        selected = false;
-        iconSize = iconSizeUnselected;
-        setTextSize(iconSize);
+        emojiSize = EmojiSize.NONE;
+        setTextSize(emojiSize.getColorPickerIconSize(getContext()));
         invalidate();
-    }
-
-    private int getNextSize() {
-        if (iconSize == iconSizeLarge || iconSize == iconSizeUnselected) {
-            return iconSizeSmall;
-        } else if (iconSize == iconSizeMedium) {
-            return iconSizeLarge;
-        } else {
-            return iconSizeMedium;
-        }
     }
 
     @Override
     public int getSize() {
-        return iconSize;
+        return emojiSize.getIconSize(getContext());
     }
 
     public void setEmoji(String emoji) {
@@ -101,11 +77,6 @@ public class ColorPickerEmojiView extends TextView implements ColorPickerView {
     }
 
     public int getEmojiSize() {
-        if (iconSize == iconSizeLarge) {
-            return emojiSizeLarge;
-        } else if (iconSize == iconSizeMedium) {
-            return emojiSizeMedium;
-        }
-        return emojiSizeSmall;
+        return emojiSize.getEmojiSize(getContext());
     }
 }

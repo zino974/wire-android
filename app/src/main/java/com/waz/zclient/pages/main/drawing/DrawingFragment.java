@@ -20,10 +20,14 @@ package com.waz.zclient.pages.main.drawing;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.ExifInterface;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,12 +43,17 @@ import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.drawing.DrawingController;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.ui.colorpicker.ColorPickerLayout;
 import com.waz.zclient.ui.colorpicker.ColorPickerScrollView;
+import com.waz.zclient.ui.colorpicker.EmojiBottomSheetDialog;
+import com.waz.zclient.ui.colorpicker.EmojiSize;
 import com.waz.zclient.ui.sketch.DrawingCanvasView;
 import com.waz.zclient.ui.text.TypefaceTextView;
+import com.waz.zclient.utils.Emojis;
 import com.waz.zclient.utils.LayoutSpec;
+import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.TrackingUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.debug.ShakeEventListener;
@@ -87,6 +96,10 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
 
     private DrawingController.DrawingDestination drawingDestination;
     private boolean includeBackgroundImage;
+    private EmojiSize currentEmojiSize = EmojiSize.SMALL;
+
+    private Handler backgroundHandler;
+    private HandlerThread handlerThread;
 
     public static DrawingFragment newInstance(ImageAsset backgroundAsset, DrawingController.DrawingDestination drawingDestination) {
         DrawingFragment fragment = new DrawingFragment();
@@ -112,6 +125,9 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         backgroundImage = args.getParcelable(ARGUMENT_BACKGROUND_IMAGE);
         drawingDestination = DrawingController.DrawingDestination.valueOf(args.getString(ARGUMENT_DRAWING_DESTINATION));
         sensorManager = (SensorManager) getActivity().getSystemService(Activity.SENSOR_SERVICE);
+        handlerThread = new HandlerThread("Background handler");
+        handlerThread.start();
+        backgroundHandler = new Handler(handlerThread.getLooper());
     }
 
     @Override
@@ -119,6 +135,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         View rootView = inflater.inflate(R.layout.fragment_drawing, container, false);
         drawingCanvasView = ViewUtils.getView(rootView, R.id.dcv__canvas);
         drawingCanvasView.setDrawingCanvasCallback(this);
+        drawingCanvasView.setDrawingColor(getControllerFactory().getAccentColorController().getColor());
         drawingCanvasView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -231,6 +248,21 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         sensorManager.registerListener(shakeEventListener,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
+        if (!getControllerFactory().getUserPreferencesController().hasCheckedForUnsupportedEmojis(Emojis.VERSION)) {
+            backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    checkForUnsupportedEmojis(Emojis.ACTIVITY,
+                                              Emojis.FLAGS,
+                                              Emojis.FOOD_AND_DRINK,
+                                              Emojis.NATURE,
+                                              Emojis.OBJECTS,
+                                              Emojis.PEOPLE,
+                                              Emojis.SYMBOLS,
+                                              Emojis.TRAVEL_AND_PLACES);
+                }
+            });
+        }
     }
 
     @Override
@@ -394,6 +426,23 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     }
 
     @Override
+    public void onMoreClick() {
+        final EmojiBottomSheetDialog dialog = new EmojiBottomSheetDialog(getContext(),
+                                                                         currentEmojiSize,
+                                                                         new EmojiBottomSheetDialog.EmojiDialogListener() {
+                                                                             @Override
+                                                                             public void onEmojiSelected(String emoji, EmojiSize emojiSize) {
+                                                                                 colorLayout.setCurrentEmoji(emoji, emojiSize);
+                                                                                 currentEmojiSize = emojiSize;
+                                                                                 getControllerFactory().getUserPreferencesController().addRecentEmoji(emoji);
+                                                                             }
+                                                                         },
+                                                                         getControllerFactory().getUserPreferencesController().getRecentEmojis(),
+                                                                         getControllerFactory().getUserPreferencesController().getUnsupportedEmojis());
+        dialog.show();
+    }
+
+    @Override
     public void drawingAdded() {
         undoSketchButton.setTextColor(getResources().getColor(R.color.drawing__icon__enabled_color));
         undoSketchButton.setClickable(true);
@@ -412,6 +461,29 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     @Override
     public void reserveBitmapMemory(int width, int height) {
         MemoryImageCache.reserveImageMemory(width, height);
+    }
+
+    private void checkForUnsupportedEmojis(String[]...arrays) {
+        if (getControllerFactory() == null ||
+            getControllerFactory().isTornDown()) {
+            return;
+        }
+        IUserPreferencesController userPreferencesController = getControllerFactory().getUserPreferencesController();
+        for (String[] array : arrays) {
+            for (String emoji : array) {
+                Paint paint = new Paint();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (!paint.hasGlyph(emoji)) {
+                        userPreferencesController.addUnsupportedEmoji(emoji);
+                    }
+                } else {
+                    if (StringUtils.isCharacterMissingInFont(emoji)) {
+                        userPreferencesController.addUnsupportedEmoji(emoji);
+                    }
+                }
+            }
+        }
+        getControllerFactory().getUserPreferencesController().setCheckedForUnsupportedEmojis(Emojis.VERSION);
     }
 
     public interface Container { }
