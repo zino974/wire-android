@@ -35,12 +35,12 @@ dependencies {
             dev = true;
             break;
         }
-        if (taskName.contains("Internal") || taskName.contains("Experimental")) {
+        if (taskName.contains("Internal") || taskName.contains("Experimental") || taskName.contains("Qaavs") || taskName.contains("Avs")) {
             internal = true;
             dev = false;
             break;
         }
-        if (taskName.contains("Prod") || taskName.contains("Candidate") || taskName.contains("Qaavs") || taskName.contains("Avs")) {
+        if (taskName.contains("Prod") || taskName.contains("Candidate")) {
             prod = true;
             dev = false;
             break;
