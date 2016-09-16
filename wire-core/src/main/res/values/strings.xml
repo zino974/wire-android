@@ -240,6 +240,7 @@
     <string name="content__file__action__share">SHARE</string>
     <string name="content__file__action__open__no_app_found">No app found to open this file type</string>
     <string name="content__file__action__save_completed">File successfully saved</string>
+    <string name="content__file__action__save_error">Unable to save file</string>
 
     <string name="content__location__no_map_placeholder">THE LOCATION WILL APPEAR ON THE MAP WHEN YOU ARE BACK ONLINE.</string>
 
