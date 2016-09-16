@@ -134,6 +134,14 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
             // Only image supported ATM, need to handle Audio/File/Video
             case ASSET:
                 return true;
+            case ANY_ASSET:
+            case AUDIO_ASSET:
+            case VIDEO_ASSET:
+                if (message.getAsset().getStatus() == AssetStatus.UPLOAD_DONE ||
+                    message.getAsset().getStatus() == AssetStatus.DOWNLOAD_DONE) {
+                    return true;
+                }
+                return false;
             default:
                 return false;
         }
