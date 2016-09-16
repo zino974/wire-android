@@ -112,6 +112,7 @@ import com.waz.zclient.controllers.tracking.events.navigation.OpenedMoreActionsE
 import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
+import com.waz.zclient.core.controllers.tracking.events.filetransfer.SavedFileEvent;
 import com.waz.zclient.core.controllers.tracking.events.filetransfer.SelectedTooLargeFileEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.CancelledRecordingAudioMessageEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.OpenedActionHintEvent;
@@ -415,8 +416,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                         message.like();
                         getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
                         getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.like(message.getConversation(),
-                                                                                                             message,
-                                                                                                             ReactedToMessageEvent.Method.MENU));
+                                                                                                           message,
+                                                                                                           ReactedToMessageEvent.Method.MENU));
                     }
                     break;
                 case SAVE:
@@ -2390,11 +2391,51 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     private void saveMessage(Message message) {
-        imageAssetToSave = message.getImage();
-        if (PermissionUtils.hasSelfPermissions(getActivity(), SAVE_IMAGE_PERMISSIONS)) {
-            saveImageAssetToGallery();
+        if (message.getMessageType() == Message.Type.ASSET) {
+            imageAssetToSave = message.getImage();
+            if (PermissionUtils.hasSelfPermissions(getActivity(), SAVE_IMAGE_PERMISSIONS)) {
+                saveImageAssetToGallery();
+            } else {
+                ActivityCompat.requestPermissions(getActivity(),
+                                                  SAVE_IMAGE_PERMISSIONS,
+                                                  SAVE_IMAGE_PERMISSION_REQUEST_ID);
+            }
         } else {
-            ActivityCompat.requestPermissions(getActivity(), SAVE_IMAGE_PERMISSIONS, SAVE_IMAGE_PERMISSION_REQUEST_ID);
+            final ProgressDialog dialog = ProgressDialog.show(getContext(),
+                                                              getString(R.string.conversation__action_mode__fwd__dialog__title),
+                                                              getString(R.string.conversation__action_mode__fwd__dialog__message),
+                                                              true, true, null);
+            final Asset asset = message.getAsset();
+            asset.saveToDownloads(new Asset.LoadCallback() {
+
+                @Override
+                public void onLoaded(Object o) {
+                    if (getActivity() == null ||
+                        getControllerFactory() == null ||
+                        getControllerFactory().isTornDown()) {
+                        return;
+                    }
+                    getControllerFactory().getTrackingController().tagEvent(new SavedFileEvent(asset.getMimeType(),
+                                                                                               (int) asset.getSizeInBytes()));
+                    Toast.makeText(getActivity(),
+                                   com.waz.zclient.ui.R.string.content__file__action__save_completed,
+                                   Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+
+                @Override
+                public void onLoadFailed() {
+                    if (getActivity() == null ||
+                        getControllerFactory() == null ||
+                        getControllerFactory().isTornDown()) {
+                        return;
+                    }
+                    Toast.makeText(getActivity(),
+                                   com.waz.zclient.ui.R.string.content__file__action__save_error,
+                                   Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
         }
     }
 
