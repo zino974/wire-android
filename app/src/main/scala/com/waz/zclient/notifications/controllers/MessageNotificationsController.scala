@@ -121,7 +121,8 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
            TEXT |
            CONNECT_ACCEPTED |
            CONNECT_REQUEST |
-           RENAME =>
+           RENAME |
+           LIKE =>
         getSelectedSoundUri(sharedPreferences.getString(context.getString(R.string.pref_options_ringtones_text_key), null), R.raw.new_message_gcm)
       case KNOCK =>
         val value = sharedPreferences.getString(context.getString(R.string.pref_options_ringtones_ping_key), null)
@@ -243,6 +244,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
       case RENAME                   => getString(R.string.notification__message__group__renamed_conversation, message)
       case MEMBER_LEAVE             => getString(R.string.notification__message__group__remove)
       case MEMBER_JOIN              => getString(R.string.notification__message__group__add)
+      case LIKE                     => getString(R.string.notification__message__group__liked)
       case CONNECT_ACCEPTED         => if (multiple) getString(R.string.notification__message__multiple__accept_request)    else getString(R.string.notification__message__single__accept_request)
       case _ => ""
     }
