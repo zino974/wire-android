@@ -33,10 +33,11 @@ import com.waz.ZLog.ImplicitTag._
 import com.waz.ZLog.verbose
 import com.waz.api.NotificationsHandler.NotificationType
 import com.waz.api.NotificationsHandler.NotificationType._
+import com.waz.bitmap
 import com.waz.service.ZMessaging
 import com.waz.service.push.NotificationService.NotificationInfo
 import com.waz.threading.Threading
-import com.waz.utils.events.Signal
+import com.waz.utils.events.{EventContext, Signal}
 import com.waz.zclient._
 import com.waz.zclient.controllers.userpreferences.UserPreferencesController
 import com.waz.zclient.controllers.vibrator.VibratorController
@@ -48,13 +49,12 @@ import org.threeten.bp.Instant
 
 import scala.concurrent.duration._
 
-class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) extends Injectable {
+class MessageNotificationsController(implicit inj: Injector, cxt: Context, eventContext: EventContext) extends Injectable {
 
   import MessageNotificationsController._
-  implicit val eventContext = cxt.eventContext
-  implicit val context = cxt
+  def context = cxt
 
-  val zms = inject[Signal[Option[ZMessaging]]].collect { case Some(z) => z }
+  val zms = inject[Signal[ZMessaging]]
 
   val notsService = zms.map(_.notifications)
 
@@ -221,7 +221,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     builder.build
   }
 
-  private def getMessage(n: NotificationInfo, multiple: Boolean, singleConversationInBatch: Boolean, singleUserInBatch: Boolean) = {
+  private[notifications] def getMessage(n: NotificationInfo, multiple: Boolean, singleConversationInBatch: Boolean, singleUserInBatch: Boolean) = {
     val message = n.message.replaceAll("\\r\\n|\\r|\\n", " ")
 
     def getHeader(testPrefix: Boolean = false, singleUser: Boolean = false) = getDefaultNotificationMessageLineHeader(n, multiple, textPrefix = testPrefix, singleConversationInBatch = singleConversationInBatch, singleUser = singleUser)
@@ -284,6 +284,7 @@ class MessageNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     try {
       val icon: Drawable = cxt.getPackageManager.getApplicationIcon(cxt.getPackageName)
       icon match {
+        case null => bitmap.EmptyBitmap
         case drawable: BitmapDrawable =>
           drawable.getBitmap
         case _ =>
