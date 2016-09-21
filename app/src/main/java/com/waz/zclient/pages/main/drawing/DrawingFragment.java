@@ -26,8 +26,6 @@ import android.hardware.SensorManager;
 import android.media.ExifInterface;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,6 +37,7 @@ import com.waz.api.ImageAsset;
 import com.waz.api.ImageAssetFactory;
 import com.waz.api.LoadHandle;
 import com.waz.api.MemoryImageCache;
+import com.waz.threading.Threading;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
@@ -98,9 +97,6 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     private boolean includeBackgroundImage;
     private EmojiSize currentEmojiSize = EmojiSize.SMALL;
 
-    private Handler backgroundHandler;
-    private HandlerThread handlerThread;
-
     public static DrawingFragment newInstance(ImageAsset backgroundAsset, DrawingController.DrawingDestination drawingDestination) {
         DrawingFragment fragment = new DrawingFragment();
         Bundle bundle = new Bundle();
@@ -125,9 +121,6 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         backgroundImage = args.getParcelable(ARGUMENT_BACKGROUND_IMAGE);
         drawingDestination = DrawingController.DrawingDestination.valueOf(args.getString(ARGUMENT_DRAWING_DESTINATION));
         sensorManager = (SensorManager) getActivity().getSystemService(Activity.SENSOR_SERVICE);
-        handlerThread = new HandlerThread("Background handler");
-        handlerThread.start();
-        backgroundHandler = new Handler(handlerThread.getLooper());
     }
 
     @Override
@@ -249,7 +242,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
         if (!getControllerFactory().getUserPreferencesController().hasCheckedForUnsupportedEmojis(Emojis.VERSION)) {
-            backgroundHandler.post(new Runnable() {
+            Threading.Background().execute(new Runnable() {
                 @Override
                 public void run() {
                     checkForUnsupportedEmojis(Emojis.ACTIVITY,
