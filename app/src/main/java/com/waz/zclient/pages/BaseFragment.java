@@ -26,10 +26,16 @@ import com.waz.zclient.core.stores.IStoreFactory;
 public class BaseFragment<T> extends Fragment implements ServiceContainer {
 
     private T container;
+    private IControllerFactory controllerFactory;
+    private IStoreFactory storeFactory;
 
     @Override
     public final void onAttach(Activity activity) {
         super.onAttach(activity);
+        if (activity instanceof ServiceContainer) {
+            controllerFactory = ((ServiceContainer) activity).getControllerFactory();
+            storeFactory = ((ServiceContainer) activity).getStoreFactory();
+        }
         Fragment fragment = getParentFragment();
         if (fragment != null) {
             container = (T) fragment;
@@ -56,11 +62,11 @@ public class BaseFragment<T> extends Fragment implements ServiceContainer {
 
     @Override
     public final IStoreFactory getStoreFactory() {
-        return getActivity() != null ? ((ServiceContainer) getActivity()).getStoreFactory() : null;
+        return storeFactory;
     }
 
     @Override
     public final IControllerFactory getControllerFactory() {
-        return getActivity() != null ? ((ServiceContainer) getActivity()).getControllerFactory() : null;
+        return controllerFactory;
     }
 }
