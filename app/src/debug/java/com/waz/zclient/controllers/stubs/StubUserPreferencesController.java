@@ -22,6 +22,7 @@ import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Collection;
 
 public class StubUserPreferencesController implements IUserPreferencesController {
   @Override
@@ -130,7 +131,7 @@ public class StubUserPreferencesController implements IUserPreferencesController
   }
 
   @Override
-  public void addUnsupportedEmoji(String emoji) {
+  public void setUnsupportedEmoji(Collection<String> emoji, int version) {
 
   }
 
@@ -142,11 +143,6 @@ public class StubUserPreferencesController implements IUserPreferencesController
   @Override
   public boolean hasCheckedForUnsupportedEmojis(int version) {
     return false;
-  }
-
-  @Override
-  public void setCheckedForUnsupportedEmojis(int version) {
-
   }
 
   @Override
