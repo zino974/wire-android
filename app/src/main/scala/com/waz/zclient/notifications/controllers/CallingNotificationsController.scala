@@ -22,6 +22,7 @@ import android.content.Intent
 import android.support.v4.app.NotificationCompat
 import com.waz.api.VoiceChannelState._
 import com.waz.api.{KindOfCall, VoiceChannelState}
+import com.waz.bitmap.BitmapUtils
 import com.waz.model.{ConvId, ImageAssetData}
 import com.waz.service.ZMessaging
 import com.waz.service.assets.AssetService.BitmapRequest.Regular
@@ -42,6 +43,8 @@ class CallingNotificationsController(cxt: WireContext)(implicit inj: Injector) e
 
   implicit val eventContext = cxt.eventContext
   implicit val context = cxt
+
+  val callImageSizePx = toPx(CallImageSizeDp)
 
   val notificationManager = inject[NotificationManager]
 
@@ -71,12 +74,12 @@ class CallingNotificationsController(cxt: WireContext)(implicit inj: Injector) e
   //TODO use image controller when available from messages rewrite branch
   val bitmap = zms.zip(caller.map(_.picture)).flatMap {
     case (zms, Some(imageId)) => zms.assetsStorage.signal(imageId).flatMap {
-      case data: ImageAssetData => BitmapSignal(data, Regular(toPx(CallImageSizeDp)), zms.imageLoader, zms.imageCache)
+      case data: ImageAssetData => BitmapSignal(data, Regular(callImageSizePx), zms.imageLoader, zms.imageCache)
       case _ => Signal.empty[BitmapResult]
     }
     case _ => Signal.empty[BitmapResult]
   }.map {
-    case BitmapLoaded(bitmap, _, _) => Some(bitmap)
+    case BitmapLoaded(bmp, _, _) => Option(BitmapUtils.cropRect(bmp, callImageSizePx))
     case _ => None
   }
 
