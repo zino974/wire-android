@@ -23,11 +23,16 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import com.waz.zclient.R;
 import com.waz.zclient.camera.CameraFacing;
+import com.waz.zclient.utils.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
 import timber.log.Timber;
 
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.UUID;
+import java.util.Collection;
 
 public class UserPreferencesController implements IUserPreferencesController {
 
@@ -313,26 +318,36 @@ public class UserPreferencesController implements IUserPreferencesController {
     }
 
     @Override
-    public void addUnsupportedEmoji(String emoji) {
-        UnsupportedEmojis emojis = new UnsupportedEmojis(userPreferences.getString(USER_PREF_UNSUPPORTED_EMOJIS, null));
-        if (emojis.addUnsupportedEmoji(emoji)) {
-            userPreferences.edit().putString(USER_PREF_UNSUPPORTED_EMOJIS, emojis.getJson()).apply();
+    public void setUnsupportedEmoji(Collection<String> emoji, int version) {
+        JSONArray array = new JSONArray();
+        for (String e : emoji) {
+            array.put(e);
         }
+        userPreferences.edit()
+            .putString(USER_PREF_UNSUPPORTED_EMOJIS, array.toString())
+            .putInt(USER_PREF_UNSUPPORTED_EMOJIS_CHECKED, version)
+            .apply();
     }
 
     @Override
     public Set<String> getUnsupportedEmojis() {
-        return new UnsupportedEmojis(userPreferences.getString(USER_PREF_UNSUPPORTED_EMOJIS, null)).getUnsupportedEmojis();
+        String json = userPreferences.getString(USER_PREF_UNSUPPORTED_EMOJIS, null);
+        Set<String> unsupportedEmojis = new HashSet<>();
+        if (!StringUtils.isBlank(json)) {
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    unsupportedEmojis.add(jsonArray.getString(i));
+                }
+            } catch (JSONException e) {
+                // ignore
+            }
+        }
+        return unsupportedEmojis;
     }
 
     @Override
     public boolean hasCheckedForUnsupportedEmojis(int version) {
         return userPreferences.getInt(USER_PREF_UNSUPPORTED_EMOJIS_CHECKED, 0) >= version;
     }
-
-    @Override
-    public void setCheckedForUnsupportedEmojis(int version) {
-        userPreferences.edit().putInt(USER_PREF_UNSUPPORTED_EMOJIS_CHECKED, version).apply();
-    }
-
 }

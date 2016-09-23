@@ -19,11 +19,14 @@ package com.waz.zclient.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Locale;
 
 public class StringUtils {
@@ -117,24 +120,40 @@ public class StringUtils {
                directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
     }
 
-    private static Bitmap drawBitmap(String text) {
-        Bitmap b = Bitmap.createBitmap(50, 50, Bitmap.Config.ALPHA_8);
-        Canvas c = new Canvas(b);
-        c.drawText(text, 0, 50 / 2, paint);
-        return b;
+    public static Collection<String> getMissingInFont(Collection<String> strings) {
+        TextDrawing template = new TextDrawing();
+        template.set("\uFFFF"); // missing char
+
+        TextDrawing emoji = new TextDrawing();
+        ArrayList<String> missing = new ArrayList<>();
+        for (String s : strings) {
+            emoji.set(s);
+            if (template.equals(emoji)) {
+                missing.add(s);
+            }
+        }
+        return missing;
     }
 
-    private static byte[] getPixels(Bitmap b) {
-        ByteBuffer buffer = ByteBuffer.allocate(b.getByteCount());
-        b.copyPixelsToBuffer(buffer);
-        return buffer.array();
-    }
+    private static class TextDrawing {
+        private final Bitmap bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ALPHA_8);
+        private final Canvas canvas = new Canvas(bitmap);
+        private final ByteBuffer buffer = ByteBuffer.allocate(bitmap.getByteCount());
 
-    public static boolean isCharacterMissingInFont(String string) {
-        String missingChar = "\uFFFF";
-        byte[] b1 = getPixels(drawBitmap(string));
-        byte[] b2 = getPixels(drawBitmap(missingChar));
-        return Arrays.equals(b1, b2);
-    }
+        public void set(String text) {
+            canvas.drawColor(Color.TRANSPARENT);
+            canvas.drawText(text, 0, 50 / 2, paint);
+            bitmap.copyPixelsToBuffer(buffer);
+        }
 
+        @Override
+        public boolean equals(Object o) {
+            return o != null && (o instanceof TextDrawing) && Arrays.equals(buffer.array(), ((TextDrawing) o).buffer.array());
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(buffer.array());
+        }
+    }
 }

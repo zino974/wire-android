@@ -59,6 +59,9 @@ import com.waz.zclient.utils.debug.ShakeEventListener;
 import net.hockeyapp.android.ExceptionHandler;
 
 import java.util.Locale;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DrawingFragment extends BaseFragment<DrawingFragment.Container> implements OnBackPressedListener,
                                                                                         ColorPickerLayout.OnColorSelectedListener,
@@ -245,14 +248,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
             Threading.Background().execute(new Runnable() {
                 @Override
                 public void run() {
-                    checkForUnsupportedEmojis(Emojis.ACTIVITY,
-                                              Emojis.FLAGS,
-                                              Emojis.FOOD_AND_DRINK,
-                                              Emojis.NATURE,
-                                              Emojis.OBJECTS,
-                                              Emojis.PEOPLE,
-                                              Emojis.SYMBOLS,
-                                              Emojis.TRAVEL_AND_PLACES);
+                    checkForUnsupportedEmojis();
                 }
             });
         }
@@ -456,27 +452,31 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         MemoryImageCache.reserveImageMemory(width, height);
     }
 
-    private void checkForUnsupportedEmojis(String[]...arrays) {
+    private void checkForUnsupportedEmojis() {
         if (getControllerFactory() == null ||
             getControllerFactory().isTornDown()) {
             return;
         }
         IUserPreferencesController userPreferencesController = getControllerFactory().getUserPreferencesController();
-        for (String[] array : arrays) {
-            for (String emoji : array) {
-                Paint paint = new Paint();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        Collection<String> unsupported = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Paint paint = new Paint();
+            for (String[] array : Emojis.getAllEmojisSortedByCategory()) {
+                for (String emoji : array) {
                     if (!paint.hasGlyph(emoji)) {
-                        userPreferencesController.addUnsupportedEmoji(emoji);
-                    }
-                } else {
-                    if (StringUtils.isCharacterMissingInFont(emoji)) {
-                        userPreferencesController.addUnsupportedEmoji(emoji);
+                        unsupported.add(emoji);
                     }
                 }
             }
+        } else {
+            for (String[] array : Emojis.getAllEmojisSortedByCategory()) {
+                unsupported.addAll(Arrays.asList(array));
+            }
+            unsupported = StringUtils.getMissingInFont(unsupported);
         }
-        getControllerFactory().getUserPreferencesController().setCheckedForUnsupportedEmojis(Emojis.VERSION);
+        if (!unsupported.isEmpty()) {
+            userPreferencesController.setUnsupportedEmoji(unsupported, Emojis.VERSION);
+        }
     }
 
     public interface Container { }
