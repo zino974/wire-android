@@ -531,7 +531,7 @@
     <!-- About -->
     <string name="pref_about_screen_title">About</string>
     <string name="pref_about_website_title">Wire Website</string>
-    <string name="pref_about_website_url">https://www.wire.com</string>
+    <string name="pref_about_website_url">https://wire.com</string>
     <string name="pref_about_tos_title">Terms Of Use</string>
     <string name="pref_about_tos_url">@string/url_terms_of_service</string>
     <string name="pref_about_privacy_policy_title">Privacy Policy</string>
@@ -568,11 +568,11 @@
     <string name="pref__account_action__dialog__change_email__title">Edit Email Address</string>
 
     <!-- URLs -->
-    <string name="url_home">https://www.wire.com</string>
-    <string name="url_terms_of_service">https://www.wire.com/legal/terms/embed/</string>
-    <string name="url_privacy_policy">https://www.wire.com/legal/privacy/embed/</string>
+    <string name="url_home">https://wire.com</string>
+    <string name="url_terms_of_service">https://wire.com/legal/terms/embed/</string>
+    <string name="url_privacy_policy">https://wire.com/legal/privacy/embed/</string>
     <string name="url__help">https://support.wire.com</string>
-    <string name="url_password_reset">https://www.wire.com/forgot/</string>
+    <string name="url_password_reset">https://account.wire.com/forgot/</string>
     <string name="url_third_party_licences">https://wire.com/legal/#licenses</string>
     <string name="url_otr_learn_why">https://wire.com/privacy/why</string>
     <string name="url_otr_learn_how">https://wire.com/privacy/how</string>
