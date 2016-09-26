@@ -175,7 +175,6 @@ android {
         internal {
             applicationId "com.wire.internal"
             versionName majorVersion + android.defaultConfig.versionCode + "-internal"
-            proguardFile 'proguard-rules-test.txt'
             manifestPlaceholders = [applicationLabel : "Wire Internal",
                                     allowBackup      : "true",
                                     applicationIcon  : "@drawable/ic_launcher_wire_internal",
@@ -205,7 +204,6 @@ android {
         avs {
             applicationId "com.wire.avs"
             versionName majorVersion + android.defaultConfig.versionCode + "-avs"
-            proguardFile 'proguard-rules-test.txt'
             manifestPlaceholders = [applicationLabel       : "Wire AVS",
                                     allowBackup            : "true",
                                     applicationIcon        : "@drawable/ic_launcher_wire_playground",
@@ -233,7 +231,6 @@ android {
         qaavs {
             applicationId "com.wire.qaavs"
             versionName majorVersion + android.defaultConfig.versionCode + "-qaavs"
-            proguardFile 'proguard-rules-test.txt'
             manifestPlaceholders = [applicationLabel       : "Wire QA AVS",
                                     allowBackup            : "true",
                                     applicationIcon        : "@drawable/ic_launcher_wire_playground",
@@ -262,7 +259,6 @@ android {
         experimental {
             applicationId "com.wire.x"
             versionName majorVersion + android.defaultConfig.versionCode + "-exp"
-            proguardFile 'proguard-rules-test.txt'
             manifestPlaceholders = [applicationLabel       : "Wire Exp",
                                     allowBackup            : "true",
                                     applicationIcon        : "@drawable/ic_launcher_wire_playground",
