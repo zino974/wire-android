@@ -446,7 +446,7 @@
     <string name="pref_account_email_title">Email</string>
     <string name="pref_account_add_email_title">Add email</string>
     <string name="pref_account_sign_out_title">Log out</string>
-    <string name="pref_account_dark_theme_title">Dark Theme</string>
+    <string name="pref_account_dark_theme_title">Dark theme</string>
     <string name="pref_account_color_title">Color</string>
     <string name="pref_account_picture_title">Picture</string>
     <string name="pref_account_delete_title">Delete Account</string>
@@ -475,8 +475,8 @@
     <string name="pref_options_ringtones_ringtone_title">Ringtone</string>
     <string name="pref_options_ringtones_text_title">Text tone</string>
     <string name="pref_options_ringtones_ping_title">Ping</string>
-    <string name="pref_options_ringtones_default_summary">Wire Default</string>
-    <string name="pref_options_image_download_title">Download Pictures</string>
+    <string name="pref_options_ringtones_default_summary">Wire default</string>
+    <string name="pref_options_image_download_title">Download pictures</string>
     <string name="pref_options_image_download_always">Always</string>
     <string name="pref_options_image_download_wifi">Wi-Fi only</string>
     <string name="pref_options_media_category_title">Media</string>
@@ -514,7 +514,7 @@
 
     <!-- Advanced -->
     <string name="pref_advanced_screen_title">Advanced</string>
-    <string name="pref_advanced_debug_report_title">Submit Debug Report</string>
+    <string name="pref_advanced_debug_report_title">Submit debug report</string>
     <string name="pref_advanced_debug_report_summary">This helps Wire Support diagnose problems.</string>
     <string name="pref_advanced_analytics_title">Usage data and crash reports</string>
     <string name="pref_advanced_analytics_summary">Make Wire better by sending anonymous information.</string>
@@ -523,16 +523,16 @@
 
     <!-- Support -->
     <string name="pref_support_screen_title">Support</string>
-    <string name="pref_support_website_title">Wire Support Website</string>
+    <string name="pref_support_website_title">Wire Support website</string>
     <string name="pref_support_website_url">https://support.wire.com</string>
     <string name="pref_support_contact_title">Contact Support</string>
     <string name="pref_support_contact_url">https://support.wire.com/hc/de/requests/new</string>
 
     <!-- About -->
     <string name="pref_about_screen_title">About</string>
-    <string name="pref_about_website_title">Wire Website</string>
+    <string name="pref_about_website_title">Wire website</string>
     <string name="pref_about_website_url">https://wire.com</string>
-    <string name="pref_about_tos_title">Terms Of Use</string>
+    <string name="pref_about_tos_title">Terms of Use</string>
     <string name="pref_about_tos_url">@string/url_terms_of_service</string>
     <string name="pref_about_privacy_policy_title">Privacy Policy</string>
     <string name="pref_about_privacy_policy_url">@string/url_privacy_policy</string>
