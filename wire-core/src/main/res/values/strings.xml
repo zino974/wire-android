@@ -446,7 +446,6 @@
     <string name="pref_account_email_title">Email</string>
     <string name="pref_account_add_email_title">Add email</string>
     <string name="pref_account_sign_out_title">Log out</string>
-    <string name="pref_account_dark_theme_title">Dark theme</string>
     <string name="pref_account_color_title">Color</string>
     <string name="pref_account_picture_title">Picture</string>
     <string name="pref_account_delete_title">Delete Account</string>
@@ -461,6 +460,7 @@
     <string name="pref_account_password_title">Reset Password</string>
 
     <!-- Options -->
+    <string name="pref_options_dark_theme_title">Dark theme</string>
     <string name="pref_options_screen_title">Options</string>
     <string name="pref_options_contacts_title">Share Contacts</string>
     <string name="pref_options_contacts_summary">This helps you connect with others. We anonymize all the information and do not share it with anyone else.</string>
@@ -480,8 +480,9 @@
     <string name="pref_options_image_download_always">Always</string>
     <string name="pref_options_image_download_wifi">Wi-Fi only</string>
     <string name="pref_options_media_category_title">Media</string>
+    <string name="pref_options_requested_category_title">By popular demand</string>
     <string name="pref_options_cursor_send_button_title">Send button</string>
-    <string name="pref_options_cursor_send_button_summary">Show send button</string>
+    <string name="pref_options_cursor_send_button_summary">Disable to send via the keyboard.</string>
     <string name="pref_options_spotify_title">Connect with Spotify</string>
     <string name="pref_options_spotify_logout_title">Disconnect with Spotify</string>
     <string name="pref_options_spotify_summary">You need a Spotify Premium account.</string>

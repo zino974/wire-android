@@ -66,12 +66,6 @@
             android:title="@string/pref_account_color_title"
             />
 
-        <SwitchPreference
-            android:key="@string/pref_account_theme_switch_key"
-            android:title="@string/pref_account_dark_theme_title"
-            android:icon="@drawable/ic_action_theme"
-            />
-
     </PreferenceCategory>
 
     <PreferenceCategory
