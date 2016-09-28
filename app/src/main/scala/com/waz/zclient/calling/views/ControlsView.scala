@@ -100,7 +100,7 @@ private class OutgoingControlsView(val context: Context, val attrs: AttributeSet
     callOnClick()
   }
   rightButton.onClick {
-    if (controller.videoCall.currentValue.getOrElse(false)) controller.toggleVideo() else controller.speakerPressed ! (())
+    if (controller.videoCall.currentValue.getOrElse(false)) controller.toggleVideo() else controller.speakerButton.press()
     callOnClick()
   }
 
@@ -120,7 +120,7 @@ private class OutgoingControlsView(val context: Context, val attrs: AttributeSet
 
   controller.muted.on(Threading.Ui)(leftButton.setButtonPressed)
 
-  Signal(controller.videoCall, controller.speakerEnabled, controller.videoSendState).map {
+  Signal(controller.videoCall, controller.speakerButton, controller.videoSendState).map {
     case (true, _, videoSendState) => videoSendState == SEND
     case (false, speakerEnabled, _) => speakerEnabled
   }.on(Threading.Ui)(rightButton.setButtonPressed)

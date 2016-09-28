@@ -26,12 +26,12 @@ import com.waz.api._
 import com.waz.avs.{VideoPreview, VideoRenderer}
 import com.waz.model.VoiceChannelData.ConnectionState
 import com.waz.model._
-import com.waz.service.ZMessaging
 import com.waz.service.call.FlowManagerService.{StateAndReason, UnknownState}
 import com.waz.threading.Threading
 import com.waz.utils._
 import com.waz.utils.events.{ClockSignal, EventStream, EventStreamWithAuxSignal, Signal}
 import com.waz.zclient._
+import com.waz.zclient.utils.events.ButtonSignal
 import org.threeten.bp.Duration
 import org.threeten.bp.Duration._
 import org.threeten.bp.Instant._
@@ -244,12 +244,8 @@ class CurrentCallController(implicit inj: Injector, cxt: WireContext) extends In
     }
   }
 
-  val speakerEnabled = zms.flatMap(_.mediamanager.isSpeakerOn)
-  val speakerPressed = EventStream[Unit]()
-
-  (new EventStreamWithAuxSignal(speakerPressed, Signal(zms, speakerEnabled))) {
-    case (_, Some((zms, isSpeakerSet))) => zms.mediamanager.setSpeaker(!isSpeakerSet)
-    case _ =>
+  val speakerButton = ButtonSignal(zms.flatMap(_.mediamanager.isSpeakerOn), zms.map(_.mediamanager)) {
+    case (mm, isSpeakerSet) => mm.setSpeaker(!isSpeakerSet)
   }
 
   val isTablet = Signal(LayoutSpec.isTablet(cxt))
