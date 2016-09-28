@@ -31,12 +31,14 @@ public enum CursorMenuItem {
     CAMERA(R.string.glyph__camera, R.id.cursor_menu_item_camera, R.string.tooltip_camera),
     SKETCH(R.string.glyph__paint, R.id.cursor_menu_item_draw, R.string.tooltip_sketch),
     FILE(R.string.glyph__attachment, R.id.cursor_menu_item_file, R.string.tooltip_file),
+    GIF(R.string.glyph__gif, R.id.cursor_menu_item_gif, R.string.tooltip_gif),
     AUDIO_MESSAGE(R.string.glyph__microphone_on, R.id.cursor_menu_item_audio_message, R.string.tooltip_audio_message),
     MORE(R.string.glyph__more, R.id.cursor_menu_item_more, R.string.tooltip_more),
     LESS(R.string.glyph__more, R.id.cursor_menu_item_less, R.string.tooltip_more),
     // DUMMY item is a blank icon just used to position icons when the row of icons is not full
     DUMMY(R.string.empty_string, R.id.cursor_menu_item_dummy, R.string.tooltip_ping),
     LOCATION(R.string.glyph__location, R.id.cursor_menu_item_location, R.string.tooltip_location),
+    EMOJI(R.string.glyph__emoji, R.id.cursor_menu_item_emoji, R.string.tooltip_emoji),
     PING(R.string.glyph__ping, R.id.cursor_menu_item_ping, R.string.tooltip_ping);
 
     public int glyphResId;

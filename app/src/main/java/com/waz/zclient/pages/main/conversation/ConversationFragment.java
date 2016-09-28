@@ -127,11 +127,11 @@ import com.waz.zclient.core.stores.conversation.ConversationStoreObserver;
 import com.waz.zclient.core.stores.inappnotification.InAppNotificationStoreObserver;
 import com.waz.zclient.core.stores.inappnotification.KnockingEvent;
 import com.waz.zclient.core.stores.network.DefaultNetworkAction;
-import com.waz.zclient.core.stores.network.NetworkStoreObserver;
 import com.waz.zclient.core.stores.participants.ParticipantsStoreObserver;
 import com.waz.zclient.notifications.controllers.ImageNotificationsController;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.pages.extendedcursor.ExtendedCursorContainer;
+import com.waz.zclient.pages.extendedcursor.emoji.EmojiKeyboardLayout;
 import com.waz.zclient.pages.extendedcursor.image.CursorImagesLayout;
 import com.waz.zclient.pages.extendedcursor.image.ImagePreviewLayout;
 import com.waz.zclient.pages.extendedcursor.voicefilter.VoiceFilterLayout;
@@ -192,7 +192,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                                                                   MessageViewsContainer,
                                                                                                   NavigationControllerObserver,
                                                                                                   SlidingPaneObserver,
-                                                                                                  NetworkStoreObserver,
                                                                                                   SingleImageObserver,
                                                                                                   MentioningObserver,
                                                                                                   GiphyObserver,
@@ -205,6 +204,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                                                                   PagerControllerObserver,
                                                                                                   CursorImagesLayout.Callback,
                                                                                                   VoiceFilterLayout.Callback,
+                                                                                                  EmojiKeyboardLayout.Callback,
                                                                                                   ExtendedCursorContainer.Callback {
     public static final String TAG = ConversationFragment.class.getName();
     private static final String SAVED_STATE_PREVIEW = "SAVED_STATE_PREVIEW";
@@ -607,9 +607,9 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                                                                 R.dimen.typing_indicator__chathead_size));
         typingIndicatorLayoutParams.gravity = Gravity.CENTER;
         typingIndicatorView.setLayoutParams(typingIndicatorLayoutParams);
-        cursorLayout.getTypingIndicatorContainer().addTypingIndicatorView(typingIndicatorView);
-        // Only show Giphy button when text field has input
-        cursorLayout.enableGiphyButton(false);
+        // TODO: Support new typing indicator
+        //cursorLayout.getTypingIndicatorContainer().addTypingIndicatorView(typingIndicatorView);
+        cursorLayout.showSendButton(false);
 
         typingListener = new UpdateListener() {
             @Override
@@ -629,7 +629,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
                 UsersList usersList = inputStateIndicator.getTypingUsers();
                 typingIndicatorView.usersUpdated(usersList, true);
-                cursorLayout.getTypingIndicatorContainer().setOtherIsTyping(usersList.size() > 0);
+                // TODO: Support new typing indicator
+                //cursorLayout.getTypingIndicatorContainer().setOtherIsTyping(usersList.size() > 0);
             }
         };
 
@@ -660,6 +661,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         getControllerFactory().getGlobalLayoutController().addKeyboardVisibilityObserver(extendedCursorContainer);
         getControllerFactory().getRequestPermissionsController().addObserver(this);
         cursorLayout.setCursorCallback(this);
+        cursorLayout.showSendButtonAsEnterKey(!getControllerFactory().getUserPreferencesController().isCursorSendButtonEnabled());
         final String draftText = getStoreFactory().getDraftStore().getDraft(getStoreFactory().getConversationStore().getCurrentConversation());
         if (!TextUtils.isEmpty(draftText)) {
             cursorLayout.setText(draftText);
@@ -693,7 +695,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         getStoreFactory().getInAppNotificationStore().addInAppNotificationObserver(this);
 
         getControllerFactory().getSlidingPaneController().addObserver(this);
-        getStoreFactory().getNetworkStore().addNetworkStoreObserver(this);
 
         typingIndicatorView.setSelfUser(getStoreFactory().getProfileStore().getSelfUser());
         extendedCursorContainer.setCallback(this);
@@ -738,7 +739,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             getControllerFactory().getMentioningController().removeObserver(this);
         }
         getControllerFactory().getGiphyController().removeObserver(this);
-        getStoreFactory().getNetworkStore().removeNetworkStoreObserver(this);
         getControllerFactory().getSingleImageController().removeSingleImageObserver(this);
 
         if (!cursorLayout.isEditingMessage()) {
@@ -1149,15 +1149,11 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             } else {
                 inputStateIndicator.textChanged();
             }
-            if (!getStoreFactory().getNetworkStore().hasInternetConnection()) {
-                cursorLayout.enableGiphyButton(false);
-                return;
-            }
         }
 
-        boolean isGiphyPreferenceEnabled = getControllerFactory().getUserPreferencesController().isGiphyEnabled();
-        boolean isInputAllowedForGiphy = getControllerFactory().getGiphyController().isInputAllowedForGiphy(text);
-        cursorLayout.enableGiphyButton(isGiphyPreferenceEnabled && isInputAllowedForGiphy);
+        if (getControllerFactory().getUserPreferencesController().isCursorSendButtonEnabled()) {
+            cursorLayout.showSendButton(!TextUtils.isEmpty(text));
+        }
     }
 
     public boolean isKeyboardUp() {
@@ -1473,25 +1469,17 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     @Override
-    public void onConnectivityChange(boolean hasInternet, boolean isServerError) {
-        if (cursorLayout == null) {
-            return;
-        }
-        cursorLayout.enableGiphyButton(hasInternet && cursorLayout.hasText());
-    }
-
-    @Override
-    public void onNoInternetConnection(boolean isServerError) {
-
-    }
-
-    @Override
     public void onSearch(String keyword) {
 
     }
 
     @Override
     public void onRandomSearch() {
+
+    }
+
+    @Override
+    public void onTrendingSearch() {
 
     }
 
@@ -1666,6 +1654,10 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 getControllerFactory().getTrackingController().tagEvent(new OpenedMoreActionsEvent(
                     getConversationTypeString()));
                 break;
+            case GIF:
+                getControllerFactory().getGiphyController().handleInput(cursorLayout.getText());
+                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.giphy(isGroupConversation));
+                break;
         }
     }
 
@@ -1681,11 +1673,13 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 break;
             case VOICE_FILTER_RECORDING:
                 extendedCursorContainer.openVoiceFilter(this);
+                hideSendButtonIfNeeded();
                 getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.audiomessage(
                     isGroupConversation));
                 break;
             case IMAGES:
                 extendedCursorContainer.openCursorImages(this);
+                hideSendButtonIfNeeded();
                 getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.photo(
                     isGroupConversation));
                 break;
@@ -1735,17 +1729,14 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         if (TextUtils.isEmpty(message.trim())) {
             return;
         }
-        if (!getControllerFactory().getUserPreferencesController().isGiphyEnabled() ||
-            !getControllerFactory().getGiphyController().handleInput(message, true)) {
-            resetCursor();
-            getStoreFactory().getConversationStore().sendMessage(message);
-            TrackingUtils.onSentTextMessage(getControllerFactory().getTrackingController(),
-                                            getStoreFactory().getConversationStore().getCurrentConversation());
+        resetCursor();
+        getStoreFactory().getConversationStore().sendMessage(message);
+        TrackingUtils.onSentTextMessage(getControllerFactory().getTrackingController(),
+                                        getStoreFactory().getConversationStore().getCurrentConversation());
 
-            getStoreFactory().getNetworkStore().doIfHasInternetOrNotifyUser(null);
-            getControllerFactory().getTrackingController().updateSessionAggregates(RangedAttribute.TEXT_MESSAGES_SENT,
-                                                                                   message);
-        }
+        getStoreFactory().getNetworkStore().doIfHasInternetOrNotifyUser(null);
+        getControllerFactory().getTrackingController().updateSessionAggregates(RangedAttribute.TEXT_MESSAGES_SENT,
+                                                                               message);
         getControllerFactory().getSharingController().maybeResetSharedText(getStoreFactory().getConversationStore().getCurrentConversation());
     }
 
@@ -1797,11 +1788,17 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     @Override
-    public void onCursorGiphyButtonClicked() {
-        getControllerFactory().getGiphyController().handleInput(cursorLayout.getText(), false);
-        final IConversation conversation = getStoreFactory().getConversationStore().getCurrentConversation();
-        boolean isGroupConversation = conversation.getType() == IConversation.Type.GROUP;
-        getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.giphy(isGroupConversation));
+    public void onEmojiButtonClicked(boolean showEmojiKeyboard) {
+        if (showEmojiKeyboard) {
+            KeyboardUtils.hideKeyboard(getActivity());
+            extendedCursorContainer.openEmojis(getControllerFactory().getUserPreferencesController().getRecentEmojis(),
+                                               getControllerFactory().getUserPreferencesController().getUnsupportedEmojis(),
+                                               this);
+            cursorLayout.showSendButton(true);
+        } else {
+            extendedCursorContainer.close(false);
+            KeyboardUtils.showKeyboard(getActivity());
+        }
     }
 
     @Override
@@ -2266,6 +2263,13 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     @Override
     public void onExtendedCursorClosed() {
         cursorLayout.onExtendedCursorClosed();
+        hideSendButtonIfNeeded();
+    }
+
+    private void hideSendButtonIfNeeded() {
+        if (!getControllerFactory().getUserPreferencesController().isCursorSendButtonEnabled() || TextUtils.isEmpty(cursorLayout.getText())) {
+            cursorLayout.showSendButton(false);
+        }
     }
 
     private void editMessage(final Message message) {
@@ -2468,6 +2472,12 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     private void unableToSaveImageNoPermissions() {
         imageAssetToSave = null;
         Toast.makeText(getContext(), R.string.message_bottom_menu_action_save_fail, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onEmojiSelected(String emoji) {
+        cursorLayout.appendText(emoji);
+        getControllerFactory().getUserPreferencesController().addRecentEmoji(emoji);
     }
 
     public interface Container {

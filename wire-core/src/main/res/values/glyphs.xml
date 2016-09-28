@@ -33,6 +33,7 @@
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__flip">\uE120</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__list">\uE121</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__grid">\uE123</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__is_typing">\uE124</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__more">\uE125</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__loading">\uE126</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__info">\uE127</string>
@@ -102,6 +103,10 @@
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__delete_everywhere">\uE232</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__forward">\uE233</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__copy">\uE234</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__send">\uE235</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__keyboard">\uE236</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__emoji">\uE237</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__backspace">\uE238</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__filter_helium">\uE240</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__filter_jellyfish">\uE242</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__filter_hare">\uE243</string>
@@ -109,4 +114,11 @@
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__filter_alien">\uE245</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__filter_robot">\uE246</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__filter_reverse">\uE247</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__emoji_flower">\uE250</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__emoji_cake">\uE251</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__emoji_car">\uE252</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__emoji_ball">\uE253</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__emoji_crown">\uE254</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__emoji_symbol">\uE255</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__emoji_flag">\uE256</string>
 </resources>

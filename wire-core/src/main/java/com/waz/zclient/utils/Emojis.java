@@ -17,6 +17,8 @@
  */
 package com.waz.zclient.utils;
 
+import com.waz.zclient.core.R;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,6 +48,19 @@ public class Emojis {
         all.add(FLAGS);
         return all;
     }
+
+    public static final int[] EMOJI_KEYBOARD_TAB_LABELS = {
+        R.string.glyph__clock,
+        R.string.glyph__emoji,
+        R.string.glyph__emoji_flower,
+        R.string.glyph__emoji_cake,
+        R.string.glyph__emoji_car,
+        R.string.glyph__emoji_ball,
+        R.string.glyph__emoji_crown,
+        R.string.glyph__emoji_symbol,
+        R.string.glyph__emoji_flag,
+        R.string.glyph__backspace
+    };
 
     public static final int VERSION = 1;
 
