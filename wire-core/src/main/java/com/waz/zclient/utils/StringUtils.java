@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 
 import java.nio.ByteBuffer;
@@ -141,8 +142,9 @@ public class StringUtils {
         private final ByteBuffer buffer = ByteBuffer.allocate(bitmap.getByteCount());
 
         public void set(String text) {
-            canvas.drawColor(Color.TRANSPARENT);
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             canvas.drawText(text, 0, 50 / 2, paint);
+            buffer.rewind();
             bitmap.copyPixelsToBuffer(buffer);
         }
 

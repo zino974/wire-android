@@ -62,7 +62,7 @@ public class Emojis {
         R.string.glyph__backspace
     };
 
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     public static final String[] ACTIVITY = new String[] {
         "\ud83d\udc7e", // Alien Monster
