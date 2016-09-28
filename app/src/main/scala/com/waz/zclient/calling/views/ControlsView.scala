@@ -100,7 +100,7 @@ private class OutgoingControlsView(val context: Context, val attrs: AttributeSet
     callOnClick()
   }
   rightButton.onClick {
-    if (controller.videoCall.currentValue.getOrElse(false)) controller.toggleVideo() else controller.speakerEnabled.mutate(!_)
+    if (controller.videoCall.currentValue.getOrElse(false)) controller.toggleVideo() else controller.speakerPressed ! (())
     callOnClick()
   }
 
