@@ -173,6 +173,10 @@ public class TabIndicatorLayout extends LinearLayout implements ViewPager.OnPage
         tabIndicatorView.setColor(color);
     }
 
+    public void setShowDivider(boolean show) {
+        tabIndicatorView.setShowDivider(show);
+    }
+
     public void setViewPager(ViewPager viewPager) {
         if (this.viewPager != null) {
             this.viewPager.removeOnPageChangeListener(this);

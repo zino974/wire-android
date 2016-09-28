@@ -371,7 +371,7 @@ public class GiphySharingPreviewFragment extends BaseFragment<GiphySharingPrevie
         if (TextUtils.isEmpty(searchTerm) || searchTerm == null) {
             gifTitle = "";
         } else {
-            gifTitle = getString(R.string.giphy_preview__title_search, searchTerm);
+            gifTitle = getStoreFactory().getConversationStore().getCurrentConversation().getName();
         }
         giphyTitle.setText(gifTitle);
     }

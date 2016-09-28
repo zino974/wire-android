@@ -33,6 +33,7 @@
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__flip">\uE120</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__list">\uE121</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__grid">\uE123</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__is_typing">\uE124</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__more">\uE125</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__loading">\uE126</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__info">\uE127</string>

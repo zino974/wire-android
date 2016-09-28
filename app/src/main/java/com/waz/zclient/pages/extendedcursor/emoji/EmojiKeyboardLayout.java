@@ -114,6 +114,7 @@ public class EmojiKeyboardLayout extends LinearLayout {
 
         recyclerView.addOnScrollListener(new EmojiScrollListener());
 
+        tapIndicatorLayout.setShowDivider(false);
         tapIndicatorLayout.setGlyphLabels(Emojis.EMOJI_KEYBOARD_TAB_LABELS);
         tapIndicatorLayout.setTextColor(ContextCompat.getColorStateList(getContext(), com.waz.zclient.ui.R.color.wire__text_color_dark_selector));
         tapIndicatorLayout.setPrimaryColor(ContextCompat.getColor(getContext(), com.waz.zclient.ui.R.color.text__primary_dark));
