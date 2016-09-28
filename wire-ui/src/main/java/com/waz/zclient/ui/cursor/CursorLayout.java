@@ -43,6 +43,7 @@ import com.waz.api.MessageContent;
 import com.waz.zclient.ui.R;
 import com.waz.zclient.ui.animation.interpolators.penner.Expo;
 import com.waz.zclient.ui.animation.interpolators.penner.Quart;
+import com.waz.zclient.ui.theme.ThemeUtils;
 import com.waz.zclient.ui.utils.CursorUtils;
 import com.waz.zclient.ui.views.CursorIconButton;
 import com.waz.zclient.utils.LayoutSpec;
@@ -188,7 +189,7 @@ public class CursorLayout extends FrameLayout implements
                                                           this,
                                                           false);
         emojiButton.setText(R.string.glyph__emoji);
-        emojiButton.setAccentColor(ContextCompat.getColor(getContext(), R.color.light_graphite));
+        emojiButton.setPressedBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_graphite));
         int buttonWidth = getResources().getDimensionPixelSize(R.dimen.cursor__menu_button__diameter);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(buttonWidth,
                                                                        buttonWidth);
@@ -217,7 +218,11 @@ public class CursorLayout extends FrameLayout implements
                                                           this,
                                                           false);
         sendButton.setText(R.string.glyph__send);
-        sendButton.setAccentColor(ContextCompat.getColor(getContext(), R.color.light_graphite));
+        if (!ThemeUtils.isDarkTheme(getContext())) {
+            sendButton.setTextColor(ContextCompat.getColor(getContext(), R.color.text__primary_dark));
+        } else {
+            sendButton.setTextColor(ContextCompat.getColor(getContext(), R.color.text__primary_light));
+        }
         sendButtonContainer.addView(sendButton, new FrameLayout.LayoutParams(buttonWidth,
                                                                              buttonWidth));
         sendButton.setVisibility(View.INVISIBLE);
@@ -232,7 +237,7 @@ public class CursorLayout extends FrameLayout implements
     public void setAccentColor(int accentColor) {
         newCursorEditText.setAccentColor(accentColor);
         mainToolbar.setAccentColor(accentColor);
-        sendButton.setAccentTextColor(accentColor);
+        sendButton.setSolidBackgroundColor(accentColor);
     }
 
     private void connectEditText() {

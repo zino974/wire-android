@@ -48,8 +48,8 @@ public class CursorToolbar extends LinearLayout {
     private CursorIconButton cursorIconButtonAudio;
 
     public void setAccentColor(int accentColor) {
-        cursorIconButtonCamera.setTextColor(accentColor);
-        cursorIconButtonAudio.setTextColor(accentColor);
+        cursorIconButtonCamera.initTextColor(accentColor);
+        cursorIconButtonAudio.initTextColor(accentColor);
     }
 
     private GestureDetector.OnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
@@ -142,7 +142,7 @@ public class CursorToolbar extends LinearLayout {
                                                                    this,
                                                                    false);
             cursorIconButton.setText(item.glyphResId);
-            cursorIconButton.setAccentColor(ContextCompat.getColor(getContext(), R.color.light_graphite));
+            cursorIconButton.setPressedBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_graphite));
 
             switch (item) {
                 case CAMERA:
@@ -154,8 +154,8 @@ public class CursorToolbar extends LinearLayout {
             }
 
             if (item == CursorMenuItem.DUMMY) {
-                cursorIconButton.setTextColor(ContextCompat.getColor(getContext(), R.color.transparent));
-                cursorIconButton.setAccentColor(ContextCompat.getColor(getContext(), R.color.transparent));
+                cursorIconButton.initTextColor(ContextCompat.getColor(getContext(), R.color.transparent));
+                cursorIconButton.setPressedBackgroundColor(ContextCompat.getColor(getContext(), R.color.transparent));
                 cursorIconButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.transparent));
             }
 

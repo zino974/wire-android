@@ -48,6 +48,7 @@ public class TabIndicatorView extends View {
     private final Paint paint;
     private final Path path;
     private ObjectAnimator animator;
+    private boolean showDivider;
 
     public TabIndicatorView(Context context) {
         this(context, null);
@@ -68,6 +69,8 @@ public class TabIndicatorView extends View {
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(getResources().getDimensionPixelSize(R.dimen.wire__divider__height__thin));
+
+        showDivider = true;
     }
 
     public void setAnimationPosition(int pos) {
@@ -93,6 +96,11 @@ public class TabIndicatorView extends View {
         }
     }
 
+    public void setShowDivider(boolean showDivider) {
+        this.showDivider = showDivider;
+        invalidate();
+    }
+
     public void setColor(int color) {
         paint.setColor(color);
     }
@@ -106,7 +114,9 @@ public class TabIndicatorView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawPath(path, paint);
+        if (showDivider) {
+            canvas.drawPath(path, paint);
+        }
     }
 
     private void updatePath() {

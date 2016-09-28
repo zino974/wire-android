@@ -50,42 +50,52 @@ public class CursorIconButton extends GlyphTextView {
         super(context, attrs, defStyleAttr);
     }
 
-    public void setAccentColor(int color) {
+    public void setPressedBackgroundColor(int color) {
+        setBackgroundColor(Color.TRANSPARENT, color);
+    }
+
+    public void setSolidBackgroundColor(int color) {
+        setBackgroundColor(color, color);
+    }
+
+    private void setBackgroundColor(int defaultColor, int pressedColor) {
         if (ThemeUtils.isDarkTheme(getContext())) {
             alphaPressed = PRESSED_ALPHA__DARK;
         } else {
             alphaPressed = PRESSED_ALPHA__LIGHT;
         }
 
-        float avg = (Color.red(color) + Color.blue(color) + Color.green(color)) / (3 * 255.0f);
+        float avg = (Color.red(pressedColor) + Color.blue(pressedColor) + Color.green(pressedColor)) / (3 * 255.0f);
         if (avg > TRESHOLD) {
             float darken = 1.0f - DARKEN_FACTOR;
-            color = Color.rgb((int) (Color.red(color) * darken),
-                              (int) (Color.green(color) * darken),
-                              (int) (Color.blue(color) * darken));
+            pressedColor = Color.rgb((int) (Color.red(pressedColor) * darken),
+                              (int) (Color.green(pressedColor) * darken),
+                              (int) (Color.blue(pressedColor) * darken));
         }
 
-        int pressed = ColorUtils.injectAlpha(alphaPressed, color);
-        GradientDrawable pressedTextColor = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+        int pressed = ColorUtils.injectAlpha(alphaPressed, pressedColor);
+        GradientDrawable pressedBgColor = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
                                                                  new int[] {pressed, pressed});
-        pressedTextColor.setShape(GradientDrawable.OVAL);
+        pressedBgColor.setShape(GradientDrawable.OVAL);
+
+        GradientDrawable defaultBgColor = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+                                                                 new int[] {defaultColor, defaultColor});
+        defaultBgColor.setShape(GradientDrawable.OVAL);
 
         StateListDrawable states = new StateListDrawable();
-        states.addState(new int[] {android.R.attr.state_pressed}, pressedTextColor);
-        states.addState(new int[] {android.R.attr.state_focused}, pressedTextColor);
-        states.addState(new int[] {-android.R.attr.state_enabled}, pressedTextColor);
-        states.addState(new int[] {}, new ColorDrawable(Color.TRANSPARENT));
+        states.addState(new int[] {android.R.attr.state_pressed}, pressedBgColor);
+        states.addState(new int[] {android.R.attr.state_focused}, pressedBgColor);
+        states.addState(new int[] {-android.R.attr.state_enabled}, pressedBgColor);
+        states.addState(new int[] {}, defaultBgColor);
 
         setBackground(states);
 
-        setTextColor(color);
         invalidate();
     }
 
-    public void setTextColor(int accentColor) {
+    public void initTextColor(int selectedColor) {
         int pressedColor = getResources().getColor(R.color.text__primary_dark_40);
         int focusedColor = pressedColor;
-        int selectedColor = accentColor;
         int enabledColor = getResources().getColor(R.color.text__primary_dark);
         int disabledColor = getResources().getColor(R.color.text__primary_dark_16);
 
@@ -101,9 +111,5 @@ public class CursorIconButton extends GlyphTextView {
         ColorStateList colorStateList = new ColorStateList(states, colors);
 
         super.setTextColor(colorStateList);
-    }
-
-    public void setAccentTextColor(int color) {
-        super.setTextColor(color);
     }
 }
