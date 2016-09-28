@@ -53,8 +53,8 @@
 
             <FrameLayout
                 android:id="@+id/fl__cursor__emoji_container"
-                android:layout_width="@dimen/content__separator__avatar_container__width"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/cursor_anchor2"
+                android:layout_height="match_parent"
                 android:layout_gravity="start|center_vertical"
                 />
 

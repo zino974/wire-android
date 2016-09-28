@@ -22,9 +22,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -49,6 +51,7 @@ import com.waz.api.User;
 import com.waz.api.Verification;
 import com.waz.api.VoiceChannel;
 import com.waz.model.ConvId;
+import com.waz.threading.Threading;
 import com.waz.zclient.calling.CallingActivity;
 import com.waz.zclient.calling.controllers.CallPermissionsController;
 import com.waz.zclient.controllers.accentcolor.AccentColorChangeRequester;
@@ -61,6 +64,7 @@ import com.waz.zclient.controllers.tracking.events.exception.ExceptionEvent;
 import com.waz.zclient.controllers.tracking.events.otr.VerifiedConversationEvent;
 import com.waz.zclient.controllers.tracking.events.profile.SignOut;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
+import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.controllers.userpreferences.UserPreferencesController;
 import com.waz.zclient.core.api.scala.AppEntryStore;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
@@ -81,15 +85,20 @@ import com.waz.zclient.pages.main.grid.GridFragment;
 import com.waz.zclient.pages.main.profile.ZetaPreferencesActivity;
 import com.waz.zclient.pages.startup.UpdateFragment;
 import com.waz.zclient.utils.BuildConfigUtils;
+import com.waz.zclient.utils.Emojis;
 import com.waz.zclient.utils.HockeyCrashReporting;
 import com.waz.zclient.utils.IntentUtils;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.PhoneUtils;
 import com.waz.zclient.utils.PhoneUtils.PhoneState;
+import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
 import net.hockeyapp.android.NativeCrashManager;
 import timber.log.Timber;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -213,6 +222,15 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
 
         //This is needed to drag the user back to the calling activity if they open the app again during a call
         CallingActivity.startIfCallIsActive(this);
+
+        if (!getControllerFactory().getUserPreferencesController().hasCheckedForUnsupportedEmojis(Emojis.VERSION)) {
+            Threading.Background().execute(new Runnable() {
+                @Override
+                public void run() {
+                    checkForUnsupportedEmojis();
+                }
+            });
+        }
     }
 
     @Override
@@ -928,6 +946,33 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         }
         if (previousVerification != Verification.VERIFIED && currentVerification == Verification.VERIFIED) {
             getControllerFactory().getTrackingController().tagEvent(new VerifiedConversationEvent());
+        }
+    }
+
+    private void checkForUnsupportedEmojis() {
+        if (getControllerFactory() == null ||
+            getControllerFactory().isTornDown()) {
+            return;
+        }
+        IUserPreferencesController userPreferencesController = getControllerFactory().getUserPreferencesController();
+        Collection<String> unsupported = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Paint paint = new Paint();
+            for (String[] array : Emojis.getAllEmojisSortedByCategory()) {
+                for (String emoji : array) {
+                    if (!paint.hasGlyph(emoji)) {
+                        unsupported.add(emoji);
+                    }
+                }
+            }
+        } else {
+            for (String[] array : Emojis.getAllEmojisSortedByCategory()) {
+                unsupported.addAll(Arrays.asList(array));
+            }
+            unsupported = StringUtils.getMissingInFont(unsupported);
+        }
+        if (!unsupported.isEmpty()) {
+            userPreferencesController.setUnsupportedEmoji(unsupported, Emojis.VERSION);
         }
     }
 }
