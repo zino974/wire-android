@@ -43,7 +43,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.Formatter;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -136,10 +135,10 @@ import com.waz.zclient.pages.extendedcursor.image.CursorImagesLayout;
 import com.waz.zclient.pages.extendedcursor.image.ImagePreviewLayout;
 import com.waz.zclient.pages.extendedcursor.voicefilter.VoiceFilterLayout;
 import com.waz.zclient.pages.main.calling.enums.VoiceBarAppearance;
+import com.waz.zclient.pages.main.conversation.views.TypingIndicatorView;
 import com.waz.zclient.pages.main.conversation.views.ExpandableView;
 import com.waz.zclient.pages.main.conversation.views.MessageBottomSheetDialog;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
-import com.waz.zclient.pages.main.conversation.views.TypingIndicatorView;
 import com.waz.zclient.pages.main.conversation.views.header.StreamMediaPlayerBarFragment;
 import com.waz.zclient.pages.main.conversation.views.listview.ConversationListView;
 import com.waz.zclient.pages.main.conversation.views.listview.ConversationScrollListener;
@@ -205,7 +204,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                                                                                                   CursorImagesLayout.Callback,
                                                                                                   VoiceFilterLayout.Callback,
                                                                                                   EmojiKeyboardLayout.Callback,
-                                                                                                  ExtendedCursorContainer.Callback {
+                                                                                                  ExtendedCursorContainer.Callback,
+                                                                                                  TypingIndicatorView.Callback {
     public static final String TAG = ConversationFragment.class.getName();
     private static final String SAVED_STATE_PREVIEW = "SAVED_STATE_PREVIEW";
     private static final int REQUEST_VIDEO_CAPTURE = 911;
@@ -523,6 +523,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         audioMessageRecordingView = ViewUtils.getView(view, R.id.amrv_audio_message_recording);
         toolbar = ViewUtils.getView(view, R.id.t_conversation_toolbar);
         toolbarTitle = ViewUtils.getView(toolbar, R.id.tv__conversation_toolbar__title);
+        typingIndicatorView = ViewUtils.getView(view, R.id.tiv_typing_indicator_view);
+        typingIndicatorView.setCallback(this);
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -600,39 +602,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
         listView.addFooterView(invisibleFooter, null, false);
 
-        typingIndicatorView = new TypingIndicatorView(getActivity());
-        FrameLayout.LayoutParams typingIndicatorLayoutParams = new FrameLayout.LayoutParams(getResources().getDimensionPixelSize(
-            R.dimen.typing_indicator__chathead_size),
-                                                                                            getResources().getDimensionPixelSize(
-                                                                                                R.dimen.typing_indicator__chathead_size));
-        typingIndicatorLayoutParams.gravity = Gravity.CENTER;
-        typingIndicatorView.setLayoutParams(typingIndicatorLayoutParams);
-        // TODO: Support new typing indicator
-        //cursorLayout.getTypingIndicatorContainer().addTypingIndicatorView(typingIndicatorView);
         cursorLayout.showSendButton(false);
-
-        typingListener = new UpdateListener() {
-            @Override
-            public void updated() {
-                if (inputStateIndicator == null || typingIndicatorView == null || cursorLayout == null) {
-                    return;
-                }
-
-                if (getStoreFactory() == null || getStoreFactory().isTornDown()) {
-                    return;
-                }
-
-                final IConversation currentConversation = getStoreFactory().getConversationStore().getCurrentConversation();
-                if (currentConversation == null || currentConversation.getType() != IConversation.Type.ONE_TO_ONE) {
-                    return;
-                }
-
-                UsersList usersList = inputStateIndicator.getTypingUsers();
-                typingIndicatorView.usersUpdated(usersList, true);
-                // TODO: Support new typing indicator
-                //cursorLayout.getTypingIndicatorContainer().setOtherIsTyping(usersList.size() > 0);
-            }
-        };
 
         // Recording audio messages
         audioMessageRecordingView.setCallback(this);
@@ -696,7 +666,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
         getControllerFactory().getSlidingPaneController().addObserver(this);
 
-        typingIndicatorView.setSelfUser(getStoreFactory().getProfileStore().getSelfUser());
         extendedCursorContainer.setCallback(this);
     }
 
@@ -777,6 +746,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             inputStateIndicator.removeUpdateListener(typingListener);
             inputStateIndicator = null;
         }
+        typingIndicatorView.clear();
         typingIndicatorView = null;
         typingListener = null;
         conversationModelObserver.clear();
@@ -930,7 +900,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     if (!inSplitPortraitMode() && listView.computeIsScrolledToBottom()) {
                         resetCursor();
                     }
-                    typingIndicatorView.reset();
 
                     final String draftText = getStoreFactory().getDraftStore().getDraft(toConversation);
                     if (TextUtils.isEmpty(draftText)) {
@@ -984,6 +953,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 }
 
                 inputStateIndicator = toConversation.getInputStateIndicator();
+                typingIndicatorView.setInputStateIndicator(inputStateIndicator);
 
                 if (inputStateIndicator != null) {
                     inputStateIndicator.getTypingUsers().addUpdateListener(typingListener);
@@ -1095,7 +1065,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     public void onScrolledAwayFromBottom() {
         getStoreFactory().getInAppNotificationStore().onScrolledAwayFromBottom();
         messageStreamManager.onScrolledToBottom(false);
-        cursorLayout.showTopbar(true);
+        cursorLayout.showTopbar(typingIndicatorView.getVisibility() == View.GONE);
     }
 
     @Override
@@ -2478,6 +2448,15 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     public void onEmojiSelected(String emoji) {
         cursorLayout.appendText(emoji);
         getControllerFactory().getUserPreferencesController().addRecentEmoji(emoji);
+    }
+
+    @Override
+    public void onTypingIndicatorVisibilityChanged(boolean visible) {
+        if (visible) {
+            cursorLayout.showTopbar(false);
+        } else {
+            cursorLayout.showTopbar(!listView.computeIsScrolledToBottom());
+        }
     }
 
     public interface Container {
