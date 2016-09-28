@@ -446,7 +446,7 @@
     <string name="pref_account_email_title">Email</string>
     <string name="pref_account_add_email_title">Add email</string>
     <string name="pref_account_sign_out_title">Log out</string>
-    <string name="pref_account_dark_theme_title">Dark Theme</string>
+    <string name="pref_account_dark_theme_title">Dark theme</string>
     <string name="pref_account_color_title">Color</string>
     <string name="pref_account_picture_title">Picture</string>
     <string name="pref_account_delete_title">Delete Account</string>
@@ -475,8 +475,8 @@
     <string name="pref_options_ringtones_ringtone_title">Ringtone</string>
     <string name="pref_options_ringtones_text_title">Text tone</string>
     <string name="pref_options_ringtones_ping_title">Ping</string>
-    <string name="pref_options_ringtones_default_summary">Wire Default</string>
-    <string name="pref_options_image_download_title">Download Pictures</string>
+    <string name="pref_options_ringtones_default_summary">Wire default</string>
+    <string name="pref_options_image_download_title">Download pictures</string>
     <string name="pref_options_image_download_always">Always</string>
     <string name="pref_options_image_download_wifi">Wi-Fi only</string>
     <string name="pref_options_media_category_title">Media</string>
@@ -499,44 +499,44 @@
     <string name="pref_devices_device_id">ID: %1$s</string>
     <string name="pref_devices_device_verified">Verified</string>
     <string name="pref_devices_device_not_verified">Not verified</string>
-    <string name="pref_devices_warning_summary">If you don\'t recognize a device above, remove it and reset your password in Settings > Account.</string>
+    <string name="pref_devices_warning_summary">If you don\'t recognize a device above, remove it and reset your password.</string>
     <string name="pref_devices_device_screen_title">Device details</string>
     <string name="pref_devices_device_fingerprint_category_title">Key Fingerprint</string>
-    <string name="pref_devices_device_fingerprint_summary">Wire gives every device a unique fingerprint. Compare fingerprints to verify your devices and conversations.</string>
+    <string name="pref_devices_device_fingerprint_summary">Wire gives every device a unique fingerprint. Compare them and verify your devices and conversations.</string>
     <string name="pref_devices_device_actions_category_title">Actions</string>
     <string name="pref_devices_device_trust_title">Verified</string>
     <string name="pref_devices_device_reset_session_title">Reset session</string>
-    <string name="pref_devices_device_reset_session_summary">If fingerprints don’t match, reset your secure session to make sure that the correct fingerprints are shown on all devices.</string>
+    <string name="pref_devices_device_reset_session_summary">If fingerprints don\'t match, reset the session to generate new encryption keys on both sides.</string>
     <string name="pref_devices_device_remove_title">Remove device</string>
-    <string name="pref_devices_device_remove_summary">You will be automatically logged out of that device.</string>
+    <string name="pref_devices_device_remove_summary">Remove this device if you have stopped using it. Your message history will be erased and you will be logged out.</string>
     <string name="pref_devices_device_fingerprint_copy_description">Fingerprint</string>
     <string name="pref_devices_device_fingerprint_copy_toast">Key Fingerprint Copied</string>
 
     <!-- Advanced -->
     <string name="pref_advanced_screen_title">Advanced</string>
-    <string name="pref_advanced_debug_report_title">Submit Debug Report</string>
+    <string name="pref_advanced_debug_report_title">Submit debug report</string>
     <string name="pref_advanced_debug_report_summary">This helps Wire Support diagnose problems.</string>
     <string name="pref_advanced_analytics_title">Usage data and crash reports</string>
     <string name="pref_advanced_analytics_summary">Make Wire better by sending anonymous information.</string>
-    <string name="debug_report__title">Android Wire bug report - %1$s</string>
-    <string name="debug_report__body">Help us troubleshoot! Please tell us details of what happened, what error message you received or screenshot, and if possible the steps to reproduce the issue.\n\n</string>
+    <string name="debug_report__title">Wire debug report - %1$s</string>
+    <string name="debug_report__body">Please describe the steps required to reproduce the issue, provide screenshots if possible and send this email.\n\n</string>
 
     <!-- Support -->
     <string name="pref_support_screen_title">Support</string>
-    <string name="pref_support_website_title">Wire Support Website</string>
+    <string name="pref_support_website_title">Wire Support website</string>
     <string name="pref_support_website_url">https://support.wire.com</string>
     <string name="pref_support_contact_title">Contact Support</string>
     <string name="pref_support_contact_url">https://support.wire.com/hc/de/requests/new</string>
 
     <!-- About -->
     <string name="pref_about_screen_title">About</string>
-    <string name="pref_about_website_title">Wire Website</string>
+    <string name="pref_about_website_title">Wire website</string>
     <string name="pref_about_website_url">https://wire.com</string>
-    <string name="pref_about_tos_title">Terms Of Use</string>
+    <string name="pref_about_tos_title">Terms of Use</string>
     <string name="pref_about_tos_url">@string/url_terms_of_service</string>
     <string name="pref_about_privacy_policy_title">Privacy Policy</string>
     <string name="pref_about_privacy_policy_url">@string/url_privacy_policy</string>
-    <string name="pref_about_licenses_title">Licenses</string>
+    <string name="pref_about_licenses_title">License information</string>
     <string name="pref_about_licenses_url">@string/url_third_party_licences</string>
     <string name="pref_about_version_title">Version %s</string>
     <string name="pref_about_copyright_title">\u00A9 Wire Swiss GmbH</string>
