@@ -193,7 +193,7 @@ public class CursorLayout extends FrameLayout implements
         int buttonWidth = getResources().getDimensionPixelSize(R.dimen.cursor__menu_button__diameter);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(buttonWidth,
                                                                        buttonWidth);
-        params.gravity = Gravity.END;
+        params.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
         params.setMarginEnd(getResources().getDimensionPixelSize(R.dimen.chathead__margin));
         emojiButtonContainer.addView(emojiButton, params);
         emojiButton.setOnClickListener(new OnClickListener() {
