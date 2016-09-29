@@ -147,6 +147,11 @@
         <item name="giphyKeyword">@style/giphy_keyword__dark</item>
         <item name="giphyConversation">@style/giphy_conversation__dark</item>
         <item name="giphyError">@style/giphy_error__dark</item>
+
+        <!-- Typing indicator -->
+        <item name="typingIndicatorBox">@style/typing_indicator_box_dark</item>
+        <item name="typingIndicatorText">@style/typing_indicator_text_dark</item>
+
     </style>
 
     <style name="Theme.Light" parent="@style/Theme.Design.Light.NoActionBar">
@@ -274,6 +279,11 @@
         <item name="giphyKeyword">@style/giphy_keyword__light</item>
         <item name="giphyConversation">@style/giphy_conversation__light</item>
         <item name="giphyError">@style/giphy_error__light</item>
+
+        <!-- Typing indicator -->
+        <item name="typingIndicatorBox">@style/typing_indicator_box_light</item>
+        <item name="typingIndicatorText">@style/typing_indicator_text_light</item>
+
     </style>
 
     <style name="Theme.Dark.Preferences" parent="@style/Theme.Design.NoActionBar">

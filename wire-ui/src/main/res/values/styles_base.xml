@@ -375,6 +375,17 @@
         <item name="font">@string/wire__typeface__light</item>
     </style>
 
+    <style name="typing_indicator_box_base">
+        <item name="android:layoutDirection">ltr</item>
+    </style>
+
+    <style name="typing_indicator_text_base">
+        <item name="android:ellipsize">end</item>
+        <item name="android:textSize">@dimen/wire__text_size__small</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
     <style name="Theme.Dark.Dialog" parent="Theme.AppCompat.Dialog">
         <item name="colorPrimary">@color/dark_theme_primary</item>
         <item name="colorPrimaryDark">@color/dark_theme_primary_dark</item>
