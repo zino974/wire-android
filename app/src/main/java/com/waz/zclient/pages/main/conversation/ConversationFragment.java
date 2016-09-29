@@ -115,6 +115,7 @@ import com.waz.zclient.core.controllers.tracking.events.filetransfer.SavedFileEv
 import com.waz.zclient.core.controllers.tracking.events.filetransfer.SelectedTooLargeFileEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.CancelledRecordingAudioMessageEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.OpenedActionHintEvent;
+import com.waz.zclient.core.controllers.tracking.events.media.OpenedEmojiKeyboardEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.OpenedMediaActionEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.PreviewedAudioMessageEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.SentPictureEvent;
@@ -1765,6 +1766,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             extendedCursorContainer.openEmojis(getControllerFactory().getUserPreferencesController().getRecentEmojis(),
                                                getControllerFactory().getUserPreferencesController().getUnsupportedEmojis(),
                                                this);
+            boolean withBot = getStoreFactory().getConversationStore().getCurrentConversation().isOtto();
+            getControllerFactory().getTrackingController().tagEvent(new OpenedEmojiKeyboardEvent(withBot));
             cursorLayout.showSendButton(true);
         } else {
             extendedCursorContainer.close(false);
