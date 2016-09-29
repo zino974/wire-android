@@ -307,7 +307,10 @@ public class CursorLayout extends FrameLayout implements
     @Override
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_SEND ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+            (actionId != EditorInfo.IME_ACTION_UNSPECIFIED &&
+             event != null &&
+             event.getKeyCode() == KeyEvent.KEYCODE_ENTER &&
+             event.getAction() == KeyEvent.ACTION_DOWN)) {
 
             if (isEditingMessage()) {
                 onApproveEditMessage();
