@@ -106,7 +106,6 @@ public class GiphySharingPreviewFragment extends BaseFragment<GiphySharingPrevie
         @Override
         public void run() {
             updateGiphyResults();
-            updateGiphyTitle();
         }
     };
 
@@ -192,7 +191,6 @@ public class GiphySharingPreviewFragment extends BaseFragment<GiphySharingPrevie
         });
 
         updateGiphyResults();
-        updateGiphyTitle();
 
         return view;
     }
@@ -205,6 +203,7 @@ public class GiphySharingPreviewFragment extends BaseFragment<GiphySharingPrevie
         getControllerFactory().getAccentColorController().addAccentColorObserver(this);
         getStoreFactory().getInAppNotificationStore().setUserSendingPicture(true);
         getStoreFactory().getNetworkStore().addNetworkStoreObserver(this);
+        giphyTitle.setText(getStoreFactory().getConversationStore().getCurrentConversation().getName());
     }
 
     @Override
@@ -364,16 +363,6 @@ public class GiphySharingPreviewFragment extends BaseFragment<GiphySharingPrevie
         });
         giphyResults.addUpdateListener(giphyResultUpdateListener);
         giphyGridViewAdapter.setGiphyResults(giphyResults);
-    }
-
-    private void updateGiphyTitle() {
-        String gifTitle;
-        if (TextUtils.isEmpty(searchTerm) || searchTerm == null) {
-            gifTitle = "";
-        } else {
-            gifTitle = getStoreFactory().getConversationStore().getCurrentConversation().getName();
-        }
-        giphyTitle.setText(gifTitle);
     }
 
     private void showError() {
