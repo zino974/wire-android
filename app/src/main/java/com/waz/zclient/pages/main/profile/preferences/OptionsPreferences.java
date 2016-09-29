@@ -32,6 +32,7 @@ import com.waz.zclient.controllers.spotify.SpotifyObserver;
 import com.waz.zclient.core.controllers.tracking.events.settings.ChangedImageDownloadPreferenceEvent;
 import com.waz.zclient.core.controllers.tracking.events.Event;
 import com.waz.zclient.core.controllers.tracking.events.settings.ChangedContactsPermissionEvent;
+import com.waz.zclient.core.controllers.tracking.events.settings.ChangedSendButtonSettingEvent;
 import com.waz.zclient.core.controllers.tracking.events.settings.ChangedThemeEvent;
 import com.waz.zclient.pages.BasePreferenceFragment;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.WireRingtonePreferenceDialogFragment;
@@ -187,7 +188,11 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
         } else if (key.equals(getString(R.string.pref_options_theme_switch_key))) {
             getControllerFactory().getThemeController().toggleThemePending(true);
             event = new ChangedThemeEvent(getControllerFactory().getThemeController().isDarkTheme());
+        } else if (key.equals(getString(R.string.pref_options_cursor_send_button_key))) {
+            boolean sendButtonIsOn = sharedPreferences.getBoolean(key, false);
+            event = new ChangedSendButtonSettingEvent(sendButtonIsOn);
         }
+
         return event;
     }
 
