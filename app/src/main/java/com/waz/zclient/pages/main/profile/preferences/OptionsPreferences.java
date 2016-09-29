@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.RawRes;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceCategory;
 import android.text.TextUtils;
 import android.widget.Toast;
 import com.waz.api.MediaProvider;
@@ -31,10 +32,14 @@ import com.waz.zclient.controllers.spotify.SpotifyObserver;
 import com.waz.zclient.core.controllers.tracking.events.settings.ChangedImageDownloadPreferenceEvent;
 import com.waz.zclient.core.controllers.tracking.events.Event;
 import com.waz.zclient.core.controllers.tracking.events.settings.ChangedContactsPermissionEvent;
+import com.waz.zclient.core.controllers.tracking.events.settings.ChangedSendButtonSettingEvent;
+import com.waz.zclient.core.controllers.tracking.events.settings.ChangedThemeEvent;
 import com.waz.zclient.pages.BasePreferenceFragment;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.WireRingtonePreferenceDialogFragment;
+import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.TrackingUtils;
 import net.xpece.android.support.preference.RingtonePreference;
+import net.xpece.android.support.preference.SwitchPreference;
 
 public class OptionsPreferences extends BasePreferenceFragment<OptionsPreferences.Container> implements SharedPreferences.OnSharedPreferenceChangeListener,
                                                                                                         SpotifyObserver {
@@ -44,6 +49,7 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
     private RingtonePreference textTonePreference;
     private RingtonePreference pingPreference;
     private Preference spotifyPreference;
+    private SwitchPreference themePreference;
 
     public static OptionsPreferences newInstance(String rootKey, Bundle extras) {
         OptionsPreferences f = new OptionsPreferences();
@@ -86,6 +92,16 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
                 return true;
             }
         });
+
+        themePreference = (SwitchPreference) findPreference(getString(R.string.pref_options_theme_switch_key));
+        themePreference.setChecked(getControllerFactory().getThemeController().isDarkTheme());
+
+        if (LayoutSpec.isTablet(getActivity())) {
+            PreferenceCategory requestedOptionsCategory = (PreferenceCategory) findPreference(getString(R.string.pref_options_requested_category_key));
+            if (requestedOptionsCategory  != null) {
+                requestedOptionsCategory.removePreference(themePreference);
+            }
+        }
     }
 
     @Override
@@ -169,7 +185,14 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
         } else if (key.equals(getString(R.string.pref_options_contacts_key))) {
             boolean shareContacts = sharedPreferences.getBoolean(key, false);
             event = new ChangedContactsPermissionEvent(shareContacts, true);
+        } else if (key.equals(getString(R.string.pref_options_theme_switch_key))) {
+            getControllerFactory().getThemeController().toggleThemePending(true);
+            event = new ChangedThemeEvent(getControllerFactory().getThemeController().isDarkTheme());
+        } else if (key.equals(getString(R.string.pref_options_cursor_send_button_key))) {
+            boolean sendButtonIsOn = sharedPreferences.getBoolean(key, false);
+            event = new ChangedSendButtonSettingEvent(sendButtonIsOn);
         }
+
         return event;
     }
 

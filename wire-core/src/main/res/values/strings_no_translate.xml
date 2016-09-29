@@ -81,7 +81,7 @@
     <string translatable="false" name="pref_account_delete_key">pref_account_delete_key</string>
     <string translatable="false" name="pref_account_password_key">PREF_RESET_PASSWORD</string>
     <string translatable="false" name="pref_account_theme_key">pref_theme_key</string>
-    <string translatable="false" name="pref_account_theme_switch_key">pref_theme_switch_key</string>
+    <string translatable="false" name="pref_options_theme_switch_key">pref_theme_switch_key</string>
     <string translatable="false" name="pref_options_spotify_key">PREF_SPOTIFY_LOGIN</string>
     <string translatable="false" name="pref_options_cursor_send_button_key">pref_cursor_send_button_key</string>
     <string translatable="false" name="pref_options_contacts_key">@string/pref_share_contacts_key</string>
@@ -123,6 +123,7 @@
     <string translatable="false" name="pref_about_copyright_key">pref_about_copyright_key</string>
     <string translatable="false" name="pref_options_alerts_category_key">pref_options_alerts_category_key</string>
     <string translatable="false" name="pref_options_media_category_key">pref_options_media_category_key</string>
+    <string translatable="false" name="pref_options_requested_category_key">pref_options_requested_category_key</string>
     <string translatable="false" name="pref_support_website_key">pref_support_website_key</string>
     <string translatable="false" name="pref_support_contact_key">pref_support_contact_key</string>
 

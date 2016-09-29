@@ -193,7 +193,7 @@ public class CursorLayout extends FrameLayout implements
         int buttonWidth = getResources().getDimensionPixelSize(R.dimen.cursor__menu_button__diameter);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(buttonWidth,
                                                                        buttonWidth);
-        params.gravity = Gravity.END;
+        params.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
         params.setMarginEnd(getResources().getDimensionPixelSize(R.dimen.chathead__margin));
         emojiButtonContainer.addView(emojiButton, params);
         emojiButton.setOnClickListener(new OnClickListener() {
@@ -307,7 +307,10 @@ public class CursorLayout extends FrameLayout implements
     @Override
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_SEND ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+            (actionId != EditorInfo.IME_ACTION_UNSPECIFIED &&
+             event != null &&
+             event.getKeyCode() == KeyEvent.KEYCODE_ENTER &&
+             event.getAction() == KeyEvent.ACTION_DOWN)) {
 
             if (isEditingMessage()) {
                 onApproveEditMessage();

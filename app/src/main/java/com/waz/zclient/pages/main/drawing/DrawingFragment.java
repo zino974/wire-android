@@ -20,11 +20,9 @@ package com.waz.zclient.pages.main.drawing;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.ExifInterface;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -37,12 +35,10 @@ import com.waz.api.ImageAsset;
 import com.waz.api.ImageAssetFactory;
 import com.waz.api.LoadHandle;
 import com.waz.api.MemoryImageCache;
-import com.waz.threading.Threading;
 import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.drawing.DrawingController;
-import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.ui.colorpicker.ColorPickerLayout;
 import com.waz.zclient.ui.colorpicker.ColorPickerScrollView;
@@ -50,18 +46,13 @@ import com.waz.zclient.ui.colorpicker.EmojiBottomSheetDialog;
 import com.waz.zclient.ui.colorpicker.EmojiSize;
 import com.waz.zclient.ui.sketch.DrawingCanvasView;
 import com.waz.zclient.ui.text.TypefaceTextView;
-import com.waz.zclient.utils.Emojis;
 import com.waz.zclient.utils.LayoutSpec;
-import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.TrackingUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.debug.ShakeEventListener;
 import net.hockeyapp.android.ExceptionHandler;
 
 import java.util.Locale;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class DrawingFragment extends BaseFragment<DrawingFragment.Container> implements OnBackPressedListener,
                                                                                         ColorPickerLayout.OnColorSelectedListener,
@@ -244,14 +235,6 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         sensorManager.registerListener(shakeEventListener,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
-        if (!getControllerFactory().getUserPreferencesController().hasCheckedForUnsupportedEmojis(Emojis.VERSION)) {
-            Threading.Background().execute(new Runnable() {
-                @Override
-                public void run() {
-                    checkForUnsupportedEmojis();
-                }
-            });
-        }
     }
 
     @Override
@@ -450,33 +433,6 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     @Override
     public void reserveBitmapMemory(int width, int height) {
         MemoryImageCache.reserveImageMemory(width, height);
-    }
-
-    private void checkForUnsupportedEmojis() {
-        if (getControllerFactory() == null ||
-            getControllerFactory().isTornDown()) {
-            return;
-        }
-        IUserPreferencesController userPreferencesController = getControllerFactory().getUserPreferencesController();
-        Collection<String> unsupported = new ArrayList<>();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Paint paint = new Paint();
-            for (String[] array : Emojis.getAllEmojisSortedByCategory()) {
-                for (String emoji : array) {
-                    if (!paint.hasGlyph(emoji)) {
-                        unsupported.add(emoji);
-                    }
-                }
-            }
-        } else {
-            for (String[] array : Emojis.getAllEmojisSortedByCategory()) {
-                unsupported.addAll(Arrays.asList(array));
-            }
-            unsupported = StringUtils.getMissingInFont(unsupported);
-        }
-        if (!unsupported.isEmpty()) {
-            userPreferencesController.setUnsupportedEmoji(unsupported, Emojis.VERSION);
-        }
     }
 
     public interface Container { }

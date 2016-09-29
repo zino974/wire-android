@@ -23,7 +23,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceCategory;
 import android.text.TextUtils;
 import com.waz.api.InitListener;
 import com.waz.api.Self;
@@ -32,8 +31,6 @@ import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.tracking.events.profile.ResetPassword;
 import com.waz.zclient.controllers.tracking.events.profile.SignOut;
 import com.waz.zclient.core.controllers.tracking.events.session.LoggedOutEvent;
-import com.waz.zclient.core.controllers.tracking.events.settings.ChangedThemeEvent;
-import com.waz.zclient.core.controllers.tracking.events.Event;
 import com.waz.zclient.core.stores.profile.ProfileStoreObserver;
 import com.waz.zclient.pages.BasePreferenceFragment;
 import com.waz.zclient.pages.main.profile.camera.CameraContext;
@@ -44,10 +41,8 @@ import com.waz.zclient.pages.main.profile.preferences.dialogs.ChangeEmailPrefere
 import com.waz.zclient.pages.main.profile.preferences.dialogs.VerifyEmailPreferenceFragment;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.VerifyPhoneNumberPreferenceFragment;
 import com.waz.zclient.ui.utils.TextViewUtils;
-import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
 import net.xpece.android.support.preference.EditTextPreference;
-import net.xpece.android.support.preference.SwitchPreference;
 
 public class AccountPreferences extends BasePreferenceFragment<AccountPreferences.Container> implements ProfileStoreObserver,
                                                                                                         SharedPreferences.OnSharedPreferenceChangeListener,
@@ -67,7 +62,6 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
     private Preference resetPasswordPreference;
     private PicturePreference picturePreference;
     private ColorPreference colorPreference;
-    private SwitchPreference themePreference;
 
     public static AccountPreferences newInstance(String rootKey, Bundle extras) {
         AccountPreferences f = new AccountPreferences();
@@ -166,15 +160,7 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
                 return true;
             }
         });
-        themePreference = (SwitchPreference) findPreference(getString(R.string.pref_account_theme_switch_key));
-        themePreference.setChecked(getControllerFactory().getThemeController().isDarkTheme());
 
-        if (LayoutSpec.isTablet(getActivity())) {
-            PreferenceCategory accountAppearanceCategory = (PreferenceCategory) findPreference(getString(R.string.pref_account_appearance_category_key));
-            if (accountAppearanceCategory != null) {
-                accountAppearanceCategory.removePreference(themePreference);
-            }
-        }
     }
 
     @Override
@@ -215,16 +201,6 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
             resetPasswordPreference = null;
         }
         super.onDestroyView();
-    }
-
-    @Override
-    public Event handlePreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Event event = null;
-        if (key.equals(getString(R.string.pref_account_theme_switch_key))) {
-            getControllerFactory().getThemeController().toggleThemePending(true);
-            event = new ChangedThemeEvent(getControllerFactory().getThemeController().isDarkTheme());
-        }
-        return event;
     }
 
     @Override
