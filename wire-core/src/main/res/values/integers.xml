@@ -23,9 +23,10 @@
     <integer name="circle_icon_button__alpha_stroke">100</integer>
     <integer name="animation_delay_short">150</integer>
     <integer name="animation_delay_very_long">350</integer>
-    <integer name="animation_duration_short">150</integer>
 
     <!-- Animation durations-->
+    <integer name="animation_duration_short">150</integer>
+    <integer name="animation_duration_medium_rare">200</integer>
     <integer name="animation_duration_medium">350</integer>
     <integer name="animation_duration_long">550</integer>
     <integer name="animation_duration_very_long">700</integer>

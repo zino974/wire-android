@@ -53,16 +53,16 @@ public class FooterViewController implements ConversationItemViewController,
     private static final int TIMESTAMP_VISIBILITY_MIL_SEC = 5000;
     private final Context context;
     private final MessageViewsContainer container;
-    private View view;
-    private TextView likeButton;
-    private TextView likeButtonAnimation;
-    private TextView messageStatusTextView;
-    private FooterLikeDetailsLayout likeDetails;
+    private final View view;
+    private final TextView likeButton;
+    private final TextView likeButtonAnimation;
+    private final TextView messageStatusTextView;
+    private final FooterLikeDetailsLayout likeDetails;
 
-    private Handler mainHandler;
+    private final Handler mainHandler;
 
-    private int likeButtonColorLiked;
-    private int likeButtonColorUnliked;
+    private final int likeButtonColorLiked;
+    private final int likeButtonColorUnliked;
     private Message message;
 
     private boolean isMyLastMessage;
@@ -71,6 +71,7 @@ public class FooterViewController implements ConversationItemViewController,
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
         public void updated(Message message) {
+
             mainHandler.removeCallbacksAndMessages(null);
             if (message.isLiked()) {
                 showLikeDetails();
@@ -97,8 +98,10 @@ public class FooterViewController implements ConversationItemViewController,
 
             updateLikeButton();
             updateMessageStatusLabel();
-            likeDetails.setUsers(message.isLiked() ? message.getLikes() : null,
-                                 !container.getControllerFactory().getUserPreferencesController().hasPerformedAction(IUserPreferencesController.LIKED_MESSAGE));
+
+            boolean showHint = !container.isTornDown() && container.getControllerFactory().getUserPreferencesController().hasPerformedAction(
+                IUserPreferencesController.LIKED_MESSAGE);
+            likeDetails.setUsers(message.isLiked() ? message.getLikes() : null, showHint);
         }
     };
 

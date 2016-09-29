@@ -289,10 +289,7 @@ public class CursorLayout extends FrameLayout implements
 
         if (TextUtils.isEmpty(charSequence.toString())) {
             hintView.setVisibility(View.VISIBLE);
-            // TODO: Support new typing indicator
-            //getTypingIndicatorContainer().setSelfIsTyping(keyboardIsVisible);
         } else {
-            //getTypingIndicatorContainer().setSelfIsTyping(true);
             hintView.setVisibility(View.GONE);
         }
 
@@ -378,11 +375,6 @@ public class CursorLayout extends FrameLayout implements
         }
     }
 
-    public TypingIndicatorContainer getTypingIndicatorContainer() {
-        return null;
-    }
-
-
     public void setText(String text) {
         newCursorEditText.setText(text);
         newCursorEditText.setSelection(text.length());
@@ -396,26 +388,13 @@ public class CursorLayout extends FrameLayout implements
     public void notifyKeyboardVisibilityChanged(boolean keyboardIsVisible, View currentFocus) {
         this.keyboardIsVisible = keyboardIsVisible;
         if (keyboardIsVisible) {
-            // TODO: Support new typing indicator
-            //getTypingIndicatorContainer().setSelfIsTyping(true);
             cursorToolbarFrame.shrink();
             shieldViewWithBanner.setEnabled(false);
             if (newCursorEditText.hasFocus() && cursorCallback != null) {
                 cursorCallback.onCursorClicked();
             }
         } else {
-
-
-            // TODO: Support new typing indicator
-            /*
-            if (!TextUtils.isEmpty(newCursorEditText.getText())) {
-                getTypingIndicatorContainer().setSelfIsTyping(true);
-            } else {
-                getTypingIndicatorContainer().setSelfIsTyping(false);
-            }*/
-
             cursorToolbarFrame.expand();
-
             if (hasText()) {
                 shieldViewWithBanner.setEnabled(false);
             } else {

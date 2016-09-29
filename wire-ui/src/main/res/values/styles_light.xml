@@ -280,4 +280,13 @@
     <style name="giphy_error__light" parent="giphy_error__base">
         <item name="android:textColor">@color/graphite</item>
     </style>
+
+    <style name="typing_indicator_box_light" parent="typing_indicator_box_base">
+        <item name="android:background">@drawable/typing_indicator_background_light</item>
+    </style>
+
+    <style name="typing_indicator_text_light" parent="typing_indicator_text_base">
+        <item name="android:textColor">@color/light_graphite</item>
+    </style>
+
 </resources>
