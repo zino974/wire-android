@@ -662,6 +662,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         getControllerFactory().getRequestPermissionsController().addObserver(this);
         cursorLayout.setCursorCallback(this);
         cursorLayout.showSendButtonAsEnterKey(!getControllerFactory().getUserPreferencesController().isCursorSendButtonEnabled());
+        hideSendButtonIfNeeded();
         final String draftText = getStoreFactory().getDraftStore().getDraft(getStoreFactory().getConversationStore().getCurrentConversation());
         if (!TextUtils.isEmpty(draftText)) {
             cursorLayout.setText(draftText);
