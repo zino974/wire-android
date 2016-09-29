@@ -54,7 +54,7 @@ public class ThemeController implements IThemeController {
     public ThemeController(Context context) {
         isTablet = LayoutSpec.isTablet(context);
         deprecatedThemeKey = context.getString(R.string.pref_account_theme_key);
-        themeKey = context.getString(R.string.pref_account_theme_switch_key);
+        themeKey = context.getString(R.string.pref_options_theme_switch_key);
         prefs = context.getSharedPreferences(UserPreferencesController.USER_PREFS_TAG, Context.MODE_PRIVATE);
         currentTheme = getThemeFromPreferences();
         optionsDarkTheme = new OptionsDarkTheme(context);
