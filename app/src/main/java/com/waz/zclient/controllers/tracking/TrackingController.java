@@ -89,6 +89,11 @@ public class TrackingController implements ITrackingController {
         sentEventPreferences = context.getSharedPreferences("TRACKING_SENT_EVENTS", Context.MODE_PRIVATE);
         trackingData.addUpdateListener(trackingDataUpdateListener);
 
+        if (BuildConfig.SHOW_DEVELOPER_OPTIONS) {
+            setCustomUserId();
+            Localytics.setProfileAttribute("android_client", "true", Localytics.ProfileScope.APPLICATION);
+        }
+
     }
 
     private void setCustomUserId() {
