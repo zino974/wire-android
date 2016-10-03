@@ -32,6 +32,7 @@ import com.waz.api.UpdateListener;
 import com.waz.api.User;
 import com.waz.api.Verification;
 import com.waz.api.VoiceChannel;
+import com.waz.api.EphemeralExpiration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -274,5 +275,17 @@ public class InboxLinkConversation implements IConversation, UpdateListener {
                 updateListener.updated();
             }
         }
+    }
+
+    public boolean isEphemeral() {
+        return false;
+    }
+
+    public EphemeralExpiration getEphemeralExpiration() {
+        return null;
+    }
+
+    public void setEphemeralExpiration(EphemeralExpiration expiration) {
+
     }
 }

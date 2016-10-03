@@ -51,10 +51,10 @@ import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.currentfocus.IFocusController;
 import com.waz.zclient.controllers.globallayout.KeyboardVisibilityObserver;
-import com.waz.zclient.core.stores.network.NetworkAction;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.stores.connect.ConnectStoreObserver;
 import com.waz.zclient.core.stores.connect.IConnectStore;
+import com.waz.zclient.core.stores.network.NetworkAction;
 import com.waz.zclient.core.stores.participants.ParticipantsStoreObserver;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.pages.main.conversation.controller.ConversationScreenControllerObserver;
@@ -84,6 +84,7 @@ public class ParticipantHeaderFragment extends BaseFragment<ParticipantHeaderFra
     private LinearLayout textViewAddressBookNameContainer;
     private View bottomBorder;
     private TextView penIcon;
+    private TextView textViewAddressBookName;
     // Helps center title in 1:1
     private ShieldView shieldView;
     private IConnectStore.UserRequester userRequester;
@@ -141,6 +142,7 @@ public class ParticipantHeaderFragment extends BaseFragment<ParticipantHeaderFra
         subHeader = ViewUtils.getView(rootView, R.id.ttv__participants__sub_header);
         textViewAddressBookNameContainer = ViewUtils.getView(rootView, R.id.ll__single_participants__real_name__container);
         textViewAddressBookNameContainer.setVisibility(View.GONE);
+        textViewAddressBookName = ViewUtils.getView(rootView, R.id.ttv__address_book_name);
         closeButton = ViewUtils.getView(rootView, R.id.gtv__participants__close);
         headerReadOnlyTextView = ViewUtils.getView(rootView, R.id.ttv__participants__header);
         headerEditText = ViewUtils.getView(rootView, R.id.taet__participants__header__editable);
@@ -316,37 +318,8 @@ public class ParticipantHeaderFragment extends BaseFragment<ParticipantHeaderFra
 
     @Override
     public void otherUserUpdated(final User otherUser) {
-        headerReadOnlyTextView.setText(otherUser.getName());
-
-        // TODO: https://wearezeta.atlassian.net/browse/AN-4278
-//        textViewAddressBookNameContainer.setVisibility(View.VISIBLE);
-//        textViewAddressBookName.setText("Marc Prengemann");
-
-        subHeader.setText(otherUser.getEmail());
-        subHeader.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                              getResources().getDimension(R.dimen.participants__subheader__font_size__one_to_one));
-        subHeader.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Uri uri = Uri.parse(String.format("mailto:%s", otherUser.getEmail()));
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
-            }
-        });
-
-        shieldView.setVisibility(otherUser.getVerified() == Verification.VERIFIED ? View.VISIBLE : View.INVISIBLE);
-
-            new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                if (getView() != null && getControllerFactory().getConversationScreenController() != null) {
-                    final int height = getView().getMeasuredHeight();
-                    getControllerFactory().getConversationScreenController().setParticipantHeaderHeight(height);
-                }
-            }
-        });
+        setParticipant(otherUser);
     }
-
 
     public void showCancelButton(boolean show, boolean animate) {
         if (closeButton == null || headerTopBorder == null) {
@@ -676,7 +649,6 @@ public class ParticipantHeaderFragment extends BaseFragment<ParticipantHeaderFra
 
     @Override
     public void onMessagesUpdated(MessagesList messagesList) {
-
     }
 
     @Override
@@ -684,11 +656,18 @@ public class ParticipantHeaderFragment extends BaseFragment<ParticipantHeaderFra
         if (usertype != userRequester) {
             return;
         }
+        setParticipant(user);
+    }
+
+    private void setParticipant(final User user) {
         headerReadOnlyTextView.setText(user.getName());
 
-        // TODO: https://wearezeta.atlassian.net/browse/AN-4278
-//        textViewAddressBookNameContainer.setVisibility(View.VISIBLE);
-//        textViewAddressBookName.setText("Marc Prengemann");
+        if (user.isContact()) {
+            textViewAddressBookNameContainer.setVisibility(View.VISIBLE);
+            textViewAddressBookName.setText(user.getFirstContact().getDisplayName());
+        } else {
+            textViewAddressBookNameContainer.setVisibility(View.GONE);
+        }
 
         subHeader.setText(user.getEmail());
         subHeader.setTextSize(TypedValue.COMPLEX_UNIT_PX,

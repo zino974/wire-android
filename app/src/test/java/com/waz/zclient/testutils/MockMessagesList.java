@@ -20,6 +20,7 @@ package com.waz.zclient.testutils;
 import android.annotation.SuppressLint;
 import android.os.Parcel;
 import com.waz.api.Asset;
+import com.waz.api.EphemeralExpiration;
 import com.waz.api.IConversation;
 import com.waz.api.ImageAsset;
 import com.waz.api.Message;
@@ -210,12 +211,7 @@ public class MockMessagesList extends MockObservable implements MessagesList {
         public boolean isCreateConversation() {
             return false;
         }
-
-        @Override
-        public boolean isOtr() {
-            return false;
-        }
-
+        
         @Override
         public boolean isFirstMessage() {
             return false;
@@ -264,6 +260,21 @@ public class MockMessagesList extends MockObservable implements MessagesList {
         @Override
         public void unlike() {
 
+        }
+
+        @Override
+        public boolean isEphemeral() {
+            return false;
+        }
+
+        @Override
+        public EphemeralExpiration getEphemeralExpiration() {
+            return null;
+        }
+
+        @Override
+        public Instant getExpirationTime() {
+            return null;
         }
 
         @Override

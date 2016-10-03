@@ -31,7 +31,7 @@
         android:layout_height="@dimen/wire__divider__height__thin"
         android:background="@color/text__secondary_light__40"
         />
-    
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -120,14 +120,15 @@
                     >
 
                     <com.waz.zclient.ui.text.TypefaceTextView
-                        android:layout_width="match_parent"
+                        android:id="@+id/ttv__address_book_name"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:textAllCaps="true"
-                        android:singleLine="true"
                         android:textColor="@color/text__secondary_light"
                         android:textSize="@dimen/participants__subheader__font_size__one_to_one"
                         app:font="@string/wire__typeface__light"
+                        android:maxLines="1"
                         />
 
                     <com.waz.zclient.ui.text.GlyphTextView
