@@ -19,6 +19,7 @@ package com.waz.zclient.testutils;
 
 import android.annotation.SuppressLint;
 import android.os.Parcel;
+import com.waz.api.EphemeralExpiration;
 import com.waz.api.IConversation;
 import com.waz.api.ImageAsset;
 import com.waz.api.InputStateIndicator;
@@ -39,7 +40,7 @@ public class MockConversation extends MockObservable implements IConversation {
         super(id);
         messages = new MockMessagesList(this);
     }
-    
+
     @Override
     public Type getType() {
         return null;
@@ -203,6 +204,21 @@ public class MockConversation extends MockObservable implements IConversation {
     @Override
     public boolean isSelected() {
         return false;
+    }
+
+    @Override
+    public boolean isEphemeral() {
+        return false;
+    }
+
+    @Override
+    public EphemeralExpiration getEphemeralExpiration() {
+        return null;
+    }
+
+    @Override
+    public void setEphemeralExpiration(EphemeralExpiration expiration) {
+
     }
 
     @Override

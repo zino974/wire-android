@@ -73,7 +73,7 @@ ext {
     playServicesVersion = '7.8.+'
 
     audioVersion = System.getenv("AUDIO_VERSION") ?: '1.195.0@aar'
-    zMessagingDevVersionBase = '80.1220'
+    zMessagingDevVersionBase = '80.1225'
     zMessagingDevVersion = "${zMessagingDevVersionBase}@aar"
     // Release version number must be like this X.0(.Y)
     zMessagingReleaseVersion = System.getenv("ZMESSAGING_VERSION") ?: '80.0.297@aar'
