@@ -223,35 +223,42 @@ public class EmojiKeyboardLayout extends LinearLayout {
 
     private void updateCategoryPositions(Set<String> unsupported) {
         for (int i = 0; i < CATEGORY_COUNT; i++) {
-            int pos;
+            int pos = 0;
+            List<String> filteredList = null;
             switch (i) {
                 case 1:
-                    pos = emojis.indexOf(getFilteredList(Emojis.PEOPLE, unsupported).get(0));
+                    filteredList = getFilteredList(Emojis.PEOPLE, unsupported);
                     break;
                 case 2:
-                    pos = emojis.indexOf(getFilteredList(Emojis.NATURE, unsupported).get(0));
+                    filteredList = getFilteredList(Emojis.NATURE, unsupported);
                     break;
                 case 3:
-                    pos = emojis.indexOf(getFilteredList(Emojis.FOOD_AND_DRINK, unsupported).get(0));
+                    filteredList = getFilteredList(Emojis.FOOD_AND_DRINK, unsupported);
                     break;
                 case 4:
-                    pos = emojis.indexOf(getFilteredList(Emojis.ACTIVITY, unsupported).get(0));
+                    filteredList = getFilteredList(Emojis.ACTIVITY, unsupported);
                     break;
                 case 5:
-                    pos = emojis.indexOf(getFilteredList(Emojis.TRAVEL_AND_PLACES, unsupported).get(0));
+                    filteredList = getFilteredList(Emojis.TRAVEL_AND_PLACES, unsupported);
                     break;
                 case 6:
-                    pos = emojis.indexOf(getFilteredList(Emojis.OBJECTS, unsupported).get(0));
+                    filteredList = getFilteredList(Emojis.OBJECTS, unsupported);
                     break;
                 case 7:
-                    pos = emojis.indexOf(getFilteredList(Emojis.SYMBOLS, unsupported).get(0));
+                    filteredList = getFilteredList(Emojis.SYMBOLS, unsupported);
                     break;
                 case 8:
-                    pos = emojis.indexOf(getFilteredList(Emojis.FLAGS, unsupported).get(0));
+                    filteredList = getFilteredList(Emojis.FLAGS, unsupported);
                     break;
                 default:
                     pos = 0;
                     break;
+            }
+            if (filteredList != null && filteredList.size() > 1) {
+                pos = emojis.indexOf(filteredList.get(0));
+                if (pos < 0) {
+                    pos = 0;
+                }
             }
             categoryPositions[i] = pos;
         }
