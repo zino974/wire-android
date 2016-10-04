@@ -374,7 +374,7 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
             .replace(R.id.fl__root__right_view,
                      fragment,
                      tag)
-            .commit();
+            .commitAllowingStateLoss();
     }
 
     @Override
