@@ -77,6 +77,9 @@ public class PhoneSignInFragment extends BaseFragment<PhoneSignInFragment.Contai
                                          new AppEntryUtil.ErrorDialogCallback() {
                                              @Override
                                              public void onOk() {
+                                                 if (editTextPhone == null) {
+                                                     return;
+                                                 }
                                                  KeyboardUtils.showKeyboard(getActivity());
                                                  editTextPhone.requestFocus();
                                                  phoneConfirmationButton.setState(PhoneConfirmationButton.State.INVALID);
@@ -228,6 +231,9 @@ public class PhoneSignInFragment extends BaseFragment<PhoneSignInFragment.Contai
     }
 
     private void confirmPhoneNumber() {
+        if (getContainer() == null || editTextPhone == null) {
+            return;
+        }
         // before loging in show loader and dismiss keyboard
         getContainer().enableProgress(true);
         KeyboardUtils.hideKeyboard(getActivity());

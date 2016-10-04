@@ -81,6 +81,9 @@ public class VerifyPhoneFragment extends BaseFragment<VerifyPhoneFragment.Contai
                                          new AppEntryUtil.ErrorDialogCallback() {
                                              @Override
                                              public void onOk() {
+                                                 if (editTextCode == null) {
+                                                     return;
+                                                 }
                                                  KeyboardUtils.showKeyboard(getActivity());
                                                  editTextCode.requestFocus();
                                                  phoneConfirmationButton.setState(PhoneConfirmationButton.State.INVALID);

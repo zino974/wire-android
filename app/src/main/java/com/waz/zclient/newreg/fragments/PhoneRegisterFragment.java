@@ -85,6 +85,9 @@ public class PhoneRegisterFragment extends BaseFragment<PhoneRegisterFragment.Co
                                          new AppEntryUtil.ErrorDialogCallback() {
                                              @Override
                                              public void onOk() {
+                                                 if (phoneConfirmationButton == null) {
+                                                     return;
+                                                 }
                                                  KeyboardUtils.showKeyboard(getActivity());
                                                  phoneConfirmationButton.setState(PhoneConfirmationButton.State.INVALID);
                                              }
