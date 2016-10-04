@@ -58,14 +58,14 @@ public class CursorLayout extends FrameLayout implements
                                                EditMessageCursorToolbar.Callback {
     private static final long TOOLTIP_DURATION = 1500;
 
-    private static List<CursorMenuItem> mainCursorItems = Arrays.asList(CursorMenuItem.VIDEO_MESSAGE,
-                                                                        CursorMenuItem.CAMERA,
+    private static List<CursorMenuItem> mainCursorItems = Arrays.asList(CursorMenuItem.CAMERA,
                                                                         CursorMenuItem.SKETCH,
                                                                         CursorMenuItem.GIF,
+                                                                        CursorMenuItem.PING,
                                                                         CursorMenuItem.AUDIO_MESSAGE,
                                                                         CursorMenuItem.MORE);
 
-    private static List<CursorMenuItem> secondaryCursorItems = Arrays.asList(CursorMenuItem.PING,
+    private static List<CursorMenuItem> secondaryCursorItems = Arrays.asList(CursorMenuItem.VIDEO_MESSAGE,
                                                                              CursorMenuItem.FILE,
                                                                              CursorMenuItem.LOCATION,
                                                                              CursorMenuItem.DUMMY,
