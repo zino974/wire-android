@@ -448,6 +448,9 @@ public class FooterViewController implements ConversationItemViewController,
 
     @Override
     public boolean toggleVisibility() {
+        if (message == null) {
+            return false;
+        }
         if (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0) {
             expand();
             return true;

@@ -62,4 +62,8 @@ public abstract class OnDoubleClickListener implements View.OnClickListener {
 
     public abstract void onSingleClick();
 
+    public void reset() {
+        handler.removeCallbacksAndMessages(null);
+    }
+
 }
