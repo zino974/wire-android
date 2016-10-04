@@ -74,10 +74,13 @@ public class StringUtils {
         if (uri == null) {
             return uri;
         }
-        Uri normalized = uri.normalizeScheme()
-            .buildUpon()
-            .encodedAuthority(uri.getAuthority().toLowerCase(Locale.getDefault()))
-            .build();
+        Uri normalized = uri.normalizeScheme();
+        if (normalized.getAuthority() != null) {
+            normalized = normalized
+                .buildUpon()
+                .encodedAuthority(normalized.getAuthority().toLowerCase(Locale.getDefault()))
+                .build();
+        }
         return Uri.parse(trimLinkPreviewUrls(normalized));
     }
 
