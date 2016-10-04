@@ -43,11 +43,11 @@ import com.waz.api.MessageContent;
 import com.waz.zclient.ui.R;
 import com.waz.zclient.ui.animation.interpolators.penner.Expo;
 import com.waz.zclient.ui.animation.interpolators.penner.Quart;
-import com.waz.zclient.ui.theme.ThemeUtils;
 import com.waz.zclient.ui.utils.CursorUtils;
 import com.waz.zclient.ui.views.CursorIconButton;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
+
 import java.util.Arrays;
 import java.util.List;
 

@@ -32,8 +32,8 @@ import com.waz.zclient.utils.ViewUtils;
 
 public class MessageBottomSheetDialog extends BottomSheetDialog {
 
-    private Message message;
-    private Callback callback;
+    private final Message message;
+    private final Callback callback;
 
     public enum MessageAction {
         FORWARD(R.id.message_bottom_menu_item_forward, R.string.glyph__forward, R.string.message_bottom_menu_action_forward),
@@ -56,7 +56,7 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         }
     }
 
-    public MessageBottomSheetDialog(@NonNull Context context, Message message, boolean isMemberOfConversation, Callback callback) {
+    public MessageBottomSheetDialog(@NonNull Context context, @NonNull Message message, boolean isMemberOfConversation, Callback callback) {
         super(context);
         this.message = message;
         this.callback = callback;
