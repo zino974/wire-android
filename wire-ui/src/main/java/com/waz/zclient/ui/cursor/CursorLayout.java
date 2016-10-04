@@ -43,7 +43,6 @@ import com.waz.api.MessageContent;
 import com.waz.zclient.ui.R;
 import com.waz.zclient.ui.animation.interpolators.penner.Expo;
 import com.waz.zclient.ui.animation.interpolators.penner.Quart;
-import com.waz.zclient.ui.theme.ThemeUtils;
 import com.waz.zclient.ui.utils.CursorUtils;
 import com.waz.zclient.ui.views.CursorIconButton;
 import com.waz.zclient.utils.LayoutSpec;
@@ -58,14 +57,14 @@ public class CursorLayout extends FrameLayout implements
                                                EditMessageCursorToolbar.Callback {
     private static final long TOOLTIP_DURATION = 1500;
 
-    private static List<CursorMenuItem> mainCursorItems = Arrays.asList(CursorMenuItem.VIDEO_MESSAGE,
-                                                                        CursorMenuItem.CAMERA,
+    private static List<CursorMenuItem> mainCursorItems = Arrays.asList(CursorMenuItem.CAMERA,
                                                                         CursorMenuItem.SKETCH,
                                                                         CursorMenuItem.GIF,
+                                                                        CursorMenuItem.PING,
                                                                         CursorMenuItem.AUDIO_MESSAGE,
                                                                         CursorMenuItem.MORE);
 
-    private static List<CursorMenuItem> secondaryCursorItems = Arrays.asList(CursorMenuItem.PING,
+    private static List<CursorMenuItem> secondaryCursorItems = Arrays.asList(CursorMenuItem.VIDEO_MESSAGE,
                                                                              CursorMenuItem.FILE,
                                                                              CursorMenuItem.LOCATION,
                                                                              CursorMenuItem.DUMMY,
