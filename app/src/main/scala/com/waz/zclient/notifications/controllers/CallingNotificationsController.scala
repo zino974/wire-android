@@ -83,7 +83,7 @@ class CallingNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     case _ => None
   }
 
-  Signal(conv.map(_.name).map(_.getOrElse("UKNOWN")), caller.map(_.name), currentChannel, bitmap).on(Threading.Ui) {
+  Signal(conv.map(_.name).map(_.getOrElse("UNKNOWN")), caller.map(_.name), currentChannel, bitmap).on(Threading.Ui) {
     case (conv, caller, data, bitmap) =>
       val message = getCallStateMessage(data.state, data.video.isVideoCall)
       val title = if (data.tracking.kindOfCall == KindOfCall.GROUP) getString(R.string.system_notification__group_call_title, caller, conv) else conv
