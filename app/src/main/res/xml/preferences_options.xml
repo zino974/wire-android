@@ -93,7 +93,6 @@
         <SwitchPreference
             android:key="@string/pref_options_theme_switch_key"
             android:title="@string/pref_options_dark_theme_title"
-            android:icon="@drawable/ic_action_theme"
             />
 
         <SwitchPreference
