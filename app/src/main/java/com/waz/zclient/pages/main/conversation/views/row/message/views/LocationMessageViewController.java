@@ -153,6 +153,7 @@ public class LocationMessageViewController extends MessageViewController impleme
 
     @Override
     protected void onSetMessage(Separator separator) {
+        onDoubleClickListener.reset();
         messageModelObserver.addAndUpdate(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(this);
 
@@ -230,6 +231,7 @@ public class LocationMessageViewController extends MessageViewController impleme
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
 
+        onDoubleClickListener.reset();
         mapImageView.animate().cancel();
         mapImageView.setVisibility(View.INVISIBLE);
         mapImageView.setImageDrawable(null);

@@ -64,7 +64,7 @@ public class ImageMessageViewController extends MessageViewController implements
     private int paddingLeft;
     private int paddingRight;
 
-    private final View.OnClickListener containerOnClickListener = new OnDoubleClickListener() {
+    private final OnDoubleClickListener containerOnDoubleClickListener = new OnDoubleClickListener() {
         @Override
         public void onDoubleClick() {
             if (message.isLikedByThisUser()) {
@@ -96,7 +96,7 @@ public class ImageMessageViewController extends MessageViewController implements
         super(context, messageViewContainer);
         view = View.inflate(context, R.layout.row_conversation_image, null);
         imageContainer = ViewUtils.getView(view, R.id.fl__row_conversation__message_image_container);
-        imageContainer.setOnClickListener(containerOnClickListener);
+        imageContainer.setOnClickListener(containerOnDoubleClickListener);
         imageContainer.setOnLongClickListener(this);
         gifImageView = ViewUtils.getView(view, R.id.iv__row_conversation__message_image);
         polkadotView = ViewUtils.getView(view, R.id.iv__row_conversation__message_polkadots);
@@ -133,6 +133,7 @@ public class ImageMessageViewController extends MessageViewController implements
 
     @Override
     public void onSetMessage(Separator separator) {
+        containerOnDoubleClickListener.reset();
         wifiContainer.setVisibility(View.GONE);
         gifImageView.setTag(message.getId());
         imageAsset = message.getImage();
@@ -313,6 +314,7 @@ public class ImageMessageViewController extends MessageViewController implements
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
+        containerOnDoubleClickListener.reset();
         gifImageView.animate().cancel();
         polkadotView.animate().cancel();
         singleImageButton.setVisibility(View.GONE);

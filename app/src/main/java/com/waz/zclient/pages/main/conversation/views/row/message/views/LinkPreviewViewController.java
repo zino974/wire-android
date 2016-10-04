@@ -140,6 +140,7 @@ public class LinkPreviewViewController extends MessageViewController implements 
 
     @Override
     protected void onSetMessage(Separator separator) {
+        onDoubleClickListener.reset();
         messageObserver.setAndUpdate(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(textMessageLinkTextView);
     }
@@ -163,6 +164,7 @@ public class LinkPreviewViewController extends MessageViewController implements 
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(textMessageLinkTextView);
         }
+        onDoubleClickListener.reset();
         previewImageContainerView.setVisibility(View.GONE);
         progressDotsView.setVisibility(View.VISIBLE);
         messageObserver.clear();

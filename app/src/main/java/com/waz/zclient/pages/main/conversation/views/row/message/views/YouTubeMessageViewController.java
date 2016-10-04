@@ -128,6 +128,7 @@ public class YouTubeMessageViewController extends MessageViewController implemen
 
     @Override
     protected void onSetMessage(Separator separator) {
+        onDoubleClickListener.reset();
         textMessageLinkTextView.setMessage(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(textMessageLinkTextView);
         updated();
@@ -174,6 +175,7 @@ public class YouTubeMessageViewController extends MessageViewController implemen
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(textMessageLinkTextView);
         }
+        onDoubleClickListener.reset();
         if (loadHandle != null) {
             loadHandle.cancel();
         }

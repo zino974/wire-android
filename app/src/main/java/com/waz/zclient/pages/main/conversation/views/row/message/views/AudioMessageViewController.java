@@ -189,6 +189,7 @@ public class AudioMessageViewController extends MessageViewController implements
 
     @Override
     protected void onSetMessage(Separator separator) {
+        containerOnClickListener.reset();
         messageModelObserver.setAndUpdate(message);
         actionButton.setMessage(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(this);
@@ -199,6 +200,7 @@ public class AudioMessageViewController extends MessageViewController implements
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
+        containerOnClickListener.reset();
         messageModelObserver.clear();
         playbackControlsModelObserver.clear();
         assetModelObserver.clear();

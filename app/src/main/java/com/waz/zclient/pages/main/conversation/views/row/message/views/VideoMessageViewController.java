@@ -181,6 +181,7 @@ public class VideoMessageViewController extends MessageViewController implements
 
     @Override
     protected void onSetMessage(Separator separator) {
+        imageOnDoubleClickListener.reset();
         messageObserver.setAndUpdate(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(this);
         if (messageViewsContainer.getControllerFactory().getThemeController().isDarkTheme()) {
@@ -200,6 +201,7 @@ public class VideoMessageViewController extends MessageViewController implements
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
+        imageOnDoubleClickListener.reset();
         messageObserver.clear();
         assetObserver.clear();
         progressIndicatorObserver.clear();
