@@ -218,11 +218,7 @@ public class CursorLayout extends FrameLayout implements
                                                           this,
                                                           false);
         sendButton.setText(R.string.glyph__send);
-        if (!ThemeUtils.isDarkTheme(getContext())) {
-            sendButton.setTextColor(ContextCompat.getColor(getContext(), R.color.text__primary_dark));
-        } else {
-            sendButton.setTextColor(ContextCompat.getColor(getContext(), R.color.text__primary_light));
-        }
+        sendButton.setTextColor(ContextCompat.getColor(getContext(), R.color.text__primary_dark));
         sendButtonContainer.addView(sendButton, new FrameLayout.LayoutParams(buttonWidth,
                                                                              buttonWidth));
         sendButton.setVisibility(View.INVISIBLE);
