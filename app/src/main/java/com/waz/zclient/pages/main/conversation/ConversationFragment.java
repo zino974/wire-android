@@ -1376,13 +1376,16 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public boolean onItemLongClick(final Message message) {
-        final boolean isMemberOfConversation = getStoreFactory().getConversationStore().getCurrentConversation().isMemberOfConversation();
         if (messageBottomSheetDialog != null) {
             if (messageBottomSheetDialog.isShowing()) {
                 messageBottomSheetDialog.dismiss();
             }
             messageBottomSheetDialog = null;
         }
+        if (message == null) {
+            return false;
+        }
+        final boolean isMemberOfConversation = getStoreFactory().getConversationStore().getCurrentConversation().isMemberOfConversation();
         if (KeyboardUtils.isKeyboardVisible(getContext())) {
             KeyboardUtils.hideKeyboard(getActivity());
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
