@@ -87,7 +87,7 @@ class MessageNotificationsControllerTest extends JUnitSuite with RobolectricUtil
   def displayNotificationForReceivedLike(): Unit = {
     assertTrue(notManagerShadow.getAllNotifications.isEmpty)
 
-    zms.notifStorage.insert(NotificationData(Uid().str, "", conv.id, user.id, NotificationType.LIKE, Instant.now))
+    zms.notifStorage.insert(NotificationData(NotId(Uid().str), "", conv.id, user.id, NotificationType.LIKE, Instant.now))
 
     withDelay {
       assertEquals(1, notManagerShadow.getAllNotifications.size())
