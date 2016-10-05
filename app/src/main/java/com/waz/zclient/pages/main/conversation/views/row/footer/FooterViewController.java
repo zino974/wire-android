@@ -45,6 +45,7 @@ import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.ZTimeFormatter;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.Instant;
+import org.threeten.bp.temporal.ChronoUnit;
 
 public class FooterViewController implements ConversationItemViewController,
                                              FooterLikeDetailsLayout.OnClickListener,
@@ -52,6 +53,7 @@ public class FooterViewController implements ConversationItemViewController,
 
     private static final int LIKE_HINT_VISIBILITY_MIL_SEC = 3000;
     private static final int TIMESTAMP_VISIBILITY_MIL_SEC = 5000;
+    private static final int EPHEMERAL_REFRESH_TIMEOUT = 500;
     private final Context context;
     private final MessageViewsContainer container;
     private final View view;
@@ -230,7 +232,23 @@ public class FooterViewController implements ConversationItemViewController,
                               message.getTime();
         String timestamp = ZTimeFormatter.getSingleMessageTime(getView().getContext(), DateTimeUtils.toDate(messageTime));
         String status;
-        if (message.getUser().isMe()) {
+        Runnable linkRunnable = null;
+        boolean linkUnderlined = true;
+        int linkHighlightColor = ContextCompat.getColor(context, R.color.accent_red);
+        if (message.isEphemeral()) {
+            long remainingTime = remainingSeconds(message.getExpirationTime());
+            status = context.getString(R.string.message_footer__status__ephemeral, timestamp, remainingTime);
+            if (remainingTime > 0) {
+                mainHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateMessageStatusLabel();
+                    }
+                }, EPHEMERAL_REFRESH_TIMEOUT);
+            }
+            linkHighlightColor = ContextCompat.getColor(context, R.color.ephemera);
+            linkUnderlined = false;
+        } else if (message.getUser().isMe()) {
             switch (message.getMessageStatus()) {
                 case PENDING:
                     status = context.getString(R.string.message_footer__status__sending);
@@ -251,6 +269,12 @@ public class FooterViewController implements ConversationItemViewController,
                 case FAILED:
                 case FAILED_READ:
                     status = context.getString(R.string.message_footer__status__failed);
+                    linkRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            message.retry();
+                        }
+                    };
                     break;
                 default:
                     status = timestamp;
@@ -261,14 +285,19 @@ public class FooterViewController implements ConversationItemViewController,
         }
         messageStatusTextView.setText(status);
         TextViewUtils.linkifyText(messageStatusTextView,
-                                  ContextCompat.getColor(context, R.color.accent_red),
+                                  linkHighlightColor,
                                   false,
-                                  new Runnable() {
-                                      @Override
-                                      public void run() {
-                                          message.retry();
-                                      }
-                                  });
+                                  linkUnderlined,
+                                  linkRunnable);
+    }
+
+    private long remainingSeconds(Instant instant) {
+        Instant now = Instant.now();
+        if (now.isAfter(instant)) {
+            return 0;
+        } else {
+            return ChronoUnit.SECONDS.between(now, instant);
+        }
     }
 
     private void showLikeAnimation(boolean like) {
@@ -293,11 +322,11 @@ public class FooterViewController implements ConversationItemViewController,
         likeButtonAnimation.setAlpha(startAlpha);
         likeButtonAnimation.setVisibility(View.VISIBLE);
         likeButtonAnimation.animate()
-                  .scaleX(endScale)
-                  .scaleY(endScale)
-                  .alpha(endAlpha)
-                  .setDuration(250)
-                  .setInterpolator(interpolator).withEndAction(new Runnable() {
+                           .scaleX(endScale)
+                           .scaleY(endScale)
+                           .alpha(endAlpha)
+                           .setDuration(250)
+                           .setInterpolator(interpolator).withEndAction(new Runnable() {
             @Override
             public void run() {
                 if (likeButtonAnimation != null) {
@@ -325,10 +354,10 @@ public class FooterViewController implements ConversationItemViewController,
             // needed for tests
             widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         } else {
-             widthSpec = View.MeasureSpec.makeMeasureSpec(parent.getMeasuredWidth()
-                                                                   - parent.getPaddingLeft()
-                                                                   - parent.getPaddingRight(),
-                                                                   View.MeasureSpec.AT_MOST);
+            widthSpec = View.MeasureSpec.makeMeasureSpec(parent.getMeasuredWidth()
+                                                         - parent.getPaddingLeft()
+                                                         - parent.getPaddingRight(),
+                                                         View.MeasureSpec.AT_MOST);
         }
         final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         view.measure(widthSpec, heightSpec);
@@ -484,7 +513,8 @@ public class FooterViewController implements ConversationItemViewController,
     }
 
     private boolean shouldShowLikeButton() {
-        return !(message.getMessageStatus() == Message.Status.FAILED ||
+        return !message.isEphemeral() &&
+               !(message.getMessageStatus() == Message.Status.FAILED ||
                  message.getMessageStatus() == Message.Status.FAILED_READ ||
                  message.getMessageStatus() == Message.Status.PENDING);
     }

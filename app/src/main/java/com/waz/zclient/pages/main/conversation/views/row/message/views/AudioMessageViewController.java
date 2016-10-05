@@ -42,6 +42,7 @@ import com.waz.zclient.core.stores.network.DefaultNetworkAction;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
+import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.AssetActionButton;
@@ -59,6 +60,7 @@ public class AudioMessageViewController extends MessageViewController implements
     private TextView audioDurationText;
     private SeekBar audioSeekBar;
     private LinearLayout selectionContainer;
+    private EphemeralDotAnimationView ephemeralDotAnimationView;
 
     private Asset asset;
     private PlaybackControls playbackControls;
@@ -106,7 +108,9 @@ public class AudioMessageViewController extends MessageViewController implements
     private final OnDoubleClickListener containerOnClickListener = new OnDoubleClickListener() {
         @Override
         public void onDoubleClick() {
-            if (message.isLikedByThisUser()) {
+            if (message.isEphemeral()) {
+                return;
+            } else if (message.isLikedByThisUser()) {
                 message.unlike();
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                                          message,
@@ -131,7 +135,9 @@ public class AudioMessageViewController extends MessageViewController implements
     private final View.OnClickListener actionButtonOnClickListener = new OnDoubleClickListener()  {
         @Override
         public void onDoubleClick() {
-            if (message.isLikedByThisUser()) {
+            if (message.isEphemeral()) {
+                return;
+            } else if (message.isLikedByThisUser()) {
                 message.unlike();
             } else {
                 messageViewsContainer.getControllerFactory().getUserPreferencesController().setPerformedAction(IUserPreferencesController.LIKED_MESSAGE);
@@ -155,6 +161,7 @@ public class AudioMessageViewController extends MessageViewController implements
         selectionContainer = ViewUtils.getView(view, R.id.tfll__audio_message_container);
         selectionContainer.setOnLongClickListener(this);
         selectionContainer.setOnClickListener(containerOnClickListener);
+        ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         actionButton.setProgressColor(messageViewsContainer.getControllerFactory().getAccentColorController().getColor());
 
@@ -193,6 +200,7 @@ public class AudioMessageViewController extends MessageViewController implements
         messageModelObserver.setAndUpdate(message);
         actionButton.setMessage(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(this);
+        ephemeralDotAnimationView.setMessage(message);
     }
 
     @Override
@@ -200,6 +208,7 @@ public class AudioMessageViewController extends MessageViewController implements
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
+        ephemeralDotAnimationView.setMessage(null);
         containerOnClickListener.reset();
         messageModelObserver.clear();
         playbackControlsModelObserver.clear();

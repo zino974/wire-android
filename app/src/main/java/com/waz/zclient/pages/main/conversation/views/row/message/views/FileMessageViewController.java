@@ -44,6 +44,7 @@ import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewCont
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.AssetDialogUtils;
 import com.waz.zclient.ui.utils.TextViewUtils;
+import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.AssetUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.AssetActionButton;
@@ -63,6 +64,7 @@ public class FileMessageViewController extends MessageViewController implements 
     private ProgressDotsView progressDotsView;
     private AssetActionButton actionButton;
     private View downloadDoneIndicatorView;
+    private EphemeralDotAnimationView ephemeralDotAnimationView;
 
     private TextView fileNameTextView;
     private TextView fileInfoTextView;
@@ -194,6 +196,7 @@ public class FileMessageViewController extends MessageViewController implements 
         downloadDoneIndicatorView = ViewUtils.getView(view, R.id.gtv__row_conversation__download_done_indicator);
         fileNameTextView = ViewUtils.getView(view, R.id.ttv__row_conversation__file__filename);
         fileInfoTextView = ViewUtils.getView(view, R.id.ttv__row_conversation__file__fileinfo);
+        ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         failedTextColor = ContextCompat.getColor(context, R.color.accent_red);
     }
@@ -203,6 +206,7 @@ public class FileMessageViewController extends MessageViewController implements 
         messageObserver.setAndUpdate(message);
         actionButton.setMessage(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(this);
+        ephemeralDotAnimationView.setMessage(message);
     }
 
     @Override
@@ -210,6 +214,7 @@ public class FileMessageViewController extends MessageViewController implements 
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
+        ephemeralDotAnimationView.setMessage(null);
         messageObserver.clear();
         assetObserver.clear();
         message = null;
@@ -416,7 +421,9 @@ public class FileMessageViewController extends MessageViewController implements 
     }
 
     private void toggleMessageLikeStatusViaDoubleTap() {
-        if (message.isLikedByThisUser()) {
+        if (message.isEphemeral()) {
+            return;
+        } else if (message.isLikedByThisUser()) {
             message.unlike();
             messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                                        message,

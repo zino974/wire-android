@@ -43,6 +43,7 @@ import com.waz.zclient.ui.text.GlyphTextView;
 import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.ColorUtils;
 import com.waz.zclient.ui.utils.ResourceUtils;
+import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.MessageUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.OnDoubleClickListener;
@@ -58,10 +59,13 @@ public class YouTubeMessageViewController extends MessageViewController implemen
     private GlyphTextView glyphTextView;
     private TypefaceTextView errorTextView;
     private TypefaceTextView titleTextView;
+    private EphemeralDotAnimationView ephemeralDotAnimationView;
+
     private LoadHandle loadHandle;
     private ImageAsset imageAsset;
     private MediaAsset mediaAsset;
     private final float alphaOverlay;
+
     private final UpdateListener imageAssetUpdateListener = new UpdateListener() {
         @Override
         public void updated() {
@@ -80,7 +84,9 @@ public class YouTubeMessageViewController extends MessageViewController implemen
     private final OnDoubleClickListener onDoubleClickListener = new OnDoubleClickListener() {
         @Override
         public void onDoubleClick() {
-            if (message.isLikedByThisUser()) {
+            if (message.isEphemeral()) {
+                return;
+            } else if (message.isLikedByThisUser()) {
                 message.unlike();
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                                            message,
@@ -118,6 +124,7 @@ public class YouTubeMessageViewController extends MessageViewController implemen
         glyphTextView = ViewUtils.getView(view, R.id.gtv__youtube_message__play);
         glyphTextView.setOnClickListener(this);
         titleTextView = ViewUtils.getView(view, R.id.ttv__youtube_message__title);
+        ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         alphaOverlay = ResourceUtils.getResourceFloat(context.getResources(), R.dimen.content__youtube__alpha_overlay);
         imageView.getLayoutParams().height = (int) ((double) ViewUtils.getOrientationIndependentDisplayWidth(context) * 9 / 16);
@@ -131,6 +138,7 @@ public class YouTubeMessageViewController extends MessageViewController implemen
         onDoubleClickListener.reset();
         textMessageLinkTextView.setMessage(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(textMessageLinkTextView);
+        ephemeralDotAnimationView.setMessage(message);
         updated();
     }
 
@@ -175,6 +183,7 @@ public class YouTubeMessageViewController extends MessageViewController implemen
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(textMessageLinkTextView);
         }
+        ephemeralDotAnimationView.setMessage(null);
         onDoubleClickListener.reset();
         if (loadHandle != null) {
             loadHandle.cancel();

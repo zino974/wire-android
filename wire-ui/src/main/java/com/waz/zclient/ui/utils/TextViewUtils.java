@@ -205,6 +205,9 @@ public class TextViewUtils {
         ClickableSpan linkSpan = new ClickableSpan() {
             @Override
             public void onClick(View widget) {
+                if (onClick == null) {
+                    return;
+                }
                 onClick.run();
             }
 

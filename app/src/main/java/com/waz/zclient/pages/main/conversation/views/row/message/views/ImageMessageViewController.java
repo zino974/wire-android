@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
@@ -38,6 +37,7 @@ import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
+import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.LoadingIndicatorView;
@@ -57,6 +57,7 @@ public class ImageMessageViewController extends MessageViewController implements
     private TextView sketchButton;
     private TextView singleImageButton;
     private View wifiContainer;
+    private EphemeralDotAnimationView ephemeralDotAnimationView;
     private LoadingIndicatorView previewLoadingIndicator;
     private UpdateListener imageAssetUpdateListener;
     private LoadHandle bitmapLoadHandle;
@@ -67,7 +68,9 @@ public class ImageMessageViewController extends MessageViewController implements
     private final OnDoubleClickListener containerOnDoubleClickListener = new OnDoubleClickListener() {
         @Override
         public void onDoubleClick() {
-            if (message.isLikedByThisUser()) {
+            if (message.isEphemeral()) {
+                return;
+            } else if (message.isLikedByThisUser()) {
                 message.unlike();
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                                            message,
@@ -120,6 +123,7 @@ public class ImageMessageViewController extends MessageViewController implements
                 showSketchOnImageView();
             }
         });
+        ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         previewLoadingIndicator.setColor(messageViewContainer.getControllerFactory().getAccentColorController().getColor());
         previewLoadingIndicator.setType(LoadingIndicatorView.INFINITE_LOADING_BAR);
@@ -137,6 +141,7 @@ public class ImageMessageViewController extends MessageViewController implements
         wifiContainer.setVisibility(View.GONE);
         gifImageView.setTag(message.getId());
         imageAsset = message.getImage();
+        ephemeralDotAnimationView.setMessage(message);
 
         int displayWidth;
         if (ViewUtils.isInPortrait(context)) {
@@ -160,8 +165,8 @@ public class ImageMessageViewController extends MessageViewController implements
             } else {
                 ViewUtils.setPaddingLeft(imageContainer, paddingLeft);
                 ViewUtils.setPaddingRight(imageContainer, paddingRight);
-                imageContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                                                             LinearLayout.LayoutParams.MATCH_PARENT));
+                imageContainer.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                                                                            FrameLayout.LayoutParams.MATCH_PARENT));
             }
         }
 
@@ -314,6 +319,7 @@ public class ImageMessageViewController extends MessageViewController implements
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
+        ephemeralDotAnimationView.setMessage(null);
         containerOnDoubleClickListener.reset();
         gifImageView.animate().cancel();
         polkadotView.animate().cancel();
@@ -358,7 +364,7 @@ public class ImageMessageViewController extends MessageViewController implements
 
     public void showSketchOnImageView() {
         messageViewsContainer.getControllerFactory().getDrawingController().showDrawing(message.getImage(),
-                                                                  IDrawingController.DrawingDestination.SINGLE_IMAGE_VIEW);
+                                                                                        IDrawingController.DrawingDestination.SINGLE_IMAGE_VIEW);
     }
 
 }

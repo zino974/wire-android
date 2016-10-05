@@ -39,6 +39,7 @@ import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.text.GlyphTextView;
+import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.IntentUtils;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.StringUtils;
@@ -58,6 +59,7 @@ public class LocationMessageViewController extends MessageViewController impleme
     private View pinImage;
     private TextView mapPlaceholderText;
     private GlyphTextView pinView;
+    private EphemeralDotAnimationView ephemeralDotAnimationView;
 
     private ImageAsset imageAsset;
     private LoadHandle bitmapLoadHandle;
@@ -97,7 +99,9 @@ public class LocationMessageViewController extends MessageViewController impleme
     private final OnDoubleClickListener onDoubleClickListener = new OnDoubleClickListener() {
         @Override
         public void onDoubleClick() {
-            if (message.isLikedByThisUser()) {
+            if (message.isEphemeral()) {
+                return;
+            } else if (message.isLikedByThisUser()) {
                 message.unlike();
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                                            message,
@@ -141,6 +145,7 @@ public class LocationMessageViewController extends MessageViewController impleme
         pinView = ViewUtils.getView(view, R.id.gtv__row_conversation__map_pin_glyph);
         pinImage = ViewUtils.getView(view, R.id.iv__row_conversation__map_pin_image);
         pinView.setTextColor(ContextCompat.getColor(context, R.color.accent_blue));
+        ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         imageWidth = getImageWidth();
         afterInit();
@@ -164,6 +169,7 @@ public class LocationMessageViewController extends MessageViewController impleme
             locationName.setText(location.getName());
             locationName.setVisibility(View.VISIBLE);
         }
+        ephemeralDotAnimationView.setMessage(message);
     }
 
     private void loadBitmap(int finalViewWidth) {
@@ -230,7 +236,7 @@ public class LocationMessageViewController extends MessageViewController impleme
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
-
+        ephemeralDotAnimationView.setMessage(null);
         onDoubleClickListener.reset();
         mapImageView.animate().cancel();
         mapImageView.setVisibility(View.INVISIBLE);

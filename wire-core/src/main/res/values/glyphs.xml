@@ -107,6 +107,7 @@
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__keyboard">\uE236</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__emoji">\uE237</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__backspace">\uE238</string>
+    <string translatable="false" tools:ignore="UnusedResources" name="glyph__hourglass">\uE239</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__filter_helium">\uE240</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__filter_jellyfish">\uE242</string>
     <string translatable="false" tools:ignore="UnusedResources" name="glyph__filter_hare">\uE243</string>
