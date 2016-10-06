@@ -105,16 +105,6 @@
                 android:layout_marginEnd="@dimen/cursor_button_horizontal_margin"
                 />
 
-            <include
-                android:id="@+id/svwb"
-                layout="@layout/shield_view_with_banner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="@dimen/cursor_button_horizontal_margin"
-                />
-
-
             <com.waz.zclient.ui.text.TypefaceTextView
                 android:id="@+id/ctv__cursor"
                 android:layout_width="wrap_content"
