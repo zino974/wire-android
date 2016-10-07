@@ -75,7 +75,6 @@ public class CursorLayout extends FrameLayout implements
     private View editMessageBackgroundView;
     private CursorToolbarFrame cursorToolbarFrame;
     private CursorEditText newCursorEditText;
-    private ShieldViewWithBanner shieldViewWithBanner;
     private CursorIconButton sendButton;
     private CursorToolbar mainToolbar;
     private CursorToolbar secondaryToolbar;
@@ -156,7 +155,6 @@ public class CursorLayout extends FrameLayout implements
         editMessageBackgroundView = ViewUtils.getView(this, R.id.fl__edit_message__background);
         cursorToolbarFrame = ViewUtils.getView(this, R.id.cal__cursor);
         newCursorEditText = ViewUtils.getView(this, R.id.cet__cursor);
-        shieldViewWithBanner = ViewUtils.getView(this, R.id.svwb);
         mainToolbar = ViewUtils.getView(this, R.id.c__cursor__main);
         secondaryToolbar = ViewUtils.getView(this, R.id.c__cursor__secondary);
         editMessageCursorToolbar = ViewUtils.getView(this, R.id.emct__edit_message__toolbar);
@@ -388,17 +386,11 @@ public class CursorLayout extends FrameLayout implements
         this.keyboardIsVisible = keyboardIsVisible;
         if (keyboardIsVisible) {
             cursorToolbarFrame.shrink();
-            shieldViewWithBanner.setEnabled(false);
             if (newCursorEditText.hasFocus() && cursorCallback != null) {
                 cursorCallback.onCursorClicked();
             }
         } else {
             cursorToolbarFrame.expand();
-            if (hasText()) {
-                shieldViewWithBanner.setEnabled(false);
-            } else {
-                shieldViewWithBanner.setEnabled(true);
-            }
         }
     }
 
@@ -418,12 +410,8 @@ public class CursorLayout extends FrameLayout implements
         this.newCursorEditText.setSelection(selection);
     }
 
-    public void tearDown() {
-        shieldViewWithBanner.tearDown();
-    }
 
     public void setConversation(IConversation conversation) {
-        shieldViewWithBanner.setConversation(conversation);
         enableMessageWriting();
         resetMainAndSecondaryToolbars();
         closeEditMessage(false);

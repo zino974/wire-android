@@ -39,19 +39,28 @@
             style="?conversationToolbar"
             >
 
-            <FrameLayout
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
+                android:layout_gravity="start|center_vertical"
                 android:gravity="center_vertical"
+                android:orientation="horizontal"
                 >
+
+                <com.waz.zclient.ui.views.e2ee.ShieldView
+                    android:id="@+id/sv__conversation_toolbar__verified_shield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/wire__otr__shield__small_width"
+                    android:layout_marginEnd="@dimen/wire__padding__8"
+                    app:shieldVerified="true"
+                    />
 
                 <com.waz.zclient.ui.text.TypefaceTextView
                     android:id="@+id/tv__conversation_toolbar__title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left|center_vertical"
-                    android:layout_marginRight="@dimen/wire__padding__regular"
+                    android:layout_marginEnd="@dimen/wire__padding__regular"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:background="@null"
@@ -61,14 +70,13 @@
                 <com.waz.zclient.ui.text.GlyphTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
                     android:text="@string/glyph__linedown"
                     android:textSize="@dimen/wire__icon_button__text_size_half"
                     android:background="@null"
                     style="?conversationToolbar"
                     />
 
-            </FrameLayout>
+            </LinearLayout>
 
         </android.support.v7.widget.Toolbar>
 

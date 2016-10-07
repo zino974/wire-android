@@ -161,6 +161,7 @@ import com.waz.zclient.ui.cursor.CursorLayout;
 import com.waz.zclient.ui.cursor.CursorMenuItem;
 import com.waz.zclient.ui.theme.ThemeUtils;
 import com.waz.zclient.ui.utils.KeyboardUtils;
+import com.waz.zclient.ui.views.e2ee.ShieldView;
 import com.waz.zclient.utils.AssetUtils;
 import com.waz.zclient.utils.Callback;
 import com.waz.zclient.utils.LayoutSpec;
@@ -245,6 +246,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     private String lastHotPingMessageId;
     private Toolbar toolbar;
     private TextView toolbarTitle;
+    private ShieldView shieldView;
 
     private CursorLayout cursorLayout;
     private AudioMessageRecordingView audioMessageRecordingView;
@@ -264,9 +266,14 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     private final ModelObserver<IConversation> conversationModelObserver = new ModelObserver<IConversation>() {
         @Override
         public void updated(IConversation model) {
-            if (toolbar == null || toolbarTitle == null) {
+            if (toolbar == null ||
+                toolbarTitle == null ||
+                shieldView == null) {
                 return;
             }
+
+            shieldView.setVisibility(model.getVerified() == Verification.VERIFIED ? View.VISIBLE : View.GONE);
+
             toolbarTitle.setText(model.getName());
             toolbar.getMenu().clear();
             if (!model.isMemberOfConversation()) {
@@ -524,6 +531,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         audioMessageRecordingView = ViewUtils.getView(view, R.id.amrv_audio_message_recording);
         toolbar = ViewUtils.getView(view, R.id.t_conversation_toolbar);
         toolbarTitle = ViewUtils.getView(toolbar, R.id.tv__conversation_toolbar__title);
+        shieldView = ViewUtils.getView(view, R.id.sv__conversation_toolbar__verified_shield);
+        shieldView.setVisibility(View.GONE);
         typingIndicatorView = ViewUtils.getView(view, R.id.tiv_typing_indicator_view);
         typingIndicatorView.setCallback(this);
         toolbar.setOnClickListener(new View.OnClickListener() {
@@ -741,7 +750,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         containerPreview = null;
         listView = null;
         messageAdapter = null;
-        cursorLayout.tearDown();
         cursorLayout = null;
         conversationLoadingIndicatorViewView = null;
         if (inputStateIndicator != null) {
