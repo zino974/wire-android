@@ -76,7 +76,7 @@ ext {
     zMessagingDevVersionBase = '81.1234'
     zMessagingDevVersion = "${zMessagingDevVersionBase}@aar"
     // Release version number must be like this X.0(.Y)
-    zMessagingReleaseVersion = System.getenv("ZMESSAGING_VERSION") ?: '81.2.301@aar'
+    zMessagingReleaseVersion = System.getenv("ZMESSAGING_VERSION") ?: '81.3.302@aar'
 
     avsVersion = '2.8.61@aar'
     avsVersion = '2.8.65@aar'
