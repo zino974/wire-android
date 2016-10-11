@@ -19,77 +19,98 @@
 
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:sending="http://schemas.android.com/apk/res-auto"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
     >
 
     <FrameLayout
-        android:id="@+id/fl__row_conversation__message_image_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:paddingLeft="@dimen/content__padding_left"
-        android:paddingRight="@dimen/content__padding_right"
         >
 
-        <com.waz.zclient.pages.main.conversation.views.row.message.views.BlockingImageView
-            android:id="@+id/iv__row_conversation__message_image"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_gravity="left"
-            android:layout_marginBottom="@dimen/content__image__polka__loading_bar__total_height"
-            android:adjustViewBounds="false"
-            android:background="@null"
-            android:scaleType="fitXY"
-            android:visibility="gone"
-            />
-
-        <com.waz.zclient.pages.main.conversation.views.row.message.views.BlockingImageView
-            android:id="@+id/iv__row_conversation__message_polkadots"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_gravity="left"
-            android:layout_marginBottom="@dimen/content__image__polka__loading_bar__total_height"
-            android:adjustViewBounds="false"
-            android:background="@null"
-            android:scaleType="fitXY"
-            />
-
-        <!-- Polka dot image preview loading indicator -->
-        <com.waz.zclient.views.LoadingIndicatorView
-            android:id="@+id/lbv__row_conversation__message_polkadots"
+        <FrameLayout
+            android:id="@+id/fl__row_conversation__message_image_container"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/loading_bar__stroke_width"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="@dimen/content__image__polka__loading_bar__margin_top"
-            />
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:paddingLeft="@dimen/content__padding_left"
+            android:paddingRight="@dimen/content__padding_right"
+            >
 
-        <com.waz.zclient.ui.text.GlyphTextView
-            android:id="@+id/gtv__row_conversation__image_fullscreen"
-            android:layout_width="@dimen/content__image__button_size"
-            android:layout_height="@dimen/content__image__button_size"
-            android:layout_margin="@dimen/wire__padding__regular"
-            android:layout_gravity="bottom|end"
-            android:textSize="@dimen/wire__text_size__regular"
-            android:gravity="center"
-            android:background="@drawable/selector__icon_button__background__video_message"
-            android:textColor="@color/white"
-            android:text="@string/glyph__fullscreen"
-            />
+            <com.waz.zclient.pages.main.conversation.views.row.message.views.BlockingImageView
+                android:id="@+id/iv__row_conversation__message_image"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_gravity="left"
+                android:layout_marginBottom="@dimen/content__image__polka__loading_bar__total_height"
+                android:adjustViewBounds="false"
+                android:background="@null"
+                android:scaleType="fitXY"
+                android:visibility="gone"
+                />
 
-        <com.waz.zclient.ui.text.GlyphTextView
-            android:id="@+id/gtv__row_conversation__image_sketch"
-            android:layout_width="@dimen/content__image__button_size"
-            android:layout_height="@dimen/content__image__button_size"
-            android:layout_margin="@dimen/wire__padding__regular"
-            android:layout_gravity="bottom|start"
-            android:textSize="@dimen/wire__text_size__regular"
-            android:gravity="center"
-            android:background="@drawable/selector__icon_button__background__video_message"
-            android:textColor="@color/white"
-            android:text="@string/glyph__paint"
+            <com.waz.zclient.pages.main.conversation.views.row.message.views.BlockingImageView
+                android:id="@+id/iv__row_conversation__message_polkadots"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_gravity="left"
+                android:layout_marginBottom="@dimen/content__image__polka__loading_bar__total_height"
+                android:adjustViewBounds="false"
+                android:background="@null"
+                android:scaleType="fitXY"
+                />
+
+            <!-- Polka dot image preview loading indicator -->
+            <com.waz.zclient.views.LoadingIndicatorView
+                android:id="@+id/lbv__row_conversation__message_polkadots"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/loading_bar__stroke_width"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="@dimen/content__image__polka__loading_bar__margin_top"
+                />
+
+            <com.waz.zclient.ui.text.GlyphTextView
+                android:id="@+id/gtv__row_conversation__image_fullscreen"
+                android:layout_width="@dimen/content__image__button_size"
+                android:layout_height="@dimen/content__image__button_size"
+                android:layout_margin="@dimen/wire__padding__regular"
+                android:layout_gravity="bottom|end"
+                android:textSize="@dimen/wire__text_size__regular"
+                android:gravity="center"
+                android:background="@drawable/selector__icon_button__background__video_message"
+                android:textColor="@color/white"
+                android:text="@string/glyph__fullscreen"
+                />
+
+            <com.waz.zclient.ui.text.GlyphTextView
+                android:id="@+id/gtv__row_conversation__image_sketch"
+                android:layout_width="@dimen/content__image__button_size"
+                android:layout_height="@dimen/content__image__button_size"
+                android:layout_margin="@dimen/wire__padding__regular"
+                android:layout_gravity="bottom|start"
+                android:textSize="@dimen/wire__text_size__regular"
+                android:gravity="center"
+                android:background="@drawable/selector__icon_button__background__video_message"
+                android:textColor="@color/white"
+                android:text="@string/glyph__paint"
+                />
+        </FrameLayout>
+
+        <com.waz.zclient.ui.views.EphemeralDotAnimationView
+            android:id="@+id/edav__ephemeral_view"
+            android:layout_width="@dimen/ephemeral__animating_dots__width"
+            android:layout_height="@dimen/ephemeral__animating_dots__height"
+            android:layout_gravity="end|top"
+            android:layout_marginTop="@dimen/ephemeral__animating_dots__image_top_margin"
+            android:layout_marginEnd="@dimen/ephemeral__animating_dots__right_margin"
+            android:paddingTop="@dimen/ephemeral__animating_dots__padding_top"
+            android:paddingBottom="@dimen/ephemeral__animating_dots__padding_bottom"
+            app:primaryColor="@color/ephemera"
+            app:secondaryColor="@color/ephemera_dimmed"
+            app:dotPadding="@dimen/ephemeral__animating_dots__space_between"
+            style="?typingIndicatorBox"
             />
 
     </FrameLayout>
@@ -109,7 +130,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:text="@string/advanced_image_download_wifi_info"
-            sending:font="@string/wire__typeface__light"
+            app:font="@string/wire__typeface__light"
             />
 
         <com.waz.zclient.ui.text.TypefaceTextView

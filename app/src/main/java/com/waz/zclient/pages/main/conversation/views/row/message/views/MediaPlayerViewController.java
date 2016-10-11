@@ -50,6 +50,7 @@ import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.ResourceUtils;
+import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.MessageUtils;
 import com.waz.zclient.utils.ThreadUtils;
 import com.waz.zclient.utils.ViewUtils;
@@ -63,6 +64,7 @@ public abstract class MediaPlayerViewController extends MessageViewController im
     private View view;
     private TextMessageLinkTextView textMessageLinkTextView;
     protected MediaPlayerView mediaPlayerView;
+    private EphemeralDotAnimationView ephemeralDotAnimationView;
     private boolean updateProgressEnabled;
     private LoadHandle loadHandle;
     private MediaAsset mediaAsset;
@@ -130,6 +132,7 @@ public abstract class MediaPlayerViewController extends MessageViewController im
         textMessageLinkTextView.setOnLongClickListener(this);
         mediaPlayerView = ViewUtils.getView(view, R.id.mpv__row_conversation__message_media_player);
         mediaPlayerView.setOnLongClickListener(this);
+        ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
         resetMediaPlayerView(R.string.mediaplayer__artist__placeholder, getSource());
         afterInit();
     }
@@ -143,6 +146,7 @@ public abstract class MediaPlayerViewController extends MessageViewController im
         mediaPlayerView.setMediaPlayerListener(this);
         mediaPlayerView.setSourceImage(getSourceImage());
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(this);
+        ephemeralDotAnimationView.setMessage(message);
         updated();
     }
 
@@ -178,6 +182,7 @@ public abstract class MediaPlayerViewController extends MessageViewController im
 
     @Override
     public void recycle() {
+        ephemeralDotAnimationView.setMessage(null);
         unscheduleTimeUpdate();
         textMessageLinkTextView.recycle();
         mediaPlayerView.setSeekBarEnabled(false);
@@ -441,7 +446,9 @@ public abstract class MediaPlayerViewController extends MessageViewController im
 
     @Override
     public void onPlaceholderDoubleTap() {
-        if (message.isLikedByThisUser()) {
+        if (message.isEphemeral()) {
+            return;
+        } else if (message.isLikedByThisUser()) {
             message.unlike();
             messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                                        message,

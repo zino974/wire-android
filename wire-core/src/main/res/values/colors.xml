@@ -93,6 +93,9 @@
 
     <color name="yorgos">#FF4A4A4A</color>
 
+    <color name="ephemera">#FFFF5000</color>
+    <color name="ephemera_dimmed">#3DFF5000</color>
+
     <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Component colors  -->
     <!--

@@ -114,6 +114,9 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
     }
 
     private boolean isLikeAllowed() {
+        if (message.isEphemeral()) {
+            return false;
+        }
         switch (message.getMessageType()) {
             case ANY_ASSET:
             case ASSET:
@@ -130,6 +133,9 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
     }
 
     private boolean isSaveAllowed() {
+        if (message.isEphemeral()) {
+            return false;
+        }
         switch (message.getMessageType()) {
             // Only image supported ATM, need to handle Audio/File/Video
             case ASSET:
@@ -148,6 +154,9 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
     }
 
     private boolean isCopyAllowed() {
+        if (message.isEphemeral()) {
+            return false;
+        }
         switch (message.getMessageType()) {
             case TEXT:
             case TEXT_EMOJI_ONLY:
@@ -159,6 +168,9 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
     }
 
     private boolean isForwardAllowed() {
+        if (message.isEphemeral()) {
+            return false;
+        }
         switch (message.getMessageType()) {
             case TEXT:
             case TEXT_EMOJI_ONLY:
@@ -182,6 +194,7 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
 
     private boolean isEditAllowed(boolean isMemberOfConversation) {
         if (!isMemberOfConversation ||
+            message.isEphemeral() ||
             !message.getUser().isMe()) {
             return false;
         }

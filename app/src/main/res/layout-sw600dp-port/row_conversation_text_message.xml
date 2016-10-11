@@ -18,15 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:gravity="center"
-              android:paddingEnd="@dimen/content__row__padding_right"
-              android:baselineAligned="false"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="horizontal"
+             android:gravity="center"
+             android:paddingEnd="@dimen/content__row__padding_right"
+             android:baselineAligned="false"
     >
 
     <LinearLayout
@@ -48,4 +48,17 @@
 
     </LinearLayout>
 
-</LinearLayout>
+    <com.waz.zclient.ui.views.EphemeralDotAnimationView
+        android:id="@+id/edav__ephemeral_view"
+        android:layout_width="@dimen/ephemeral__animating_dots__width"
+        android:layout_height="@dimen/ephemeral__animating_dots__height"
+        android:layout_gravity="end|top"
+        android:layout_marginEnd="@dimen/ephemeral__animating_dots__right_margin"
+        android:paddingTop="@dimen/ephemeral__animating_dots__padding_top"
+        android:paddingBottom="@dimen/ephemeral__animating_dots__padding_bottom"
+        app:primaryColor="@color/ephemera"
+        app:secondaryColor="@color/ephemera_dimmed"
+        app:dotPadding="@dimen/ephemeral__animating_dots__space_between"
+        />
+
+</FrameLayout>

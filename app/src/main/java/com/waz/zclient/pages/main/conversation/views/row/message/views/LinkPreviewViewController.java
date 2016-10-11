@@ -33,6 +33,7 @@ import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.ResourceUtils;
+import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.MessageUtils;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
@@ -49,6 +50,7 @@ public class LinkPreviewViewController extends MessageViewController implements 
     private ImageAssetView previewImageAssetView;
     private View progressDotsView;
     private View previewImageContainerView;
+    private EphemeralDotAnimationView ephemeralDotAnimationView;
     private LoadHandle previewImageLoadHandle;
 
     private final ModelObserver<Message> messageObserver = new ModelObserver<Message>() {
@@ -89,7 +91,9 @@ public class LinkPreviewViewController extends MessageViewController implements 
     private final OnDoubleClickListener onDoubleClickListener = new OnDoubleClickListener() {
         @Override
         public void onDoubleClick() {
-            if (message.isLikedByThisUser()) {
+            if (message.isEphemeral()) {
+                return;
+            } else if (message.isLikedByThisUser()) {
                 message.unlike();
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                                            message,
@@ -125,6 +129,7 @@ public class LinkPreviewViewController extends MessageViewController implements 
         urlTextView = ViewUtils.getView(view, R.id.ttv__row_conversation__link_preview__url);
         previewImageAssetView = ViewUtils.getView(view, R.id.iv__row_conversation__link_preview__image);
         progressDotsView = ViewUtils.getView(view, R.id.pdv__row_conversation__link_preview__placeholder_dots);
+        ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
         previewImageContainerView = ViewUtils.getView(view, R.id.fl__row_conversation__link_preview__image_container);
         previewImageContainerView.setVisibility(View.GONE);
         previewImageAssetView.setBitmapLoadedCallback(this);
@@ -143,6 +148,7 @@ public class LinkPreviewViewController extends MessageViewController implements 
         onDoubleClickListener.reset();
         messageObserver.setAndUpdate(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(textMessageLinkTextView);
+        ephemeralDotAnimationView.setMessage(message);
     }
 
     @Override
@@ -164,6 +170,7 @@ public class LinkPreviewViewController extends MessageViewController implements 
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(textMessageLinkTextView);
         }
+        ephemeralDotAnimationView.setMessage(null);
         onDoubleClickListener.reset();
         previewImageContainerView.setVisibility(View.GONE);
         progressDotsView.setVisibility(View.VISIBLE);

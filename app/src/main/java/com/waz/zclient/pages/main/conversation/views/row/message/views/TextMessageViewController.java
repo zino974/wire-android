@@ -29,6 +29,7 @@ import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.ResourceUtils;
+import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.OnDoubleClickListener;
 
@@ -36,11 +37,14 @@ public class TextMessageViewController extends MessageViewController {
 
     private View view;
     private TextMessageLinkTextView textView;
+    private EphemeralDotAnimationView ephemeralDotAnimationView;
 
     private final View.OnClickListener onClickListener = new OnDoubleClickListener() {
         @Override
         public void onDoubleClick() {
-            if (message.isLikedByThisUser()) {
+            if (message.isEphemeral()) {
+                return;
+            } else if (message.isLikedByThisUser()) {
                 message.unlike();
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                                            message,
@@ -81,6 +85,7 @@ public class TextMessageViewController extends MessageViewController {
         textContainer.setOnLongClickListener(onLongClickListener);
         textView.setOnClickListener(onClickListener);
         textView.setOnLongClickListener(onLongClickListener);
+        ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         afterInit();
     }
@@ -89,6 +94,7 @@ public class TextMessageViewController extends MessageViewController {
     public void onSetMessage(Separator separator) {
         textView.setMessage(message);
         messageViewsContainer.getControllerFactory().getAccentColorController().addAccentColorObserver(textView);
+        ephemeralDotAnimationView.setMessage(message);
     }
 
     @Override
@@ -118,6 +124,7 @@ public class TextMessageViewController extends MessageViewController {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(textView);
         }
         textView.recycle();
+        ephemeralDotAnimationView.setMessage(null);
         super.recycle();
     }
 

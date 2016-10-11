@@ -26,6 +26,7 @@ import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.ui.text.LinkTextView;
+import org.threeten.bp.Instant;
 
 public class TextMessageLinkTextView extends LinkTextView implements AccentColorObserver {
 
@@ -42,7 +43,11 @@ public class TextMessageLinkTextView extends LinkTextView implements AccentColor
             }
 
             String messageText;
-            if (message.isDeleted()) {
+            if (message.isEphemeral() && message.getExpirationTime().isBefore(Instant.now())) {
+                // TODO should be obfuscated
+                messageText = message.getBody();
+                messageText = messageText.replaceAll("\u2028", "\n");
+            } else if (message.isDeleted()) {
                 messageText = "";
             } else {
                 messageText = message.getBody();

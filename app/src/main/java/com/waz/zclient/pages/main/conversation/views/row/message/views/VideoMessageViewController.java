@@ -45,6 +45,7 @@ import com.waz.zclient.core.stores.network.DefaultNetworkAction;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
+import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.AssetUtils;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
@@ -68,6 +69,7 @@ public class VideoMessageViewController extends MessageViewController implements
     private final ProgressDotsView placeHolderDots;
     private TextView videoInfoText;
     private FrameLayout videoPreviewContainer;
+    private EphemeralDotAnimationView ephemeralDotAnimationView;
 
     private Asset asset;
 
@@ -130,7 +132,9 @@ public class VideoMessageViewController extends MessageViewController implements
     private final OnDoubleClickListener imageOnDoubleClickListener = new OnDoubleClickListener() {
         @Override
         public void onDoubleClick() {
-            if (message.isLikedByThisUser()) {
+            if (message.isEphemeral()) {
+                return;
+            } else if (message.isLikedByThisUser()) {
                 message.unlike();
                 messageViewsContainer.getControllerFactory().getTrackingController().tagEvent(ReactedToMessageEvent.unlike(message.getConversation(),
                                                                                                                            message,
@@ -170,6 +174,7 @@ public class VideoMessageViewController extends MessageViewController implements
         placeHolderDots = ViewUtils.getView(view, R.id.pdv__row_conversation__video_placeholder_dots);
         videoInfoText = ViewUtils.getView(view, R.id.ttv__row_conversation__video_info);
         videoPreviewContainer = ViewUtils.getView(view, R.id.fl__video_message_container);
+        ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         normalButtonBackground = context.getResources().getDrawable(R.drawable.selector__icon_button__background__video_message);
         errorButtonBackground = context.getResources().getDrawable(R.drawable.selector__icon_button__background__video_message__error);
@@ -189,6 +194,7 @@ public class VideoMessageViewController extends MessageViewController implements
         } else {
             videoInfoText.setTextColor(context.getResources().getColor(R.color.graphite));
         }
+        ephemeralDotAnimationView.setMessage(message);
     }
 
     @Override
@@ -201,6 +207,7 @@ public class VideoMessageViewController extends MessageViewController implements
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
+        ephemeralDotAnimationView.setMessage(null);
         imageOnDoubleClickListener.reset();
         messageObserver.clear();
         assetObserver.clear();
