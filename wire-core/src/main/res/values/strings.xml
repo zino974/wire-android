@@ -954,7 +954,7 @@
     <string name="no_conversation_in_list__message">Tap contacts to start a conversation</string>
 
     <string name="cursor__type_a_message">TYPE A MESSAGE</string>
-    <string name="cursor__ephemeral_message">DISAPPEARING MESSAGES ON</string>
+    <string name="cursor__ephemeral_message">TIMED MESSAGE</string>
     <string name="tooltip_record">Record Video</string>
     <string name="tooltip_camera">Add Photo</string>
     <string name="tooltip_sketch">Draw A Picture</string>
@@ -1024,6 +1024,6 @@
     <string name="message_footer__status__deleted">%1$s \u30FB Deleted</string>
     <string name="message_footer__status__ephemeral">%1$s \u30FB _%2$ds left_</string>
 
-    <string name="ephemeral_message__timeout_selection_info">SET A TIMER FOR DISAPPEARING MESSAGES</string>
+    <string name="ephemeral_message__timeout_selection_info">SET A TIMER FOR TEMPORARY MESSAGES</string>
 
 </resources>
