@@ -21,5 +21,12 @@
 <resources>
     <dimen name="profile__image__width">@dimen/profile__image__width_regular</dimen>
     <dimen name="profile__image__height">@dimen/profile__image__height_regular</dimen>
+    <dimen name="sketch__emoji__icon_size__small">18dp</dimen>
+    <dimen name="sketch__emoji__icon_size__medium">20dp</dimen>
+    <dimen name="sketch__emoji__icon_size__large">24dp</dimen>
+    <dimen name="sketch__color_picker_emoji__icon_size__unselected">14dp</dimen>
+    <dimen name="sketch__color_picker_emoji__icon_size__small">14dp</dimen>
+    <dimen name="sketch__color_picker_emoji__icon_size__medium">16dp</dimen>
+    <dimen name="sketch__color_picker_emoji__icon_size__large">22dp</dimen>
     <dimen name="participants__chathead__width">88dp</dimen>
 </resources>
