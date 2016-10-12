@@ -51,7 +51,8 @@ import com.waz.zclient.views.OnDoubleClickListener;
 import java.util.List;
 
 public class YouTubeMessageViewController extends MessageViewController implements View.OnClickListener,
-                                                                                        ImageAsset.BitmapCallback {
+                                                                                   ImageAsset.BitmapCallback,
+                                                                                   TextMessageLinkTextView.Callback {
 
     private View view;
     private ImageView imageView;
@@ -116,7 +117,7 @@ public class YouTubeMessageViewController extends MessageViewController implemen
         textMessageLinkTextView = ViewUtils.getView(view, R.id.tmltv__row_conversation__message);
         textMessageLinkTextView.setMessageViewsContainer(messageViewsContainer);
         textMessageLinkTextView.setOnClickListener(onDoubleClickListener);
-        textMessageLinkTextView.setOnLongClickListener(this);
+        textMessageLinkTextView.setCallback(this);
         imageView = ViewUtils.getView(view, R.id.iv__row_conversation__youtube_image);
         imageView.setOnClickListener(onDoubleClickListener);
         imageView.setOnLongClickListener(this);
@@ -273,4 +274,8 @@ public class YouTubeMessageViewController extends MessageViewController implemen
         return bitmapWidth;
     }
 
+    @Override
+    public void onTextMessageLinkTextViewOnLongClicked(View view) {
+        onLongClick(view);
+    }
 }

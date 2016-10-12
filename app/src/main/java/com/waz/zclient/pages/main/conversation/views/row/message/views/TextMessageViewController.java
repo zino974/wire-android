@@ -33,7 +33,7 @@ import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.OnDoubleClickListener;
 
-public class TextMessageViewController extends MessageViewController {
+public class TextMessageViewController extends MessageViewController implements TextMessageLinkTextView.Callback {
 
     private View view;
     private TextMessageLinkTextView textView;
@@ -84,7 +84,7 @@ public class TextMessageViewController extends MessageViewController {
         textContainer.setOnClickListener(onClickListener);
         textContainer.setOnLongClickListener(onLongClickListener);
         textView.setOnClickListener(onClickListener);
-        textView.setOnLongClickListener(onLongClickListener);
+        textView.setCallback(this);
         ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         afterInit();
@@ -128,4 +128,8 @@ public class TextMessageViewController extends MessageViewController {
         super.recycle();
     }
 
+    @Override
+    public void onTextMessageLinkTextViewOnLongClicked(View view) {
+        onLongClick(view);
+    }
 }

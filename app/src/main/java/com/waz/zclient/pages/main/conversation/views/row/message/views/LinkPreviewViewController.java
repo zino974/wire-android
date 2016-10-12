@@ -40,7 +40,8 @@ import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.OnDoubleClickListener;
 import com.waz.zclient.views.images.ImageAssetView;
 
-public class LinkPreviewViewController extends MessageViewController implements ImageAssetView.BitmapLoadedCallback {
+public class LinkPreviewViewController extends MessageViewController implements ImageAssetView.BitmapLoadedCallback,
+                                                                                TextMessageLinkTextView.Callback {
 
     private View view;
     private TextMessageLinkTextView textMessageLinkTextView;
@@ -135,7 +136,7 @@ public class LinkPreviewViewController extends MessageViewController implements 
         previewImageAssetView.setBitmapLoadedCallback(this);
 
         textMessageLinkTextView.setOnClickListener(onDoubleClickListener);
-        textMessageLinkTextView.setOnLongClickListener(this);
+        textMessageLinkTextView.setCallback(this);
         linkPrevieContainerView.setOnClickListener(onDoubleClickListener);
         linkPrevieContainerView.setOnLongClickListener(this);
 
@@ -203,5 +204,10 @@ public class LinkPreviewViewController extends MessageViewController implements 
         if (bitmapLoaded) {
             progressDotsView.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onTextMessageLinkTextViewOnLongClicked(View view) {
+        onLongClick(view);
     }
 }
