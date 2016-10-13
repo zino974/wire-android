@@ -20,6 +20,8 @@ package com.waz.zclient.pages.main.conversation.views.row.message.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.MotionEvent;
+import android.view.View;
 import com.waz.api.Message;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
@@ -28,7 +30,11 @@ import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.ui.text.LinkTextView;
 import org.threeten.bp.Instant;
 
-public class TextMessageLinkTextView extends LinkTextView implements AccentColorObserver {
+public class TextMessageLinkTextView extends LinkTextView implements AccentColorObserver,
+                                                                     View.OnLongClickListener {
+
+    private boolean onLongClicked;
+    private Callback callback;
 
     private MessageViewsContainer messageViewContainer;
     private final float textSizeRegular;
@@ -78,6 +84,43 @@ public class TextMessageLinkTextView extends LinkTextView implements AccentColor
 
         textSizeRegular = context.getResources().getDimensionPixelSize(R.dimen.wire__text_size__regular);
         textSizeEmoji = context.getResources().getDimensionPixelSize(R.dimen.wire__text_size__emoji);
+
+        setOnLongClickListener(this);
+    }
+
+    /*
+     * This part (the methods onLongClick and onTouchEvent) of the Wire software uses source coded posted on the StackOverflow site.
+     * (http://stackoverflow.com/a/19781716)
+     *
+     * That work is licensed under a Creative Commons Attribution-ShareAlike 2.5 Generic License.
+     * (http://creativecommons.org/licenses/by-sa/2.5)
+     *
+     * Contributors on StackOverflow:
+     *  - afei (http://stackoverflow.com/users/2954908/afei)
+     */
+    @Override
+    public boolean onLongClick(View view) {
+        onLongClicked = true;
+        if (callback != null) {
+            callback.onTextMessageLinkTextViewOnLongClicked(this);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            onLongClicked = false;
+        }
+        if (event.getAction() == MotionEvent.ACTION_UP && onLongClicked) {
+            onLongClicked = false;
+            return true;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
     }
 
     public void setMessage(final Message message) {
@@ -110,4 +153,7 @@ public class TextMessageLinkTextView extends LinkTextView implements AccentColor
         }
     }
 
+    public interface Callback {
+        void onTextMessageLinkTextViewOnLongClicked(View view);
+    }
 }

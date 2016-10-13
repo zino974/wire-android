@@ -58,6 +58,7 @@ import com.waz.zclient.views.media.MediaPlayerView;
 
 public abstract class MediaPlayerViewController extends MessageViewController implements MediaPlayerView.MediaPlayerListener,
                                                                                          StreamMediaPlayerObserver,
+                                                                                         TextMessageLinkTextView.Callback,
                                                                                          NetworkStoreObserver,
                                                                                          AccentColorObserver {
 
@@ -129,7 +130,7 @@ public abstract class MediaPlayerViewController extends MessageViewController im
         view = inflater.inflate(R.layout.row_conversation_media_player, null);
         textMessageLinkTextView = ViewUtils.getView(view, R.id.tmltv__row_conversation__message);
         textMessageLinkTextView.setMessageViewsContainer(messageViewsContainer);
-        textMessageLinkTextView.setOnLongClickListener(this);
+        textMessageLinkTextView.setCallback(this);
         mediaPlayerView = ViewUtils.getView(view, R.id.mpv__row_conversation__message_media_player);
         mediaPlayerView.setOnLongClickListener(this);
         ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
@@ -558,6 +559,11 @@ public abstract class MediaPlayerViewController extends MessageViewController im
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onTextMessageLinkTextViewOnLongClicked(View view) {
+        onLongClick(view);
     }
 
     ///////////////////////////////////////////////////////////////////
