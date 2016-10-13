@@ -773,14 +773,14 @@
     <dimen name="sketch__emoji__size__medium">48dp</dimen>
     <dimen name="sketch__emoji__size__large">64dp</dimen>
 
-    <dimen name="sketch__color_picker_emoji__icon_size__unselected">4dp</dimen>
-    <dimen name="sketch__color_picker_emoji__icon_size__small">6dp</dimen>
-    <dimen name="sketch__color_picker_emoji__icon_size__medium">7dp</dimen>
-    <dimen name="sketch__color_picker_emoji__icon_size__large">9dp</dimen>
+    <dimen name="sketch__color_picker_emoji__icon_size__unselected">16dp</dimen>
+    <dimen name="sketch__color_picker_emoji__icon_size__small">18dp</dimen>
+    <dimen name="sketch__color_picker_emoji__icon_size__medium">24dp</dimen>
+    <dimen name="sketch__color_picker_emoji__icon_size__large">32dp</dimen>
 
-    <dimen name="sketch__emoji__icon_size__small">7dp</dimen>
-    <dimen name="sketch__emoji__icon_size__medium">9dp</dimen>
-    <dimen name="sketch__emoji__icon_size__large">12dp</dimen>
+    <dimen name="sketch__emoji__icon_size__small">20dp</dimen>
+    <dimen name="sketch__emoji__icon_size__medium">26dp</dimen>
+    <dimen name="sketch__emoji__icon_size__large">36dp</dimen>
 
     <dimen name="sketch__emoji__keyboard__tab_size">48dp</dimen>
     <dimen name="sketch__emoji__keyboard__tab_label_size">32dp</dimen>
