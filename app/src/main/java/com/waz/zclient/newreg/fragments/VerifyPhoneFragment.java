@@ -47,7 +47,7 @@ public class VerifyPhoneFragment extends BaseFragment<VerifyPhoneFragment.Contai
                                                                                                 TextWatcher {
     public static final String TAG = VerifyPhoneFragment.class.getName();
     private static final String ARG_SHOW_NOT_NOW = "ARG_SHOW_NOT_NOW";
-    private static final int SHOW_RESEND_CODE_BUTTON_DELAY = 30000;
+    private static final int SHOW_RESEND_CODE_BUTTON_DELAY = 15000;
     private static final int RESEND_CODE_TIMER_INTERVAL = 1000;
 
     public static VerifyPhoneFragment newInstance(boolean showNotNowButton) {
