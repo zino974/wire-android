@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.Toast;
+import com.localytics.android.Localytics;
 import com.waz.api.ImageAsset;
 import com.waz.api.ImageAssetFactory;
 import com.waz.api.LoadHandle;
@@ -34,9 +35,11 @@ import com.waz.zclient.controllers.navigation.NavigationControllerObserver;
 import com.waz.zclient.controllers.navigation.Page;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
 import com.waz.zclient.core.api.scala.AppEntryStore;
+import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
 import com.waz.zclient.core.controllers.tracking.attributes.RegistrationEventContext;
 import com.waz.zclient.core.controllers.tracking.events.Event;
 import com.waz.zclient.core.controllers.tracking.events.registration.OpenedPhoneRegistrationFromInviteEvent;
+import com.waz.zclient.core.controllers.tracking.events.registration.SucceededWithRegistrationEvent;
 import com.waz.zclient.core.stores.api.ZMessagingApiStoreObserver;
 import com.waz.zclient.core.stores.appentry.AppEntryState;
 import com.waz.zclient.core.stores.appentry.AppEntryStateCallback;
@@ -60,6 +63,7 @@ import com.waz.zclient.newreg.fragments.country.CountryController;
 import com.waz.zclient.newreg.fragments.country.CountryDialogFragment;
 import com.waz.zclient.ui.utils.KeyboardUtils;
 import com.waz.zclient.utils.ViewUtils;
+import com.waz.zclient.utils.ZTimeFormatter;
 import com.waz.zclient.views.LoadingIndicatorView;
 import timber.log.Timber;
 
@@ -478,6 +482,9 @@ public class AppEntryActivity extends BaseActivity implements VerifyPhoneFragmen
     @Override
     public void tagAppEntryEvent(Event event) {
         getControllerFactory().getTrackingController().tagEvent(event);
+        if (event instanceof SucceededWithRegistrationEvent) {
+            Localytics.setProfileAttribute(Attribute.REGISTRATION_WEEK.name(), ZTimeFormatter.getCurrentWeek(this), Localytics.ProfileScope.APPLICATION);
+        }
     }
 
     @Override
