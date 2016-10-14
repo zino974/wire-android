@@ -62,12 +62,13 @@
 
     <com.waz.zclient.ui.text.TypefaceTextView
         android:id="@+id/tv__footer__message_status"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/content__footer__height"
         android:layout_marginStart="@dimen/content__padding_left"
         android:textColor="@color/text__secondary_light"
         android:gravity="start|center_vertical"
         android:singleLine="true"
+        android:ellipsize="none"
         android:textSize="@dimen/wire__text_size__small"
         app:font="@string/wire__typeface__light"
         />
