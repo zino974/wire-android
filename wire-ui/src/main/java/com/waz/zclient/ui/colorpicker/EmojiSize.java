@@ -41,12 +41,16 @@ public enum EmojiSize {
         return context.getResources().getDimensionPixelSize(iconSizeResId);
     }
 
+    public int getIconSizeResId() {
+        return iconSizeResId;
+    }
+
     public int getEmojiSize(Context context) {
         return context.getResources().getDimensionPixelSize(emojiSizeResId);
     }
 
-    public int getColorPickerIconSize(Context context) {
-        return context.getResources().getDimensionPixelSize(colorPickerIconSizeResId);
+    public int getColorPickerIconResId() {
+        return colorPickerIconSizeResId;
     }
 
 }

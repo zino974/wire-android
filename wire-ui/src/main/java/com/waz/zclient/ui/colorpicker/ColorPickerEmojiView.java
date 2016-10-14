@@ -19,6 +19,7 @@ package com.waz.zclient.ui.colorpicker;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.TextView;
 import com.waz.zclient.ui.R;
@@ -44,21 +45,21 @@ public class ColorPickerEmojiView extends TextView implements ColorPickerView {
     private void init() {
         emojiSize = EmojiSize.NONE;
         setGravity(Gravity.CENTER);
-        setTextSize(emojiSize.getColorPickerIconSize(getContext()));
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, getContext().getResources().getDimension(emojiSize.getColorPickerIconResId()));
         setTextColor(getResources().getColor(R.color.text__primary_light));
     }
 
     @Override
     public void setSelected(int size) {
         emojiSize = EmojiSize.values()[size];
-        setTextSize(emojiSize.getColorPickerIconSize(getContext()));
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, getContext().getResources().getDimension(emojiSize.getColorPickerIconResId()));
         invalidate();
     }
 
     @Override
     public void setUnselected() {
         emojiSize = EmojiSize.NONE;
-        setTextSize(emojiSize.getColorPickerIconSize(getContext()));
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, getContext().getResources().getDimension(emojiSize.getColorPickerIconResId()));
         invalidate();
     }
 

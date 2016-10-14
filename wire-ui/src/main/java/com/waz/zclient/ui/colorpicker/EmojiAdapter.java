@@ -19,6 +19,7 @@ package com.waz.zclient.ui.colorpicker;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.waz.zclient.ui.R;
 import com.waz.zclient.utils.ViewUtils;
-
 import java.util.List;
 
 public class EmojiAdapter extends RecyclerView.Adapter<EmojiAdapter.ViewHolder> {
@@ -108,7 +108,7 @@ public class EmojiAdapter extends RecyclerView.Adapter<EmojiAdapter.ViewHolder> 
 
         public void bind(String string) {
             textView.setText(string);
-            textView.setTextSize(emojiSize.getIconSize(itemView.getContext()));
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, itemView.getResources().getDimension(emojiSize.getIconSizeResId()));
             int size;
             if (SPACE.equals(string)) {
                 size = categorySpacing;
