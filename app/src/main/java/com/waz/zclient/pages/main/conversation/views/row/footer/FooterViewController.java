@@ -232,7 +232,7 @@ public class FooterViewController implements ConversationItemViewController,
         Instant messageTime = message.isEdited() || message.isDeleted() ?
                               message.getEditTime() :
                               message.getTime();
-        String timestamp = ZTimeFormatter.getSingleMessageTime(getView().getContext(), DateTimeUtils.toDate(messageTime));
+        String timestamp = messageTime == null ? "" : ZTimeFormatter.getSingleMessageTime(getView().getContext(), DateTimeUtils.toDate(messageTime));
         String status;
         Runnable linkRunnable = null;
         boolean linkUnderlined = true;
