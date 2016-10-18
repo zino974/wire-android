@@ -79,7 +79,7 @@ class MessageNotificationsControllerTest extends JUnitSuite with RobolectricUtil
 
   @Test
   def getMessageForLike(): Unit = {
-    val msg = controller.getMessage(NotificationInfo(NotificationType.LIKE, "", false, ConvId()), false, true, true)
+    val msg = controller.getMessage(NotificationInfo(NotificationType.LIKE, "", ConvId()), false, true, true)
     assertFalse(msg.toString.isEmpty)
   }
 
