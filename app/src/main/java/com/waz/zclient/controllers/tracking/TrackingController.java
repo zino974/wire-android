@@ -27,7 +27,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import com.localytics.android.Localytics;
-import com.waz.api.Self;
 import com.waz.api.TrackingData;
 import com.waz.api.UpdateListener;
 import com.waz.api.ZMessagingApi;
@@ -66,7 +65,6 @@ public class TrackingController implements ITrackingController {
     private SessionEventAggregator sessionEventAggregator;
     private Set<String> sentEvents;
     private Context context;
-    private Self self;
     private SharedPreferences sentEventPreferences;
     private boolean appLaunchedTracked;
     private ApplicationScreen applicationScreen;
@@ -83,27 +81,10 @@ public class TrackingController implements ITrackingController {
         }
         this.sessionEventAggregator = new SessionEventAggregator(activity.getApplicationContext());
         ZMessagingApi api = ZApplication.from(activity).getStoreFactory().getZMessagingApiStore().getApi();
-        this.self = api.getSelf();
         this.trackingData = api.getTrackingData();
         this.context = activity.getApplicationContext();
         sentEventPreferences = context.getSharedPreferences("TRACKING_SENT_EVENTS", Context.MODE_PRIVATE);
         trackingData.addUpdateListener(trackingDataUpdateListener);
-
-        if (BuildConfig.SHOW_DEVELOPER_OPTIONS) {
-            setCustomUserId();
-            Localytics.setProfileAttribute("android_client", "true", Localytics.ProfileScope.APPLICATION);
-        }
-
-    }
-
-    private void setCustomUserId() {
-        String trackingId = null;
-
-        if (self != null && self.getUser() != null) {
-            trackingId = self.getTrackingId();
-        }
-
-        Localytics.setCustomerId(trackingId);
     }
 
     @Override
@@ -143,8 +124,6 @@ public class TrackingController implements ITrackingController {
             eventAttributes.put(attribute.name, event.getAttributes().get(attribute));
         }
 
-        // Needs to be done in every tag, because we have otherwise no user after login
-        setCustomUserId();
         List<String> customDimensions = getCustomDimensions();
         for (int i = 0; i < customDimensions.size(); i++) {
             Localytics.setCustomDimension(i, customDimensions.get(i));
@@ -168,8 +147,6 @@ public class TrackingController implements ITrackingController {
             eventAttributes.put(attribute, event.getAttributes().get(attribute));
         }
 
-        // Needs to be done in every tag, because we have otherwise no user after login
-        setCustomUserId();
         List<String> customDimensions = getCustomDimensions();
         for (int i = 0; i < customDimensions.size(); i++) {
             Localytics.setCustomDimension(i, customDimensions.get(i));
@@ -316,7 +293,6 @@ public class TrackingController implements ITrackingController {
 
     @Override
     public void tearDown() {
-        self = null;
         if (trackingData != null) {
             trackingData.removeUpdateListener(trackingDataUpdateListener);
             trackingData = null;
@@ -480,6 +456,11 @@ public class TrackingController implements ITrackingController {
             for (Event event : retryList) {
                 Timber.i(event.getName());
                 tagEvent(event);
+            }
+
+            // Contacts count includes bot, therefor we check for 2 contacts
+            if (trackingData.getNotBlockedContactCount() > 1) {
+                Localytics.setProfileAttribute(Attribute.CONNECT__HAS_CONTACT.name(), "true", Localytics.ProfileScope.APPLICATION);
             }
         }
     };

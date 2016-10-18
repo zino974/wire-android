@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 import android.text.format.DateFormat;
 import com.waz.zclient.R;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -82,6 +83,12 @@ public class ZTimeFormatter {
         boolean is24HourFormat = DateFormat.is24HourFormat(context);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(getTimeFormatString(context.getResources(), is24HourFormat));
         return formatter.format(DateConvertUtils.asLocalDateTime(date).atZone(ZoneId.systemDefault()));
+    }
+
+    public static String getCurrentWeek(Context context) {
+        String pattern = context.getResources().getString(R.string.timestamp_pattern__week);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        return formatter.format(DateConvertUtils.asLocalDateTime(Instant.now()).atZone(ZoneId.systemDefault()));
     }
 
     private static String getTimeFormatString(@Nullable Resources resources, boolean is24HourFormat) {

@@ -18,6 +18,10 @@
 package com.waz.zclient.core.controllers.tracking.attributes;
 
 public enum Attribute {
+
+    REGISTRATION_WEEK("registration__week"),
+    CONNECT__HAS_CONTACT("connect__has_contact"),
+
     SESSION_FIRST_SESSION("firstSession"),
     SESSION_SEARCHED_FOR_PEOPLE("searchedPeople"),
 

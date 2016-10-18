@@ -795,6 +795,7 @@
     <string name="timestamp_pattern__separator_header__yesterday">Yesterday</string>
     <string name="timestamp_pattern__24h_format">HH:mm</string> <!-- 23:15 -->
     <string name="timestamp_pattern__12h_format">hh:mm a</string>
+    <string name="timestamp_pattern__week" translatable="false">w, YYYY</string>
     <string name="reg__phone_alert__button">OK</string>
     <string name="country">Country</string>
     <string name="register">Register</string>
