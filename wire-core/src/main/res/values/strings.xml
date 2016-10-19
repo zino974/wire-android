@@ -668,6 +668,13 @@
     <string name="notification__message__group__default_conversation_name">group conversation</string>
     <string name="notification__message__group__liked">\u2764 your message</string>
 
+    <!-- ephemeral -->
+    <string name="notification__message__ephemeral_details">Press for more</string>
+    <plurals name="notification__message__ephemeral">
+        <item quantity="one">Someone sent you a message</item>
+        <item quantity="other">Someone sent you %1$d messages</item>
+    </plurals>
+
     <!-- Others -->
     <string name="app_name">Wire</string>
     <string name="content__system__item_separator">,</string>

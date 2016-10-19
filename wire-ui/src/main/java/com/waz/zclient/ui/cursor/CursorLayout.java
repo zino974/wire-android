@@ -268,8 +268,7 @@ public class CursorLayout extends FrameLayout implements
         ephemeralButton.setText(R.string.glyph__hourglass);
         ephemeralButton.setTextColor(defaultEditTextColor);
         ephemeralButton.setGravity(Gravity.CENTER);
-        // TODO uncomment to allow sending ephemeral messages
-        //sendButtonContainer.addView(ephemeralButton, new FrameLayout.LayoutParams(buttonWidth, buttonWidth));
+        sendButtonContainer.addView(ephemeralButton, new FrameLayout.LayoutParams(buttonWidth, buttonWidth));
         ephemeralButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

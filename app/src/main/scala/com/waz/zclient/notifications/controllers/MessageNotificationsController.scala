@@ -74,22 +74,29 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
 
   notifications.zip(shouldBeSilent).on(Threading.Ui) {
     case (nots, silent) =>
-      verbose(s"Notifications updated: shouldBeSilent: $silent, $nots")
-      if (nots.isEmpty) notManager.cancel(ZETA_MESSAGE_NOTIFICATION_ID)
-      else {
-        val notification =
-          if (nots.size == 1) getSingleMessageNotification(nots.head, silent)
-          else getMultipleMessagesNotification(nots, silent)
+      val (ephemeral, normal) = nots.partition(_.isEphemeral)
+      handleNotifications(normal, silent, ZETA_MESSAGE_NOTIFICATION_ID)
+      handleNotifications(ephemeral, silent, ZETA_EPHEMERAL_NOTIFICATION_ID)
+  }
 
-        notification.priority = Notification.PRIORITY_HIGH
-        notification.flags |= Notification.FLAG_AUTO_CANCEL
-        notification.deleteIntent = clearIntent
+  private def handleNotifications(nots: Seq[NotificationInfo], silent: Boolean, notifId: Int): Unit = {
+    verbose(s"Notifications updated: shouldBeSilent: $silent, $nots")
+    if (nots.isEmpty) notManager.cancel(notifId)
+    else {
+      val notification =
+        if (notifId == ZETA_EPHEMERAL_NOTIFICATION_ID) getEphemeralNotification(nots.size, silent)
+        else if (nots.size == 1) getSingleMessageNotification(nots.head, silent)
+        else getMultipleMessagesNotification(nots, silent)
 
-        attachNotificationLed(notification)
-        attachNotificationSound(notification, nots, silent)
+      notification.priority = Notification.PRIORITY_HIGH
+      notification.flags |= Notification.FLAG_AUTO_CANCEL
+      notification.deleteIntent = clearIntent
 
-        notManager.notify(ZETA_MESSAGE_NOTIFICATION_ID, notification)
-      }
+      attachNotificationLed(notification)
+      attachNotificationSound(notification, nots, silent)
+
+      notManager.notify(notifId, notification)
+    }
   }
 
   private def attachNotificationLed(notification: Notification) = {
@@ -136,6 +143,33 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
   private def getSelectedSoundUri(value: String, @RawRes preferenceDefault: Int, @RawRes returnDefault: Int): Uri = {
     if (!TextUtils.isEmpty(value) && !RingtoneUtils.isDefaultValue(context, value, preferenceDefault)) Uri.parse(value)
     else RingtoneUtils.getUriForRawId(context, returnDefault)
+  }
+
+  private def getEphemeralNotification(size: Int, silent: Boolean): Notification = {
+    val details = getString(R.string.notification__message__ephemeral_details)
+    val title = getQuantityString(R.plurals.notification__message__ephemeral, size, Integer.valueOf(size))
+
+    val builder = new NotificationCompat.Builder(cxt)
+
+    val bigTextStyle = new NotificationCompat.BigTextStyle
+    bigTextStyle.setBigContentTitle(title)
+    bigTextStyle.bigText(details)
+
+    builder
+      .setSmallIcon(R.drawable.ic_menu_logo)
+      .setLargeIcon(getAppIcon)
+      .setContentTitle(title)
+      .setContentText(details)
+      .setContentIntent(getNotificationAppLaunchIntent(cxt))
+      .setStyle(bigTextStyle)
+      .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+      .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+
+    if (VibratorController.isEnabledInPreferences(cxt) && !silent) {
+      builder.setVibrate(VibratorController.resolveResource(cxt.getResources, R.array.new_message_gcm))
+    }
+    builder.build
   }
 
   private def getSingleMessageNotification(n: NotificationInfo, silent: Boolean): Notification = {
@@ -213,7 +247,7 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     }
     else builder.setContentIntent(getNotificationAppLaunchIntent(cxt))
 
-    val messages = ns.map(n => getMessage(n, multiple = true, singleConversationInBatch = isSingleConv, singleUserInBatch = users.size == 1)).takeRight(5)
+    val messages = ns.map(n => getMessage(n, multiple = true, singleConversationInBatch = isSingleConv, singleUserInBatch = users.size == 1 && isSingleConv)).takeRight(5)
     builder.setContentText(messages.last) //the collapsed notification should have the last message
     messages.reverse.foreach(inboxStyle.addLine)//the expanded notification should have the most recent at the top (reversed)
 
@@ -302,4 +336,5 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
 
 object MessageNotificationsController {
   val ZETA_MESSAGE_NOTIFICATION_ID: Int = 1339272
+  val ZETA_EPHEMERAL_NOTIFICATION_ID: Int = 1339279
 }
