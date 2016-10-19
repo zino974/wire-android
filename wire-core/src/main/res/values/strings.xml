@@ -509,7 +509,7 @@
     <string name="pref_devices_device_reset_session_title">Reset session</string>
     <string name="pref_devices_device_reset_session_summary">If fingerprints don\'t match, reset the session to generate new encryption keys on both sides.</string>
     <string name="pref_devices_device_remove_title">Remove device</string>
-    <string name="pref_devices_device_remove_summary">Remove this device if you have stopped using it. Your message history will be erased and you will be logged out.</string>
+    <string name="pref_devices_device_remove_summary">Remove this device if you have stopped using it. Your message history will be erased on this device and you will be logged out.</string>
     <string name="pref_devices_device_fingerprint_copy_description">Fingerprint</string>
     <string name="pref_devices_device_fingerprint_copy_toast">Key Fingerprint Copied</string>
 
