@@ -1037,7 +1037,8 @@
     <string name="ephemeral_message__timeout__off">Off</string>
     <string name="ephemeral_message__timeout__5_sec">5 seconds</string>
     <string name="ephemeral_message__timeout__15_sec">15 seconds</string>
+    <string name="ephemeral_message__timeout__30_sec">30 seconds</string>
     <string name="ephemeral_message__timeout__1_min">1 minute</string>
-    <string name="ephemeral_message__timeout__15_min">15 minutes</string>
+    <string name="ephemeral_message__timeout__5_min">5 minutes</string>
 
 </resources>

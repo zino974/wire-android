@@ -23,6 +23,9 @@
                                                                 android:layout_width="match_parent"
                                                                 android:layout_height="match_parent"
                                                                 android:orientation="vertical"
+                                                                android:background="@color/graphite"
+                                                                android:paddingStart="@dimen/wire__padding__large"
+                                                                android:paddingEnd="@dimen/wire__padding__large"
     >
 
     <com.waz.zclient.ui.text.TypefaceTextView
@@ -31,6 +34,9 @@
         android:text="@string/ephemeral_message__timeout_selection_info"
         android:gravity="center"
         android:textSize="@dimen/wire__text_size__small"
+        android:paddingTop="@dimen/wire__padding__regular"
+        android:paddingBottom="@dimen/wire__padding__regular"
+        android:textColor="@color/text__primary_dark"
         app:font="@string/wire__typeface__regular"
         />
 

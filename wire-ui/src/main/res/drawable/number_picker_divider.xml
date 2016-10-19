@@ -18,8 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<com.waz.zclient.ui.views.CursorIconButton xmlns:android="http://schemas.android.com/apk/res/android"
-                                           android:layout_width="wrap_content"
-                                           android:layout_height="wrap_content"
-                                           style="?cursorIconButton"
-    />
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="line">
+    <stroke
+        android:width="0.5dp"
+        android:color="@color/light_graphite_24" />
+</shape>

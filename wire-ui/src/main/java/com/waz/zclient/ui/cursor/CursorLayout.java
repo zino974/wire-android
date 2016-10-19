@@ -268,7 +268,11 @@ public class CursorLayout extends FrameLayout implements
         ephemeralButton.setText(R.string.glyph__hourglass);
         ephemeralButton.setTextColor(defaultEditTextColor);
         ephemeralButton.setGravity(Gravity.CENTER);
-        sendButtonContainer.addView(ephemeralButton, new FrameLayout.LayoutParams(buttonWidth, buttonWidth));
+        int ephemeralButtonWidth = getResources().getDimensionPixelSize(R.dimen.cursor__ephemeral_button__width);
+        int ephemeralButtonHeight = getResources().getDimensionPixelSize(R.dimen.cursor__ephemeral_button__height);
+        params = new FrameLayout.LayoutParams(ephemeralButtonWidth, ephemeralButtonHeight);
+        params.gravity = Gravity.CENTER;
+        sendButtonContainer.addView(ephemeralButton, params);
         ephemeralButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -807,22 +811,14 @@ public class CursorLayout extends FrameLayout implements
             final String value;
             final int background;
             switch (expiration) {
-                case FIVE_SECONDS:
-                    value = "5";
-                    background = R.drawable.ephemeral_sec;
-                    break;
-                case FIFTEEN_SECONDS:
-                    value = "15";
-                    background = R.drawable.ephemeral_sec;
-                    break;
                 case ONE_MINUTE:
-                    value = "1";
+                case FIVE_MINUTES:
+                    value = String.valueOf(expiration.milliseconds / 1000 / 60);
                     background = R.drawable.ephemeral_min;
                     break;
-                case FIFTEEN_MINUTES:
-                    value = "15";
-                    background = R.drawable.ephemeral_min;
-                    break;
+                case FIVE_SECONDS:
+                case FIFTEEN_SECONDS:
+                case THIRTY_SECONDS:
                 case NONE:
                 default:
                     value = String.valueOf(expiration.milliseconds / 1000);

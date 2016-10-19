@@ -78,10 +78,9 @@ public class EphemeralLayout extends LinearLayout {
             }
         });
         try {
-            // Remove ugly dividers, should replace with something else though... TODO
             Field f = numberPicker.getClass().getDeclaredField("mSelectionDivider"); //NoSuchFieldException
             f.setAccessible(true);
-            f.set(numberPicker, null);
+            f.set(numberPicker, getResources().getDrawable(com.waz.zclient.ui.R.drawable.number_picker_divider));
         } catch (Throwable t) {
             Timber.e(t, "Something went wrong");
         }
@@ -105,7 +104,9 @@ public class EphemeralLayout extends LinearLayout {
         values.add(EphemeralExpiration.NONE);
         values.add(EphemeralExpiration.FIVE_SECONDS);
         values.add(EphemeralExpiration.FIFTEEN_SECONDS);
+        values.add(EphemeralExpiration.THIRTY_SECONDS);
         values.add(EphemeralExpiration.ONE_MINUTE);
+        values.add(EphemeralExpiration.FIVE_MINUTES);
         return values.toArray(new EphemeralExpiration[values.size()]);
     }
 
@@ -117,10 +118,12 @@ public class EphemeralLayout extends LinearLayout {
                 return getContext().getString(com.waz.zclient.core.R.string.ephemeral_message__timeout__5_sec);
             case FIFTEEN_SECONDS:
                 return getContext().getString(com.waz.zclient.core.R.string.ephemeral_message__timeout__15_sec);
+            case THIRTY_SECONDS:
+                return getContext().getString(com.waz.zclient.core.R.string.ephemeral_message__timeout__30_sec);
             case ONE_MINUTE:
                 return getContext().getString(com.waz.zclient.core.R.string.ephemeral_message__timeout__1_min);
-            case FIFTEEN_MINUTES:
-                return getContext().getString(com.waz.zclient.core.R.string.ephemeral_message__timeout__15_min);
+            case FIVE_MINUTES:
+                return getContext().getString(com.waz.zclient.core.R.string.ephemeral_message__timeout__5_min);
             default:
                 return expiration.name();
         }
