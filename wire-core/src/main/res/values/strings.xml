@@ -281,11 +281,11 @@
     <string name="calling__cannot_start__ongoing_voice__button_positive">Answer</string>
     <string name="calling__cannot_start__ongoing_voice__button_negative">Cancel</string>
     <string name="calling__video_call__slow_connection__message">You might experience issues during the call</string>
-    <string name="calling__header__joining">Joining</string>
-    <string name="calling__header__outgoing_subtitle">Ringing</string>
-    <string name="calling__header__outgoing_video_subtitle">Ringing</string>
-    <string name="calling__header__incoming_subtitle">Calling</string>
-    <string name="calling__header__incoming_subtitle__video">Video calling</string>
+    <string name="calling__header__joining">joining</string>
+    <string name="calling__header__outgoing_subtitle">ringing</string>
+    <string name="calling__header__outgoing_video_subtitle">ringing</string>
+    <string name="calling__header__incoming_subtitle">calling</string>
+    <string name="calling__header__incoming_subtitle__video">video calling</string>
     <string name="incoming__controls__incoming__decline">DECLINE</string>
     <string name="incoming__controls__incoming__accept">ACCEPT</string>
     <string name="incoming__controls__ongoing__hangup">HANG UP</string>
