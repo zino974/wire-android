@@ -432,7 +432,8 @@
     </style>
 
     <style name="NumberPickerText">
-        <item name="android:textSize">@dimen/wire__text_size__big</item>
+        <item name="android:textSize">@dimen/wire__text_size__medium</item>
+        <item name="android:textColorPrimary">@color/text__primary_dark</item>
     </style>
 
 </resources>

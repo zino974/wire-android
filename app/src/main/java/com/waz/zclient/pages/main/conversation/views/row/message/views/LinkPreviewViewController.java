@@ -18,6 +18,7 @@
 package com.waz.zclient.pages.main.conversation.views.row.message.views;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.content.ContextCompat;
@@ -57,8 +58,10 @@ public class LinkPreviewViewController extends MessageViewController implements 
     private View previewImageContainerView;
     private EphemeralDotAnimationView ephemeralDotAnimationView;
     private LoadHandle previewImageLoadHandle;
-    private final Typeface defaultTitleTypeface;
-    private final Typeface defaultUrlTypeface;
+    private final Typeface originalTitleTypeface;
+    private final ColorStateList originalTitleTextColor;
+    private final Typeface originalUrlTypeface;
+    private final ColorStateList originalUrlTextColor;
 
     private final ModelObserver<Message> messageObserver = new ModelObserver<Message>() {
         @Override
@@ -153,8 +156,10 @@ public class LinkPreviewViewController extends MessageViewController implements 
 
         textMessageLinkTextView.setMessageViewsContainer(messageViewsContainer);
 
-        defaultTitleTypeface = titleTextView.getTypeface();
-        defaultUrlTypeface = urlTextView.getTypeface();
+        originalTitleTypeface = titleTextView.getTypeface();
+        originalTitleTextColor = titleTextView.getTextColors();
+        originalUrlTypeface = urlTextView.getTypeface();
+        originalUrlTextColor = urlTextView.getTextColors();
     }
 
     @Override
@@ -198,8 +203,10 @@ public class LinkPreviewViewController extends MessageViewController implements 
         }
         previewImageLoadHandle = null;
         textMessageLinkTextView.recycle();
-        titleTextView.setTypeface(defaultTitleTypeface);
-        urlTextView.setTypeface(defaultUrlTypeface);
+        titleTextView.setTypeface(originalTitleTypeface);
+        urlTextView.setTypeface(originalUrlTypeface);
+        titleTextView.setTextColor(originalTitleTextColor);
+        urlTextView.setTextColor(originalUrlTextColor);
         super.recycle();
     }
 
@@ -231,10 +238,14 @@ public class LinkPreviewViewController extends MessageViewController implements 
         if (previewImageLoadHandle != null) {
             previewImageLoadHandle.cancel();
         }
+        int ephemeralColor = ContextCompat.getColor(context, R.color.ephemera);
         previewImageAssetView.clearImage();
-        previewImageAssetView.setImageDrawable(new ColorDrawable(ContextCompat.getColor(context, R.color.ephemera)));
+        previewImageAssetView.setImageDrawable(new ColorDrawable(ephemeralColor));
         Typeface redactedTypeface = TypefaceUtils.getTypeface(TypefaceUtils.getRedactedTypedaceName());
         titleTextView.setTypeface(redactedTypeface);
+        titleTextView.setTextColor(ephemeralColor);
         urlTextView.setTypeface(redactedTypeface);
+        urlTextView.setTextColor(ephemeralColor);
+
     }
 }

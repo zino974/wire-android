@@ -65,6 +65,8 @@ public class CursorEditText extends TypefaceEditText {
 
     public static int matchZColorToCursorResourceID(int color) {
         switch (color) {
+            case 0xFFFF5000:
+                return R.drawable.cursor_ephemeral;
             case -16726016:
                 return R.drawable.cursor_green; // green 51200 #00C800
             case -106819:

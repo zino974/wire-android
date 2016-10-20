@@ -66,7 +66,8 @@ public class LocationMessageViewController extends MessageViewController impleme
 
     private ImageAsset imageAsset;
     private LoadHandle bitmapLoadHandle;
-    private final Typeface defaultLocationNameTypeface;
+    private final Typeface originalLocationNameTypeface;
+    private final int originalLocationNameTextColor;
 
     private int imageWidth;
 
@@ -157,7 +158,8 @@ public class LocationMessageViewController extends MessageViewController impleme
         ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         imageWidth = getImageWidth();
-        defaultLocationNameTypeface = locationName.getTypeface();
+        originalLocationNameTypeface = locationName.getTypeface();
+        originalLocationNameTextColor = locationName.getCurrentTextColor();
         afterInit();
     }
 
@@ -256,7 +258,8 @@ public class LocationMessageViewController extends MessageViewController impleme
         mapPlaceholderText.setVisibility(View.VISIBLE);
 
         locationName.setText("");
-        locationName.setTypeface(defaultLocationNameTypeface);
+        locationName.setTypeface(originalLocationNameTypeface);
+        locationName.setTextColor(originalLocationNameTextColor);
         view.setTag(null);
         imageAssetModelObserver.clear();
         messageModelObserver.clear();
@@ -282,8 +285,10 @@ public class LocationMessageViewController extends MessageViewController impleme
         pinImage.setVisibility(View.INVISIBLE);
         pinView.setVisibility(View.INVISIBLE);
         mapPlaceholderText.setVisibility(View.INVISIBLE);
-        mapImageView.setImageDrawable(new ColorDrawable(ContextCompat.getColor(context, R.color.ephemera)));
+        int ephemeralColor = ContextCompat.getColor(context, R.color.ephemera);
+        mapImageView.setImageDrawable(new ColorDrawable(ephemeralColor));
         Typeface redactedTypeface = TypefaceUtils.getTypeface(TypefaceUtils.getRedactedTypedaceName());
         locationName.setTypeface(redactedTypeface);
+        locationName.setTextColor(ephemeralColor);
     }
 }
