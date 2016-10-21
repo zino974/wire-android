@@ -64,13 +64,22 @@ public class ConversationListView extends ListView {
                getChildAt(getChildCount() - 1).getBottom() <= getHeight();
     }
 
-    public void registVisibleMessagesChangedListener(ConversationScrollListener.VisibleMessagesChangesListener listener) {
+    public void registerVisibleMessagesChangedListener(ConversationScrollListener.VisibleMessagesChangesListener listener) {
         conversationScrollListener.registerVisibleMessagesChangedListener(listener);
     }
 
-    public void unregistVisibleMessagesChangedListener(ConversationScrollListener.VisibleMessagesChangesListener listener) {
+    public void unregisterVisibleMessagesChangedListener(ConversationScrollListener.VisibleMessagesChangesListener listener) {
         conversationScrollListener.unregisterVisibleMessagesChangedListener(listener);
     }
+
+    public void registerScrollStateChangeListener(ConversationScrollListener.ScrollStateChangeListener listener) {
+        conversationScrollListener.registerScrollStateChangeListener(listener);
+    }
+
+    public void unregisterScrollStateChangeListener(ConversationScrollListener.ScrollStateChangeListener listener) {
+        conversationScrollListener.unregisterScrollStateChangeListener(listener);
+    }
+
 
     public void scrollToBottom() {
         if (getAdapter() == null) {

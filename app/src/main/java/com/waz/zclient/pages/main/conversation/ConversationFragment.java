@@ -683,7 +683,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         getControllerFactory().getAccentColorController().addAccentColorObserver(this);
         getStoreFactory().getParticipantsStore().addParticipantsStoreObserver(this);
         listView.registerScrolledToBottomListener(this);
-        listView.registVisibleMessagesChangedListener(this);
+        listView.registerVisibleMessagesChangedListener(this);
+        listView.registerScrollStateChangeListener(this);
         getControllerFactory().getGlobalLayoutController().addKeyboardVisibilityObserver(this);
         getStoreFactory().getInAppNotificationStore().addInAppNotificationObserver(this);
 
@@ -749,8 +750,9 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         getStoreFactory().getConversationStore().removeConversationStoreObserver(this);
         getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         getControllerFactory().getNavigationController().removeNavigationControllerObserver(this);
-        listView.unregistVisibleMessagesChangedListener(this);
+        listView.unregisterVisibleMessagesChangedListener(this);
         listView.unregisterScrolledToBottomListener(this);
+        listView.unregisterScrollStateChangeListener(this);
         getControllerFactory().getSlidingPaneController().removeObserver(this);
         getControllerFactory().getConversationScreenController().setConversationStreamUiReady(false);
         getControllerFactory().getRequestPermissionsController().removeObserver(this);
