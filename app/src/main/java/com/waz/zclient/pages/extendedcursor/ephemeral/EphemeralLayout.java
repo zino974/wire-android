@@ -107,6 +107,7 @@ public class EphemeralLayout extends LinearLayout {
         values.add(EphemeralExpiration.THIRTY_SECONDS);
         values.add(EphemeralExpiration.ONE_MINUTE);
         values.add(EphemeralExpiration.FIVE_MINUTES);
+        values.add(EphemeralExpiration.ONE_DAY);
         return values.toArray(new EphemeralExpiration[values.size()]);
     }
 
@@ -124,6 +125,8 @@ public class EphemeralLayout extends LinearLayout {
                 return getContext().getString(com.waz.zclient.core.R.string.ephemeral_message__timeout__1_min);
             case FIVE_MINUTES:
                 return getContext().getString(com.waz.zclient.core.R.string.ephemeral_message__timeout__5_min);
+            case ONE_DAY:
+                return getContext().getString(com.waz.zclient.core.R.string.ephemeral_message__timeout__1_day);
             default:
                 return expiration.name();
         }
