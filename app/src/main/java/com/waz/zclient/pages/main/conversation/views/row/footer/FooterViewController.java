@@ -46,6 +46,7 @@ import com.waz.zclient.utils.ZTimeFormatter;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.Instant;
 import org.threeten.bp.temporal.ChronoUnit;
+import timber.log.Timber;
 
 public class FooterViewController implements ConversationItemViewController,
                                              FooterLikeDetailsLayout.OnClickListener,
@@ -63,6 +64,7 @@ public class FooterViewController implements ConversationItemViewController,
     private final FooterLikeDetailsLayout likeDetails;
 
     private final Handler mainHandler;
+    private final Handler ephemeralTimeoutHandler;
 
     private final int likeButtonColorLiked;
     private final int likeButtonColorUnliked;
@@ -125,6 +127,7 @@ public class FooterViewController implements ConversationItemViewController,
         this.context = context;
         this.container = container;
         mainHandler = new Handler(Looper.getMainLooper());
+        ephemeralTimeoutHandler = new Handler(Looper.getMainLooper());
         view = View.inflate(context, R.layout.row_conversation_footer, null);
         likeButton = ViewUtils.getView(view, R.id.gtv__footer__like__button);
         likeButtonAnimation = ViewUtils.getView(view, R.id.gtv__footer__like__button_animation);
@@ -177,6 +180,7 @@ public class FooterViewController implements ConversationItemViewController,
     @Override
     public void recycle() {
         mainHandler.removeCallbacksAndMessages(null);
+        ephemeralTimeoutHandler.removeCallbacksAndMessages(null);
         view.setVisibility(View.GONE);
         likeButton.setVisibility(View.VISIBLE);
         likeButton.setTag(null);
@@ -237,11 +241,12 @@ public class FooterViewController implements ConversationItemViewController,
         Runnable linkRunnable = null;
         boolean linkUnderlined = true;
         int linkHighlightColor = ContextCompat.getColor(context, R.color.accent_red);
+        Timber.w("message.isEphemeral=%b, message.getExpirationTime()=%s, message.isExpired()=%b", message.isEphemeral(), message.getExpirationTime().toString(), message.isExpired());
         if (message.isEphemeral() && message.getExpirationTime().compareTo(Instant.MAX) != 0 && !message.isExpired()) {
             long remainingTime = remainingSeconds(message.getExpirationTime());
             status = context.getString(R.string.message_footer__status__ephemeral, timestamp, remainingTime);
             if (remainingTime > 0) {
-                mainHandler.postDelayed(new Runnable() {
+                ephemeralTimeoutHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         updateMessageStatusLabel();

@@ -811,6 +811,10 @@ public class CursorLayout extends FrameLayout implements
             final String value;
             final int background;
             switch (expiration) {
+                case ONE_DAY:
+                    value = String.valueOf(expiration.milliseconds / 1000 / 60 / 60 / 24);
+                    background = R.drawable.ephemeral_day;
+                    break;
                 case ONE_MINUTE:
                 case FIVE_MINUTES:
                     value = String.valueOf(expiration.milliseconds / 1000 / 60);
