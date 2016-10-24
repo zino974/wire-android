@@ -67,6 +67,7 @@ public class ImageMessageViewController extends MessageViewController implements
     private boolean previewLoaded;
     private int paddingLeft;
     private int paddingRight;
+    private boolean tapButtonsVisible;
 
     private final OnDoubleClickListener containerOnDoubleClickListener = new OnDoubleClickListener() {
         @Override
@@ -89,12 +90,13 @@ public class ImageMessageViewController extends MessageViewController implements
 
         @Override
         public void onSingleClick() {
+            tapButtonsVisible = !tapButtonsVisible;
+            int visibility = tapButtonsVisible ? View.VISIBLE : View.GONE;
+            singleImageButton.setVisibility(visibility);
+            sketchButton.setVisibility(visibility);
+
             if (footerActionCallback != null) {
-                int visibility = footerActionCallback.toggleVisibility() ? View.VISIBLE : View.GONE;
-                if (!(message.isEphemeral() && message.isExpired())) {
-                    singleImageButton.setVisibility(visibility);
-                    sketchButton.setVisibility(visibility);
-                }
+                footerActionCallback.toggleVisibility();
             }
         }
     };
@@ -135,6 +137,7 @@ public class ImageMessageViewController extends MessageViewController implements
                 showSketchOnImageView();
             }
         });
+        tapButtonsVisible = false;
         ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         previewLoadingIndicator.setColor(messageViewContainer.getControllerFactory().getAccentColorController().getColor());
