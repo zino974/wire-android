@@ -81,7 +81,8 @@ public class VerifyPhoneFragment extends BaseFragment<VerifyPhoneFragment.Contai
                                          new AppEntryUtil.ErrorDialogCallback() {
                                              @Override
                                              public void onOk() {
-                                                 if (editTextCode == null) {
+                                                 if (editTextCode == null ||
+                                                     phoneConfirmationButton == null) {
                                                      return;
                                                  }
                                                  KeyboardUtils.showKeyboard(getActivity());
