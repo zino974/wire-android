@@ -411,4 +411,13 @@ public class ImageMessageViewController extends MessageViewController implements
                                                                                         IDrawingController.DrawingDestination.SINGLE_IMAGE_VIEW);
     }
 
+    @Override
+    public void OnFooterChanged(boolean visible) {
+        if(!visible){
+            singleImageButton.setVisibility(View.GONE);
+            sketchButton.setVisibility(View.GONE);
+            tapButtonsVisible = false;
+        }
+    }
+
 }

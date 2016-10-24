@@ -27,6 +27,7 @@ import com.waz.api.Asset;
 import com.waz.api.Message;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.footer.FooterActionCallback;
+import com.waz.zclient.pages.main.conversation.views.row.footer.FooterActionListener;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 
 import static com.waz.api.AssetStatus.META_DATA_SENT;
@@ -35,7 +36,8 @@ import static com.waz.api.AssetStatus.UPLOAD_IN_PROGRESS;
 import static com.waz.api.AssetStatus.UPLOAD_NOT_STARTED;
 
 public abstract class MessageViewController implements ConversationItemViewController,
-                                                       View.OnLongClickListener {
+                                                       View.OnLongClickListener,
+                                                       FooterActionListener {
 
     protected Context context;
     protected Message message;
@@ -54,6 +56,9 @@ public abstract class MessageViewController implements ConversationItemViewContr
     @CallSuper
     protected void setFooterActionCallback(FooterActionCallback footerActionCallback) {
         this.footerActionCallback = footerActionCallback;
+        if(footerActionCallback != null) {
+            footerActionCallback.addActionListener(this);
+        }
     }
 
     /**
@@ -122,4 +127,9 @@ public abstract class MessageViewController implements ConversationItemViewContr
         v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         return messageViewsContainer.onItemLongClick(message);
     }
+
+    @Override
+    public void OnFooterChanged(boolean visible) {
+    }
+
 }

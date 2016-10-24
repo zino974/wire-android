@@ -47,6 +47,8 @@ import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.Instant;
 import org.threeten.bp.temporal.ChronoUnit;
 
+import java.util.HashSet;
+
 public class FooterViewController implements ConversationItemViewController,
                                              FooterLikeDetailsLayout.OnClickListener,
                                              FooterActionCallback {
@@ -71,6 +73,8 @@ public class FooterViewController implements ConversationItemViewController,
 
     private boolean isMyLastMessage;
     private final float height;
+
+    private HashSet<FooterActionListener> actionListeners = new HashSet<>();
 
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
@@ -404,6 +408,7 @@ public class FooterViewController implements ConversationItemViewController,
             }
         });
         animator.start();
+        notifyListeners(false);
     }
 
     private void showLikeDetails() {
@@ -485,12 +490,15 @@ public class FooterViewController implements ConversationItemViewController,
         }
         if (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0) {
             expand();
+            notifyListeners(true);
             return true;
         } else if (likeButton.getVisibility() == View.GONE && shouldShowLikeButton()) {
             likeButton.setVisibility(View.VISIBLE);
+            notifyListeners(true);
             return true;
         } else if (message.isLiked()) {
             showTimestampForABit();
+            notifyListeners(true);
             return true;
         } else {
             collapse();
@@ -504,6 +512,7 @@ public class FooterViewController implements ConversationItemViewController,
             collapse();
         } else {
             view.setVisibility(View.GONE);
+            notifyListeners(false);
         }
         if (container.getExpandedView() == this) {
             container.setExpandedView(null);
@@ -522,5 +531,21 @@ public class FooterViewController implements ConversationItemViewController,
                !(message.getMessageStatus() == Message.Status.FAILED ||
                  message.getMessageStatus() == Message.Status.FAILED_READ ||
                  message.getMessageStatus() == Message.Status.PENDING);
+    }
+
+    @Override
+    public void addActionListener(FooterActionListener listener) {
+        actionListeners .add(listener);
+    }
+
+    @Override
+    public void removeActionListener(FooterActionListener listener) {
+        actionListeners .remove(listener);
+    }
+
+    private void notifyListeners(boolean visible){
+        for (FooterActionListener listener : actionListeners ) {
+            listener.OnFooterChanged(visible);
+        }
     }
 }
