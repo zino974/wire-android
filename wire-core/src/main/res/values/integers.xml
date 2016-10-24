@@ -193,4 +193,6 @@
     <integer name="share_location__current_location_marker__mid_ring_alpha">102</integer>
     <integer name="share_location__current_location_marker__inner_ring_alpha">255</integer>
 
+    <integer name="account_preferences__min_name_length">2</integer>
+
 </resources>
