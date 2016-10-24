@@ -457,6 +457,8 @@
     <string name="pref_account_sign_out_warning_verify">Log out</string>
     <string name="pref_account_sign_out_warning_cancel">Cancel</string>
     <string name="pref_account_password_title">Reset Password</string>
+    <string name="pref_account_edit_name_empty_warning">Name must have 2 or more characters</string>
+    <string name="pref_account_edit_name_empty_verify">OK</string>
 
     <!-- Options -->
     <string name="pref_options_dark_theme_title">Dark theme</string>
