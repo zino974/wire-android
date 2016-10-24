@@ -53,6 +53,11 @@ public class FooterViewController implements ConversationItemViewController,
 
     private static final int LIKE_HINT_VISIBILITY_MIL_SEC = 3000;
     private static final int TIMESTAMP_VISIBILITY_MIL_SEC = 5000;
+
+    private static final int TIME_IN_SECONDS_ONE_DAY = 24 * 60 * 60;
+    private static final int TIME_IN_SECONDS_ONE_HOUR = 60 * 60;
+    private static final int TIME_IN_SECONDS_ONE_MINUTE = 60;
+
     private static final int EPHEMERAL_REFRESH_TIMEOUT = 500;
     private final Context context;
     private final MessageViewsContainer container;
@@ -241,9 +246,9 @@ public class FooterViewController implements ConversationItemViewController,
         boolean linkUnderlined = true;
         int linkHighlightColor = ContextCompat.getColor(context, R.color.accent_red);
         if (message.isEphemeral() && message.getExpirationTime().compareTo(Instant.MAX) != 0 && !message.isExpired()) {
-            long remainingTime = remainingSeconds(message.getExpirationTime());
-            status = context.getString(R.string.message_footer__status__ephemeral, timestamp, remainingTime);
-            if (remainingTime > 0) {
+            long remainingSeconds = remainingSeconds(message.getExpirationTime());
+            status = getEphemeralTimoutString(timestamp, remainingSeconds);
+            if (remainingSeconds > 0) {
                 ephemeralTimeoutHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -294,6 +299,29 @@ public class FooterViewController implements ConversationItemViewController,
                                   false,
                                   linkUnderlined,
                                   linkRunnable);
+    }
+
+    private String getEphemeralTimoutString(String prefixTimestamp, long totalSeconds) {
+        StringBuilder stringBuilder = new StringBuilder();
+        long remainingSeconds = totalSeconds;
+        if (totalSeconds > TIME_IN_SECONDS_ONE_DAY) {
+            int days = (int) (totalSeconds / TIME_IN_SECONDS_ONE_DAY);
+            stringBuilder.append(context.getResources().getQuantityString(R.plurals.message_footer__expire__days, days, days)).append(", ");
+            remainingSeconds -= days * TIME_IN_SECONDS_ONE_DAY;
+        }
+        if (totalSeconds > TIME_IN_SECONDS_ONE_HOUR) {
+            int hours = (int) (remainingSeconds / TIME_IN_SECONDS_ONE_HOUR);
+            stringBuilder.append(context.getResources().getQuantityString(R.plurals.message_footer__expire__hours, hours, hours)).append(", ");
+            remainingSeconds -= hours * TIME_IN_SECONDS_ONE_HOUR;
+        }
+        if (totalSeconds > TIME_IN_SECONDS_ONE_MINUTE) {
+            int minutes = (int) (remainingSeconds / TIME_IN_SECONDS_ONE_MINUTE);
+            stringBuilder.append(context.getResources().getQuantityString(R.plurals.message_footer__expire__minutes, minutes, minutes)).append(", ");
+            remainingSeconds -= minutes * TIME_IN_SECONDS_ONE_MINUTE;
+        }
+        stringBuilder.append(context.getResources().getQuantityString(R.plurals.message_footer__expire__seconds, (int) remainingSeconds, (int) remainingSeconds));
+
+        return context.getString(R.string.message_footer__status__ephemeral, prefixTimestamp, stringBuilder.toString());
     }
 
     private long remainingSeconds(Instant instant) {
