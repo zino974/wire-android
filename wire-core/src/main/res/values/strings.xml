@@ -168,7 +168,6 @@
     <string name="people_picker__contact_list__contact_selection_button__label">INVITE</string>
     <string name="people_picker__contact_list__invite_dialog__title">Send invitation</string>
     <string name="people_picker__contact_list__searchbox__hint">\u0020 SEARCH BY NAME</string>
-    <string name="people_picker__contact_list__generic_invite__label">SHARE WIRE WITH YOUR FRIENDS</string>
     <string name="people_picker__contact_list__generic_invite__button__label">INVITE MORE PEOPLE</string>
 
     <!-- Conversation: Quick menu -->

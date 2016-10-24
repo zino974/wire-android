@@ -70,7 +70,7 @@
         android:maxLines="1"
         android:ellipsize="none"
         android:textSize="@dimen/wire__text_size__small"
-        app:font="@string/wire__typeface__light"
+        app:font="@string/wire__typeface__medium"
         />
 
 </FrameLayout>

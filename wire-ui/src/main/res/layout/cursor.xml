@@ -93,7 +93,7 @@
                 android:text="@string/cursor__type_a_message"
                 android:textColor="@color/light_graphite"
                 android:textSize="@dimen/wire__text_size__small"
-                custom:font="@string/wire__typeface__light"
+                custom:font="@string/wire__typeface__medium"
                 android:paddingStart="@dimen/wire__padding__small"
                 />
 
