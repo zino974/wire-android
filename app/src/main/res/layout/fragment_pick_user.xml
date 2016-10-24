@@ -157,7 +157,7 @@
         android:layout_gravity="bottom"
         style="?wireBackground"
         >
-        
+
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/people_picker__border_line__height"
@@ -204,24 +204,11 @@
             android:paddingEnd="@dimen/wire__padding__big"
             >
 
-            <com.waz.zclient.ui.text.TypefaceTextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="start"
-                android:text="@string/people_picker__contact_list__generic_invite__label"
-                android:textColor="@color/text__primary_dark"
-                android:textSize="@dimen/wire__text_size__small"
-                android:textAllCaps="true"
-                app:font="@string/wire__typeface__bold"
-                />
-
             <com.waz.zclient.ui.views.ZetaButton
                 android:id="@+id/zb__pickuser__generic_invite"
-                android:layout_width="@dimen/contactlist__user_selection_button__width"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/button__height"
                 android:layout_gravity="top"
-                android:layout_marginStart="@dimen/wire__padding__big"
                 android:gravity="center"
                 android:textColor="@color/text__primary_dark"
                 android:textSize="@dimen/wire__text_size__small"
