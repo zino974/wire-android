@@ -321,7 +321,7 @@ public class FooterViewController implements ConversationItemViewController,
         }
         stringBuilder.append(context.getResources().getQuantityString(R.plurals.message_footer__expire__seconds, (int) remainingSeconds, (int) remainingSeconds));
 
-        return context.getString(R.string.message_footer__status__ephemeral, prefixTimestamp, stringBuilder.toString());
+        return context.getString(R.string.message_footer__status__ephemeral_summary, prefixTimestamp, stringBuilder.toString());
     }
 
     private long remainingSeconds(Instant instant) {
