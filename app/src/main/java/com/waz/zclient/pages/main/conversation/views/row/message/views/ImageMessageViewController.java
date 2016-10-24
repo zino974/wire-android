@@ -92,8 +92,10 @@ public class ImageMessageViewController extends MessageViewController implements
         public void onSingleClick() {
             tapButtonsVisible = !tapButtonsVisible;
             int visibility = tapButtonsVisible ? View.VISIBLE : View.GONE;
-            singleImageButton.setVisibility(visibility);
-            sketchButton.setVisibility(visibility);
+            if (!(message.isEphemeral() && message.isExpired())) {
+                singleImageButton.setVisibility(visibility);
+                sketchButton.setVisibility(visibility);
+            }
 
             if (footerActionCallback != null) {
                 footerActionCallback.toggleVisibility();
