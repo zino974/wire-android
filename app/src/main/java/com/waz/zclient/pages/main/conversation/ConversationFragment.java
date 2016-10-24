@@ -2498,7 +2498,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             boolean ephemeral = false;
             for (int i = listView.getFirstVisiblePosition(); i <= listView.getLastVisiblePosition(); i++) {
                 Message message = (Message) listView.getItemAtPosition(i);
-                if (message.isEphemeral()) {
+                if (message != null && message.isEphemeral()) {
                     ephemeral = true;
                     break;
                 }
