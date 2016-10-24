@@ -46,7 +46,6 @@ import com.waz.zclient.utils.ZTimeFormatter;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.Instant;
 import org.threeten.bp.temporal.ChronoUnit;
-import timber.log.Timber;
 
 public class FooterViewController implements ConversationItemViewController,
                                              FooterLikeDetailsLayout.OnClickListener,
@@ -241,7 +240,6 @@ public class FooterViewController implements ConversationItemViewController,
         Runnable linkRunnable = null;
         boolean linkUnderlined = true;
         int linkHighlightColor = ContextCompat.getColor(context, R.color.accent_red);
-        Timber.w("message.isEphemeral=%b, message.getExpirationTime()=%s, message.isExpired()=%b", message.isEphemeral(), message.getExpirationTime().toString(), message.isExpired());
         if (message.isEphemeral() && message.getExpirationTime().compareTo(Instant.MAX) != 0 && !message.isExpired()) {
             long remainingTime = remainingSeconds(message.getExpirationTime());
             status = context.getString(R.string.message_footer__status__ephemeral, timestamp, remainingTime);
