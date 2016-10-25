@@ -392,6 +392,9 @@ public class ImageMessageViewController extends MessageViewController implements
             }
             previewLoadingIndicator.hide();
             previewLoadingIndicator.setVisibility(View.GONE);
+            singleImageButton.setVisibility(View.GONE);
+            sketchButton.setVisibility(View.GONE);
+            tapButtonsVisible = false;
         } else {
             imageContainer.setBackground(null);
             gifImageView.setVisibility(View.VISIBLE);
