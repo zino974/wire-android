@@ -168,7 +168,7 @@ public class MessageAdapter extends BaseAdapter {
                                                      parent.getContext());
     }
 
-    public List<View> getActiveViews(){
+    public List<View> getActiveViews() {
         ArrayList<View> activeViews = new ArrayList<>();
         activeViews.addAll(weakViewsSet);
         return activeViews;

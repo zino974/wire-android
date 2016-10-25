@@ -414,7 +414,7 @@ public class ImageMessageViewController extends MessageViewController implements
                                                                                         IDrawingController.DrawingDestination.SINGLE_IMAGE_VIEW);
     }
 
-    public void closeExtras(){
+    public void closeExtras() {
         singleImageButton.setVisibility(View.GONE);
         sketchButton.setVisibility(View.GONE);
         tapButtonsVisible = false;

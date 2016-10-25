@@ -1365,10 +1365,10 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     @Override
-    public void closeMessageViewsExtras(){
+    public void closeMessageViewsExtras() {
         for (View v : messageAdapter.getActiveViews()) {
-            MessageAndSeparatorViewController messageVC = (MessageAndSeparatorViewController)v.getTag();
-            if(messageVC != null){
+            MessageAndSeparatorViewController messageVC = (MessageAndSeparatorViewController) v.getTag();
+            if (messageVC != null) {
                 messageVC.closeMessageViewControllerExtras();
             }
         }
