@@ -47,9 +47,6 @@ import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.Instant;
 import org.threeten.bp.temporal.ChronoUnit;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class FooterViewController implements ConversationItemViewController,
                                              FooterLikeDetailsLayout.OnClickListener,
                                              FooterActionCallback {
@@ -74,8 +71,6 @@ public class FooterViewController implements ConversationItemViewController,
 
     private boolean isMyLastMessage;
     private final float height;
-
-    private Set<FooterActionListener> actionListeners;
 
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
@@ -151,7 +146,6 @@ public class FooterViewController implements ConversationItemViewController,
         likeButtonColorUnliked = ContextCompat.getColor(context, R.color.text__secondary_light);
         height = context.getResources().getDimension(R.dimen.content__footer__height);
 
-        actionListeners = new HashSet<>();
     }
 
     public void setMessage(Message message) {
@@ -350,9 +344,6 @@ public class FooterViewController implements ConversationItemViewController,
     }
 
     private void expand() {
-        if (container.getExpandedView() != null && container.getExpandedView() != this) {
-            container.getExpandedView().close();
-        }
         container.setExpandedMessageId(message.getId());
         container.setExpandedView(this);
         view.setVisibility(View.VISIBLE);
@@ -394,9 +385,9 @@ public class FooterViewController implements ConversationItemViewController,
         animator.start();
     }
 
-    private void collapse() {
+    private boolean collapse() {
         if (shouldBeExpanded()) {
-            return;
+            return false;
         }
         if (message.getId().equals(container.getExpandedMessageId())) {
             container.setExpandedMessageId(null);
@@ -411,7 +402,7 @@ public class FooterViewController implements ConversationItemViewController,
             }
         });
         animator.start();
-        notifyListeners(false);
+        return true;
     }
 
     private void showLikeDetails() {
@@ -491,21 +482,20 @@ public class FooterViewController implements ConversationItemViewController,
         if (message == null) {
             return false;
         }
+        if (container.getExpandedView() != null && container.getExpandedView() != this) {
+            container.getExpandedView().close();
+        }
         if (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0) {
             expand();
-            notifyListeners(true);
             return true;
         } else if (likeButton.getVisibility() == View.GONE && shouldShowLikeButton()) {
             likeButton.setVisibility(View.VISIBLE);
-            notifyListeners(true);
             return true;
         } else if (message.isLiked()) {
             showTimestampForABit();
-            notifyListeners(true);
             return true;
         } else {
-            collapse();
-            return false;
+            return !collapse();
         }
     }
 
@@ -515,7 +505,6 @@ public class FooterViewController implements ConversationItemViewController,
             collapse();
         } else {
             view.setVisibility(View.GONE);
-            notifyListeners(false);
         }
         if (container.getExpandedView() == this) {
             container.setExpandedView(null);
@@ -534,21 +523,5 @@ public class FooterViewController implements ConversationItemViewController,
                !(message.getMessageStatus() == Message.Status.FAILED ||
                  message.getMessageStatus() == Message.Status.FAILED_READ ||
                  message.getMessageStatus() == Message.Status.PENDING);
-    }
-
-    @Override
-    public void addActionListener(FooterActionListener listener) {
-        actionListeners .add(listener);
-    }
-
-    @Override
-    public void removeActionListener(FooterActionListener listener) {
-        actionListeners .remove(listener);
-    }
-
-    private void notifyListeners(boolean visible) {
-        for (FooterActionListener listener : actionListeners) {
-            listener.OnFooterChanged(visible);
-        }
     }
 }

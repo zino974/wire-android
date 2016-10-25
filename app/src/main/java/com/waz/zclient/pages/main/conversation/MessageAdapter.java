@@ -32,6 +32,11 @@ import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewCont
 import com.waz.zclient.pages.main.conversation.views.row.message.views.TextMessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.utils.MessageUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.WeakHashMap;
 import timber.log.Timber;
 
 
@@ -41,8 +46,12 @@ public class MessageAdapter extends BaseAdapter {
     private MessagesList messagesList;
     private Message lastReadMessage;
 
+    private Set<View> weakViewsSet;
+
     public MessageAdapter(MessageViewsContainer container) {
         this.container = container;
+        weakViewsSet = Collections.newSetFromMap(
+            new WeakHashMap<View, Boolean>());
     }
 
     public void resetState() {
@@ -130,6 +139,7 @@ public class MessageAdapter extends BaseAdapter {
             messageAndSeparator = createNewMessageAndSeparatorViewController(parent, message);
             convertView = messageAndSeparator.getView();
             convertView.setTag(messageAndSeparator);
+            weakViewsSet.add(convertView);
         } else {
             messageAndSeparator = (MessageAndSeparatorViewController) convertView.getTag();
             if (messageAndSeparator.getMessageViewController() instanceof TextMessageViewController &&
@@ -156,5 +166,11 @@ public class MessageAdapter extends BaseAdapter {
                                                      footerViewController,
                                                      container,
                                                      parent.getContext());
+    }
+
+    public List<View> getActiveViews(){
+        ArrayList<View> activeViews = new ArrayList<>();
+        activeViews.addAll(weakViewsSet);
+        return activeViews;
     }
 }

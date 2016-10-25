@@ -90,15 +90,17 @@ public class ImageMessageViewController extends MessageViewController implements
 
         @Override
         public void onSingleClick() {
-            tapButtonsVisible = !tapButtonsVisible;
+            boolean shouldOpenTapButtons = false;
+            if (footerActionCallback != null) {
+                boolean footerVisible = footerActionCallback.toggleVisibility();
+                shouldOpenTapButtons = !tapButtonsVisible && footerVisible;
+            }
+            messageViewsContainer.closeMessageViewsExtras();
+            tapButtonsVisible = shouldOpenTapButtons;
             int visibility = tapButtonsVisible ? View.VISIBLE : View.GONE;
             if (!(message.isEphemeral() && message.isExpired())) {
                 singleImageButton.setVisibility(visibility);
                 sketchButton.setVisibility(visibility);
-            }
-
-            if (footerActionCallback != null) {
-                footerActionCallback.toggleVisibility();
             }
         }
     };
@@ -352,6 +354,7 @@ public class ImageMessageViewController extends MessageViewController implements
         sketchButton.setVisibility(View.GONE);
         gifImageView.setVisibility(View.INVISIBLE);
         gifImageView.setImageDrawable(null);
+        tapButtonsVisible = false;
         previewLoadingIndicator.hide();
         previewLoadingIndicator.setVisibility(View.GONE);
         textViewChangeSetting.setOnClickListener(null);
@@ -411,13 +414,10 @@ public class ImageMessageViewController extends MessageViewController implements
                                                                                         IDrawingController.DrawingDestination.SINGLE_IMAGE_VIEW);
     }
 
-    @Override
-    public void OnFooterChanged(boolean visible) {
-        if (!visible) {
-            singleImageButton.setVisibility(View.GONE);
-            sketchButton.setVisibility(View.GONE);
-            tapButtonsVisible = false;
-        }
+    public void closeExtras(){
+        singleImageButton.setVisibility(View.GONE);
+        sketchButton.setVisibility(View.GONE);
+        tapButtonsVisible = false;
     }
 
 }

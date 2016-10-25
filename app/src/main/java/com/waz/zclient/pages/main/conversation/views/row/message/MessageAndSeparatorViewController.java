@@ -88,4 +88,7 @@ public class MessageAndSeparatorViewController implements ConversationItemViewCo
         return messageViewController.getMessage();
     }
 
+    public void closeMessageViewControllerExtras(){
+        messageViewController.closeExtras();
+    }
 }
