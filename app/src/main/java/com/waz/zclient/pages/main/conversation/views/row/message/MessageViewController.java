@@ -56,7 +56,7 @@ public abstract class MessageViewController implements ConversationItemViewContr
     @CallSuper
     protected void setFooterActionCallback(FooterActionCallback footerActionCallback) {
         this.footerActionCallback = footerActionCallback;
-        if(footerActionCallback != null) {
+        if (footerActionCallback != null) {
             footerActionCallback.addActionListener(this);
         }
     }

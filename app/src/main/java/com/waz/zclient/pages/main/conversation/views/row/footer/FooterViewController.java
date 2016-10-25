@@ -48,6 +48,7 @@ import org.threeten.bp.Instant;
 import org.threeten.bp.temporal.ChronoUnit;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class FooterViewController implements ConversationItemViewController,
                                              FooterLikeDetailsLayout.OnClickListener,
@@ -74,7 +75,7 @@ public class FooterViewController implements ConversationItemViewController,
     private boolean isMyLastMessage;
     private final float height;
 
-    private HashSet<FooterActionListener> actionListeners = new HashSet<>();
+    private Set<FooterActionListener> actionListeners;
 
     private final ModelObserver<Message> messageModelObserver = new ModelObserver<Message>() {
         @Override
@@ -149,6 +150,8 @@ public class FooterViewController implements ConversationItemViewController,
         likeButtonColorLiked = ContextCompat.getColor(context, R.color.accent_red);
         likeButtonColorUnliked = ContextCompat.getColor(context, R.color.text__secondary_light);
         height = context.getResources().getDimension(R.dimen.content__footer__height);
+
+        actionListeners = new HashSet<>();
     }
 
     public void setMessage(Message message) {
@@ -543,8 +546,8 @@ public class FooterViewController implements ConversationItemViewController,
         actionListeners .remove(listener);
     }
 
-    private void notifyListeners(boolean visible){
-        for (FooterActionListener listener : actionListeners ) {
+    private void notifyListeners(boolean visible) {
+        for (FooterActionListener listener : actionListeners) {
             listener.OnFooterChanged(visible);
         }
     }

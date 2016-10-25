@@ -413,7 +413,7 @@ public class ImageMessageViewController extends MessageViewController implements
 
     @Override
     public void OnFooterChanged(boolean visible) {
-        if(!visible){
+        if (!visible) {
             singleImageButton.setVisibility(View.GONE);
             sketchButton.setVisibility(View.GONE);
             tapButtonsVisible = false;
