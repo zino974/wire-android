@@ -65,9 +65,12 @@ public class ImageMessageViewController extends MessageViewController implements
     private UpdateListener imageAssetUpdateListener;
     private LoadHandle bitmapLoadHandle;
     private boolean previewLoaded;
+    private boolean tapButtonsVisible;
     private int paddingLeft;
     private int paddingRight;
-    private boolean tapButtonsVisible;
+    private int imageButtonsBasePadding;
+    private int imageButtonsSize;
+    private int minImageContainerWidth;
 
     private final OnDoubleClickListener containerOnDoubleClickListener = new OnDoubleClickListener() {
         @Override
@@ -150,6 +153,9 @@ public class ImageMessageViewController extends MessageViewController implements
 
         paddingLeft = (int) context.getResources().getDimension(R.dimen.content__padding_left);
         paddingRight = (int) context.getResources().getDimension(R.dimen.content__padding_right);
+        imageButtonsBasePadding = (int) context.getResources().getDimension(R.dimen.wire__padding__regular);
+        imageButtonsSize = (int) context.getResources().getDimension(R.dimen.content__image__button_size);
+        minImageContainerWidth = (int) context.getResources().getDimension(R.dimen.content__min_container_width);
 
         afterInit();
     }
@@ -173,6 +179,10 @@ public class ImageMessageViewController extends MessageViewController implements
 
         // no left/right padding for full width images
         boolean imageViewSidePadding = originalWidth < displayWidth;
+
+        final int finalWidth = computeFinalWidth(originalWidth, displayWidth, imageViewSidePadding);
+        final int finalHeight = getScaledHeight(originalWidth, originalHeight, finalWidth);
+
         if (!imageViewSidePadding) {
             ViewUtils.setPaddingLeftRight(imageContainer, 0);
         } else {
@@ -183,14 +193,23 @@ public class ImageMessageViewController extends MessageViewController implements
                 ViewUtils.setWidth(imageContainer, imageContainer.getContext().getResources().getDimensionPixelSize(R.dimen.content__width));
             } else {
                 ViewUtils.setPaddingLeft(imageContainer, paddingLeft);
-                ViewUtils.setPaddingRight(imageContainer, paddingRight);
+                ViewUtils.setPaddingRight(imageContainer, getAdjustedRightPadding(displayWidth, finalWidth));
                 imageContainer.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                                                                            FrameLayout.LayoutParams.MATCH_PARENT));
+                    FrameLayout.LayoutParams.MATCH_PARENT));
+                int buttonsPadding = getButtonsPadding(finalWidth);
+
+                ((FrameLayout.LayoutParams) sketchButton.getLayoutParams()).setMargins(
+                    buttonsPadding,
+                    imageButtonsBasePadding,
+                    buttonsPadding,
+                    imageButtonsBasePadding);
+                ((FrameLayout.LayoutParams) singleImageButton.getLayoutParams()).setMargins(
+                    buttonsPadding,
+                    imageButtonsBasePadding,
+                    buttonsPadding,
+                    imageButtonsBasePadding);
             }
         }
-
-        final int finalWidth = computeFinalWidth(originalWidth, displayWidth, imageViewSidePadding);
-        final int finalHeight = getScaledHeight(originalWidth, originalHeight, finalWidth);
 
         ViewGroup.LayoutParams layoutParams = gifImageView.getLayoutParams();
         layoutParams.width = finalWidth;
@@ -334,6 +353,17 @@ public class ImageMessageViewController extends MessageViewController implements
         double scaleFactor = finalWidth / originalWidth;
         return (int) (originalHeight * scaleFactor);
     }
+
+    private int getAdjustedRightPadding(int displayWidth, int finalWidth) {
+        int containerWidth = Math.max(finalWidth, minImageContainerWidth);
+        return displayWidth - containerWidth - paddingLeft;
+    }
+
+    private int getButtonsPadding(int finalWidth) {
+        int containerWidth = Math.max(finalWidth, minImageContainerWidth);
+        return Math.max(imageButtonsBasePadding + Math.min((containerWidth - (imageButtonsSize  + imageButtonsBasePadding) * 2) / 2, 0), 0);
+    }
+
 
     @Override
     public View getView() {
