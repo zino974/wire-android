@@ -20,6 +20,7 @@ package com.waz.zclient.ui.colorpicker;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
@@ -27,6 +28,7 @@ import android.view.View;
 public class ColorPickerScrollView extends View {
 
     private Paint paint;
+    private Paint darkPaint;
     private int leftX = 0;
     private int scrollBarSize = 0;
     private int maxScrollViewScroll = 0;
@@ -46,6 +48,8 @@ public class ColorPickerScrollView extends View {
 
     private void init() {
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        darkPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        darkPaint.setColor(Color.BLACK);
     }
 
     public void setLeftX(int scrollX) {
