@@ -80,7 +80,6 @@ public class ZetaPreferencesActivity extends BasePreferenceActivity implements A
                                                                                ProfileStoreObserver,
                                                                                AccentColorObserver,
                                                                                CameraFragment.Container {
-    public static final String TAG = ZetaPreferencesActivity.class.getSimpleName();
     public static final String SHOW_SPOTIFY_LOGIN = "SHOW_SPOTIFY_LOGIN";
     public static final String SHOW_OTR_DEVICES = "SHOW_OTR_DEVICES";
     public static final String SHOW_ACCOUNT = "SHOW_ACCOUNT";
