@@ -18,8 +18,10 @@
 package com.waz.zclient.controllers.notifications;
 
 
+import com.waz.api.EphemeralExpiration;
 import com.waz.api.ErrorResponse;
 import com.waz.api.IConversation;
+import com.waz.api.KindOfTrackingEvent;
 import com.waz.api.TrackingEvent;
 import com.waz.api.TrackingEventsHandler;
 import com.waz.service.call.AvsMetrics;
@@ -61,36 +63,44 @@ public class AppTrackingEventsHandler implements TrackingEventsHandler {
             case ASSET_UPLOAD_STARTED:
                 String conversationType = trackingEvent.getConversationType().getOrElse(IConversation.Type.UNKNOWN).toString();
                 boolean withOtto = trackingEvent.isInConversationWithOtto().getOrElse(false);
-                trackingController.tagEvent(new InitiatedFileUploadEvent(assetMimeType, assetSize, conversationType));
+                trackingController.tagEvent(new InitiatedFileUploadEvent(assetMimeType,
+                                                                         assetSize,
+                                                                         conversationType,
+                                                                         isEphemeral(trackingEvent),
+                                                                         getEphemeraDurationAsSec(trackingEvent)));
                 CompletedMediaType mediaType = CompletedMediaType.FILE;
                 if (assetMimeType.contains(ASSET_MIME_TYPE_AUDIO)) {
                     mediaType = CompletedMediaType.AUDIO;
                 } else if (assetMimeType.contains(ASSET_MIME_TYPE_VIDEO)) {
                     mediaType = CompletedMediaType.VIDEO;
                 }
-                // TODO: CM-1105 Set ephemeral flag with real value
+
                 trackingController.tagEvent(new CompletedMediaActionEvent(mediaType,
                                                                           conversationType,
                                                                           withOtto,
-                                                                          false,
-                                                                          ""));
+                                                                          isEphemeral(trackingEvent),
+                                                                          getEphemeraDurationAsSec(trackingEvent)));
                 break;
             case IMAGE_UPLOAD_AS_ASSET:
                 String type = trackingEvent.getConversationType().getOrElse(IConversation.Type.UNKNOWN).toString();
                 boolean withBot = trackingEvent.isInConversationWithOtto().getOrElse(false);
-                trackingController.tagEvent(new InitiatedFileUploadEvent(assetMimeType, assetSize, type));
+                trackingController.tagEvent(new InitiatedFileUploadEvent(assetMimeType,
+                                                                         assetSize,
+                                                                         type,
+                                                                         isEphemeral(trackingEvent),
+                                                                         getEphemeraDurationAsSec(trackingEvent)));
+
                 trackingController.tagEvent(new SentPictureEvent(SentPictureEvent.Source.CLIP, type,
                                                                  SentPictureEvent.Method.DEFAULT,
                                                                  SentPictureEvent.SketchSource.NONE,
                                                                  withBot,
-                                                                 false,
-                                                                 ""));
-                // TODO: CM-1105 Set ephemeral flag with real value
+                                                                 isEphemeral(trackingEvent),
+                                                                 getEphemeraDurationAsSec(trackingEvent)));
                 trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.PHOTO,
                                                                           type,
                                                                           withBot,
-                                                                          false,
-                                                                          ""));
+                                                                          isEphemeral(trackingEvent),
+                                                                          getEphemeraDurationAsSec(trackingEvent)));
                 break;
             case ASSET_UPLOAD_SUCCESSFUL:
                 int durationInSeconds = (int) (trackingEvent.getDuration().getOrElse(Duration.ofSeconds(-1)).toMillis() / 1000);
@@ -134,5 +144,24 @@ public class AppTrackingEventsHandler implements TrackingEventsHandler {
         }
         */
         trackingController.tagAVSMetricEvent(new EndedCallAVSMetricsEvent(avsMetrics));
+    }
+
+    private boolean isEphemeral(TrackingEvent trackingEvent) {
+        if (trackingEvent.getKind() != KindOfTrackingEvent.ASSET_UPLOAD_STARTED &&
+            trackingEvent.getKind() != KindOfTrackingEvent.IMAGE_UPLOAD_AS_ASSET) {
+            return false;
+        }
+        return trackingEvent.getEphemeralExpiration() != EphemeralExpiration.NONE;
+    }
+
+    private String getEphemeraDurationAsSec(TrackingEvent trackingEvent) {
+        if (trackingEvent.getKind() != KindOfTrackingEvent.ASSET_UPLOAD_STARTED &&
+            trackingEvent.getKind() != KindOfTrackingEvent.IMAGE_UPLOAD_AS_ASSET) {
+            return "";
+        }
+        if (isEphemeral(trackingEvent)) {
+            return String.valueOf(trackingEvent.getEphemeralExpiration().duration().toSeconds());
+        }
+        return "";
     }
 }
