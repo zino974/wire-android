@@ -2289,9 +2289,15 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     @Override
-    public void onExtendedCursorClosed() {
+    public void onExtendedCursorClosed(ExtendedCursorContainer.Type lastType) {
         cursorLayout.onExtendedCursorClosed();
         hideSendButtonIfNeeded();
+        if(lastType == ExtendedCursorContainer.Type.EPHEMERAL){
+            EphemeralExpiration expiration = getStoreFactory().getConversationStore().getCurrentConversation().getEphemeralExpiration();
+            if (!expiration.equals(EphemeralExpiration.NONE)) {
+                getControllerFactory().getUserPreferencesController().setLastEphemeralValue(expiration.milliseconds);
+            }
+        }
     }
 
     private void hideSendButtonIfNeeded() {
@@ -2550,9 +2556,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         }
         if (close) {
             extendedCursorContainer.close(false);
-        }
-        if (!expiration.equals(EphemeralExpiration.NONE)) {
-            getControllerFactory().getUserPreferencesController().setLastEphemeralValue(expiration.milliseconds);
         }
         getStoreFactory().getConversationStore().getCurrentConversation().setEphemeralExpiration(expiration);
     }
