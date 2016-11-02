@@ -2550,9 +2550,9 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         }
         if (close) {
             extendedCursorContainer.close(false);
-            if (!expiration.equals(EphemeralExpiration.NONE)) {
-                getControllerFactory().getUserPreferencesController().setLastEphemeralValue(expiration.milliseconds);
-            }
+        }
+        if (!expiration.equals(EphemeralExpiration.NONE)) {
+            getControllerFactory().getUserPreferencesController().setLastEphemeralValue(expiration.milliseconds);
         }
         getStoreFactory().getConversationStore().getCurrentConversation().setEphemeralExpiration(expiration);
     }
