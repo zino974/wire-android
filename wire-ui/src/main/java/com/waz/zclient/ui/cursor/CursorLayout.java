@@ -658,6 +658,7 @@ public class CursorLayout extends FrameLayout implements
         if (cursorCallback != null) {
             cursorCallback.onClosedMessageEditing();
         }
+        resetEphemeralButton();
     }
 
     private void dismissToolbar() {
