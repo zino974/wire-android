@@ -17,11 +17,16 @@
  */
 package com.waz.zclient.pages.main.pickuser;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -110,6 +115,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
 
     private static final int DEFAULT_SELECTED_INVITE_METHOD = 0;
     private static final int SHOW_KEYBOARD_THRETHOLD = 10;
+    private static final int REQUEST_READ_CONTACTS = 1;
     private RecyclerView searchResultRecyclerView;
     private SearchResultAdapter searchResultAdapter;
 
@@ -366,6 +372,13 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         loadStartUi();
         usersSearchModelObserver.resumeListening();
         usersSearchModelObserver.forceUpdate();
+
+        boolean hasShareContactsEnabled = getControllerFactory().getUserPreferencesController().hasShareContactsEnabled();
+        boolean hasContactsReadPermission =
+            ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
+        if (hasShareContactsEnabled && !hasContactsReadPermission) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
+        }
     }
 
     @Override
@@ -1155,5 +1168,19 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         LoadingIndicatorView getLoadingViewIndicator();
 
         IPickUserController.Destination getCurrentPickerDestination();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_READ_CONTACTS &&
+            grantResults.length > 0 &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            //Changing the value of the shareContacts seems to be the
+            //only way to trigger a refresh on the sync engine...
+            getControllerFactory().getUserPreferencesController().setShareContactsEnabled(false);
+            getControllerFactory().getUserPreferencesController().setShareContactsEnabled(true);
+        }
     }
 }

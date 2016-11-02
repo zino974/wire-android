@@ -115,4 +115,8 @@ public interface IUserPreferencesController {
     Set<String> getUnsupportedEmojis();
 
     boolean hasCheckedForUnsupportedEmojis(int version);
+
+    boolean hasShareContactsEnabled();
+
+    void setShareContactsEnabled(boolean enabled);
 }

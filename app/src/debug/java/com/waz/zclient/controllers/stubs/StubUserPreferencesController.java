@@ -229,4 +229,14 @@ public class StubUserPreferencesController implements IUserPreferencesController
   public void setCrashException(String exception, String details) {
     ;
   }
+
+    @Override
+    public boolean hasShareContactsEnabled() {
+        return false;
+    }
+
+    @Override
+    public void setShareContactsEnabled(boolean enabled) {
+
+    }
 }

@@ -18,6 +18,7 @@
 package com.waz.zclient.pages;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import com.waz.zclient.ServiceContainer;
 import com.waz.zclient.controllers.IControllerFactory;
@@ -68,5 +69,15 @@ public class BaseFragment<T> extends Fragment implements ServiceContainer {
     @Override
     public final IControllerFactory getControllerFactory() {
         return controllerFactory;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (getChildFragmentManager().getFragments() != null) {
+            for (Fragment currentFragment : getChildFragmentManager().getFragments()) {
+                currentFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
     }
 }

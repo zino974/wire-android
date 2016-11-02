@@ -350,4 +350,15 @@ public class UserPreferencesController implements IUserPreferencesController {
     public boolean hasCheckedForUnsupportedEmojis(int version) {
         return userPreferences.getInt(USER_PREF_UNSUPPORTED_EMOJIS_CHECKED, 0) >= version;
     }
+
+    @Override
+    public boolean hasShareContactsEnabled() {
+        return userPreferences.getBoolean(context.getString(R.string.pref_share_contacts_key), false);
+    }
+
+    @Override
+    public void setShareContactsEnabled(boolean enabled) {
+        userPreferences.edit().putBoolean(context.getString(R.string.pref_share_contacts_key), enabled).apply();
+    }
+
 }
