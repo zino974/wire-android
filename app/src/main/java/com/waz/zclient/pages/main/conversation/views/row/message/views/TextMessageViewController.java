@@ -31,7 +31,7 @@ import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.views.OnDoubleClickListener;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 
 public class TextMessageViewController extends MessageViewController implements TextMessageLinkTextView.Callback {
 

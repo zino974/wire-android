@@ -47,7 +47,7 @@ import com.waz.zclient.utils.IntentUtils;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.views.OnDoubleClickListener;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import timber.log.Timber;
 
 public class LocationMessageViewController extends MessageViewController implements AccentColorObserver {

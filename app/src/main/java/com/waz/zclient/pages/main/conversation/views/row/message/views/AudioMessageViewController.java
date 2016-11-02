@@ -46,7 +46,7 @@ import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.AssetActionButton;
-import com.waz.zclient.views.OnDoubleClickListener;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import org.threeten.bp.Duration;
 
 import static android.view.View.GONE;

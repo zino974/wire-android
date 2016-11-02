@@ -48,7 +48,7 @@ import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.MessageUtils;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.views.OnDoubleClickListener;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 
 import java.util.List;
 
