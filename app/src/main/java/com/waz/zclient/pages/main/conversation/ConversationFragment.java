@@ -2292,7 +2292,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     public void onExtendedCursorClosed(ExtendedCursorContainer.Type lastType) {
         cursorLayout.onExtendedCursorClosed();
         hideSendButtonIfNeeded();
-        if(lastType == ExtendedCursorContainer.Type.EPHEMERAL){
+        if (lastType == ExtendedCursorContainer.Type.EPHEMERAL) {
             EphemeralExpiration expiration = getStoreFactory().getConversationStore().getCurrentConversation().getEphemeralExpiration();
             if (!expiration.equals(EphemeralExpiration.NONE)) {
                 getControllerFactory().getUserPreferencesController().setLastEphemeralValue(expiration.milliseconds);
