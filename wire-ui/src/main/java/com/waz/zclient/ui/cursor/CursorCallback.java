@@ -45,4 +45,6 @@ public interface CursorCallback {
     void onEmojiButtonClicked(boolean showEmojiKeyboard);
 
     void onEphemeralButtonClicked(EphemeralExpiration currentEphemeralExpiration);
+
+    void onEphemeralButtonDoubleClicked(EphemeralExpiration currentEphemeralExpiration);
 }

@@ -1817,6 +1817,19 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     @Override
+    public void onEphemeralButtonDoubleClicked(EphemeralExpiration currentEphemeralExpiration) {
+        EphemeralExpiration lastExpiraton = EphemeralExpiration.getForMillis(getControllerFactory().getUserPreferencesController().getLastEphemeralValue());
+        if (lastExpiraton.equals(EphemeralExpiration.NONE)) {
+            return;
+        }
+        if (currentEphemeralExpiration.equals(EphemeralExpiration.NONE)) {
+            onEphemeralExpirationSelected(lastExpiraton, true);
+        } else {
+            onEphemeralExpirationSelected(EphemeralExpiration.NONE, true);
+        }
+    }
+
+    @Override
     public boolean onBackPressed() {
         if (isPreviewShown) {
             onCancelPreview();
@@ -2537,6 +2550,9 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         }
         if (close) {
             extendedCursorContainer.close(false);
+            if (!expiration.equals(EphemeralExpiration.NONE)) {
+                getControllerFactory().getUserPreferencesController().setLastEphemeralValue(expiration.milliseconds);
+            }
         }
         getStoreFactory().getConversationStore().getCurrentConversation().setEphemeralExpiration(expiration);
     }
