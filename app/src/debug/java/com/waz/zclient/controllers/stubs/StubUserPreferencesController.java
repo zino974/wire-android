@@ -229,4 +229,14 @@ public class StubUserPreferencesController implements IUserPreferencesController
   public void setCrashException(String exception, String details) {
     ;
   }
+
+    @Override
+    public long getLastEphemeralValue() {
+        return 0;
+    }
+
+    @Override
+    public void setLastEphemeralValue(long value) {
+
+    }
 }

@@ -42,7 +42,7 @@ import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.MessageUtils;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.views.OnDoubleClickListener;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import com.waz.zclient.views.images.ImageAssetView;
 
 public class LinkPreviewViewController extends MessageViewController implements ImageAssetView.BitmapLoadedCallback,

@@ -44,7 +44,7 @@ import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.LoadingIndicatorView;
-import com.waz.zclient.views.OnDoubleClickListener;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import timber.log.Timber;
 
 public class ImageMessageViewController extends MessageViewController implements AccentColorObserver {

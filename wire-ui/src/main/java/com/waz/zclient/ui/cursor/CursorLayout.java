@@ -49,6 +49,7 @@ import com.waz.zclient.ui.animation.interpolators.penner.Quart;
 import com.waz.zclient.ui.utils.CursorUtils;
 import com.waz.zclient.ui.utils.TypefaceUtils;
 import com.waz.zclient.ui.views.CursorIconButton;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
@@ -144,6 +145,26 @@ public class CursorLayout extends FrameLayout implements
             } else {
                 ephemeralButton.setVisibility(GONE);
             }
+        }
+    };
+
+    private OnDoubleClickListener ephemeralButtonDoubleClickListener = new OnDoubleClickListener() {
+        @Override
+        public void onDoubleClick() {
+            if (cursorCallback == null || conversation == null) {
+                return;
+            }
+            cursorCallback.onEphemeralButtonDoubleClicked(conversation.getEphemeralExpiration());
+        }
+
+        @Override
+        public void onSingleClick() {
+            if (cursorCallback == null || conversation == null) {
+                return;
+            }
+            cursorCallback.onEphemeralButtonClicked(conversation.getEphemeralExpiration());
+            ephemeralSelected = true;
+            conversationModelObserver.updated(conversation);
         }
     };
 
@@ -273,17 +294,7 @@ public class CursorLayout extends FrameLayout implements
         params = new FrameLayout.LayoutParams(ephemeralButtonWidth, ephemeralButtonHeight);
         params.gravity = Gravity.CENTER;
         sendButtonContainer.addView(ephemeralButton, params);
-        ephemeralButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (cursorCallback == null || conversation == null) {
-                    return;
-                }
-                cursorCallback.onEphemeralButtonClicked(conversation.getEphemeralExpiration());
-                ephemeralSelected = true;
-                conversationModelObserver.updated(conversation);
-            }
-        });
+        ephemeralButton.setOnClickListener(ephemeralButtonDoubleClickListener);
         ephemeralButton.setVisibility(GONE);
     }
 

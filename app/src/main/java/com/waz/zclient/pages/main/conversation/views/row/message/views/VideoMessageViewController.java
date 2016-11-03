@@ -50,7 +50,7 @@ import com.waz.zclient.utils.AssetUtils;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.GlyphProgressView;
-import com.waz.zclient.views.OnDoubleClickListener;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import timber.log.Timber;
 
 import static android.view.View.GONE;
