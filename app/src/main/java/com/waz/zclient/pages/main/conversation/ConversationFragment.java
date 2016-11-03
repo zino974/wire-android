@@ -113,6 +113,7 @@ import com.waz.zclient.controllers.tracking.events.conversation.ReactedToMessage
 import com.waz.zclient.controllers.tracking.events.navigation.OpenedMoreActionsEvent;
 import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.core.api.scala.ModelObserver;
+import com.waz.zclient.core.controllers.tracking.attributes.OpenedMediaAction;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.filetransfer.SavedFileEvent;
 import com.waz.zclient.core.controllers.tracking.events.filetransfer.SelectedTooLargeFileEvent;
@@ -1584,7 +1585,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     @Override
     public void onCursorButtonClicked(CursorMenuItem cursorMenuItem) {
 
-        final boolean isGroupConversation = getConversationType() == IConversation.Type.GROUP;
+        final IConversation conversation = getStoreFactory().getConversationStore().getCurrentConversation();
         switch (cursorMenuItem) {
             case AUDIO_MESSAGE:
                 if (PermissionUtils.hasSelfPermissions(getActivity(), AUDIO_PERMISSION)) {
@@ -1599,8 +1600,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 if (LayoutSpec.isTablet(getContext())) {
                     KeyboardUtils.closeKeyboardIfShown(getActivity());
                     getControllerFactory().getCameraController().openCamera(CameraContext.MESSAGE);
-                    getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.photo(
-                        isGroupConversation));
+                    getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.PHOTO, conversation));
                 } else {
 
                     if (PermissionUtils.hasSelfPermissions(getContext(), EXTENDED_CURSOR_PERMISSIONS)) {
@@ -1627,15 +1627,14 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
             case SKETCH:
                 getControllerFactory().getDrawingController().showDrawing(null,
                                                                           IDrawingController.DrawingDestination.SKETCH_BUTTON);
-                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.sketch(
-                    isGroupConversation));
+                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.SKETCH, conversation));
                 break;
             case FILE:
                 assetIntentsManager.openFileSharing();
-                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.file(isGroupConversation));
+                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.FILE, conversation));
                 break;
             case VIDEO_MESSAGE:
-                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.videomessage(isGroupConversation));
+                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.VIDEO_MESSAGE, conversation));
                 isVideoMessageButtonClicked = true;
                 getCameraController().releaseCamera(new Callback<Void>() {
                     @Override
@@ -1652,7 +1651,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 if (ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext())) {
                     KeyboardUtils.hideKeyboard(getActivity());
                     getControllerFactory().getLocationController().showShareLocation();
-                    getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.location(isGroupConversation));
+                    getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.LOCATION, conversation));
                 } else {
                     Toast.makeText(getContext(), R.string.location_sharing__missing_play_services, Toast.LENGTH_LONG).show();
                 }
@@ -1664,7 +1663,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 break;
             case GIF:
                 getControllerFactory().getGiphyController().handleInput(cursorLayout.getText());
-                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.giphy(isGroupConversation));
+                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.GIPHY, conversation));
                 break;
         }
     }
@@ -1674,22 +1673,21 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     }
 
     private void openExtendedCursor(ExtendedCursorContainer.Type type) {
-
-        final boolean isGroupConversation = getConversationType() == IConversation.Type.GROUP;
+        final IConversation conversation = getStoreFactory().getConversationStore().getCurrentConversation();
         switch (type) {
             case NONE:
                 break;
             case VOICE_FILTER_RECORDING:
                 extendedCursorContainer.openVoiceFilter(this);
                 hideSendButtonIfNeeded();
-                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.audiomessage(
-                    isGroupConversation));
+                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.AUDIO_MESSAGE,
+                                                                                                            conversation));
                 break;
             case IMAGES:
                 extendedCursorContainer.openCursorImages(this);
                 hideSendButtonIfNeeded();
-                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.photo(
-                    isGroupConversation));
+                getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.PHOTO,
+                                                                                                            conversation));
                 break;
         }
     }
@@ -1707,9 +1705,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     audioMessageRecordingView.prepareForRecording();
                     audioMessageRecordingView.setVisibility(View.VISIBLE);
                     final IConversation conversation = getStoreFactory().getConversationStore().getCurrentConversation();
-                    final boolean isGroupConversation = conversation.getType() == IConversation.Type.GROUP;
-                    getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.audiomessage(
-                        isGroupConversation));
+                    getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.AUDIO_MESSAGE,
+                                                                                                                conversation));
                     getControllerFactory().getTrackingController().tagEvent(new StartedRecordingAudioMessageEvent(
                         getConversationTypeString(),
                         true));
@@ -1814,6 +1811,11 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     @Override
     public void onEphemeralButtonClicked(EphemeralExpiration currentEphemeralExpiration) {
         extendedCursorContainer.openEphemeral(this, currentEphemeralExpiration);
+        if (currentEphemeralExpiration == EphemeralExpiration.NONE) {
+            IConversation conversation = getStoreFactory().getConversationStore().getCurrentConversation();
+            getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.ephemeral(conversation,
+                                                                                                     false));
+        }
     }
 
     @Override
@@ -1824,6 +1826,8 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         }
         if (currentEphemeralExpiration.equals(EphemeralExpiration.NONE)) {
             onEphemeralExpirationSelected(lastExpiraton, true);
+            IConversation conversation = getStoreFactory().getConversationStore().getCurrentConversation();
+            getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.ephemeral(conversation, true));
         } else {
             onEphemeralExpirationSelected(EphemeralExpiration.NONE, true);
         }

@@ -18,6 +18,7 @@
 package com.waz.zclient.core.controllers.tracking.events.media;
 
 import android.support.annotation.NonNull;
+import com.waz.api.IConversation;
 import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
 import com.waz.zclient.core.controllers.tracking.attributes.ConversationType;
 import com.waz.zclient.core.controllers.tracking.attributes.OpenedMediaAction;
@@ -25,79 +26,28 @@ import com.waz.zclient.core.controllers.tracking.events.Event;
 
 public class OpenedMediaActionEvent extends Event {
 
-    public static OpenedMediaActionEvent audiocall(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.AUDIO_CALL, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.AUDIO_CALL, ConversationType.ONE_TO_ONE_CONVERSATION);
+    public static OpenedMediaActionEvent cursorAction(OpenedMediaAction action, IConversation conversation) {
+        return new OpenedMediaActionEvent(action,
+                                          conversation,
+                                          "");
     }
 
-    public static OpenedMediaActionEvent videocall(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.VIDEO_CALL, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.VIDEO_CALL, ConversationType.ONE_TO_ONE_CONVERSATION);
+    public static OpenedMediaActionEvent ephemeral(IConversation conversation, boolean fromDoubleTap) {
+        return new OpenedMediaActionEvent(OpenedMediaAction.EPHEMERAL,
+                                          conversation,
+                                          fromDoubleTap ? "double_tap" : "single_tap");
     }
 
-    public static OpenedMediaActionEvent sketch(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.SKETCH, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.SKETCH, ConversationType.ONE_TO_ONE_CONVERSATION);
-    }
-
-    public static OpenedMediaActionEvent ping(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.PING, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.PING, ConversationType.ONE_TO_ONE_CONVERSATION);
-    }
-
-    public static OpenedMediaActionEvent photo(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.PHOTO, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.PHOTO, ConversationType.ONE_TO_ONE_CONVERSATION);
-    }
-
-    public static OpenedMediaActionEvent giphy(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.GIPHY, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.GIPHY, ConversationType.ONE_TO_ONE_CONVERSATION);
-    }
-
-    public static OpenedMediaActionEvent file(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.FILE, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.FILE, ConversationType.ONE_TO_ONE_CONVERSATION);
-    }
-
-    public static OpenedMediaActionEvent videomessage(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.VIDEO_MESSAGE, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.VIDEO_MESSAGE, ConversationType.ONE_TO_ONE_CONVERSATION);
-    }
-
-    public static OpenedMediaActionEvent audiomessage(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.AUDIO_MESSAGE, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.AUDIO_MESSAGE, ConversationType.ONE_TO_ONE_CONVERSATION);
-    }
-
-    public static OpenedMediaActionEvent location(boolean fromGroupConversation) {
-        if (fromGroupConversation) {
-            return new OpenedMediaActionEvent(OpenedMediaAction.LOCATION, ConversationType.GROUP_CONVERSATION);
-        }
-        return new OpenedMediaActionEvent(OpenedMediaAction.LOCATION, ConversationType.ONE_TO_ONE_CONVERSATION);
-    }
-
-    private OpenedMediaActionEvent(OpenedMediaAction action, ConversationType type) {
+    private OpenedMediaActionEvent(OpenedMediaAction action,
+                                   IConversation conversation,
+                                   String method) {
+        ConversationType conversationType = conversation.getType() == IConversation.Type.GROUP ?
+                                            ConversationType.GROUP_CONVERSATION :
+                                            ConversationType.ONE_TO_ONE_CONVERSATION;
         attributes.put(Attribute.TARGET, action.nameString);
-        attributes.put(Attribute.TYPE, type.name);
+        attributes.put(Attribute.TYPE, conversationType.name);
+        attributes.put(Attribute.WITH_OTTO, String.valueOf(conversation.isOtto()));
+        attributes.put(Attribute.METHOD, method);
     }
 
     @NonNull
