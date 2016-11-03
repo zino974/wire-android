@@ -20,7 +20,6 @@ package com.waz.zclient.pages.main.conversation.views.row.message.views;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -40,11 +39,14 @@ import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
+import com.waz.zclient.ui.theme.ThemeUtils;
+import com.waz.zclient.ui.utils.ColorUtils;
+import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.LoadingIndicatorView;
-import com.waz.zclient.views.OnDoubleClickListener;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import timber.log.Timber;
 
 public class ImageMessageViewController extends MessageViewController implements AccentColorObserver {
@@ -61,6 +63,7 @@ public class ImageMessageViewController extends MessageViewController implements
     private TextView singleImageButton;
     private View wifiContainer;
     private EphemeralDotAnimationView ephemeralDotAnimationView;
+    private View ephemeralTypeView;
     private LoadingIndicatorView previewLoadingIndicator;
     private UpdateListener imageAssetUpdateListener;
     private LoadHandle bitmapLoadHandle;
@@ -146,6 +149,8 @@ public class ImageMessageViewController extends MessageViewController implements
         });
         tapButtonsVisible = false;
         ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
+        ephemeralTypeView = ViewUtils.getView(view, R.id.gtv__row_conversation__image__ephemeral_type);
+        ephemeralTypeView.setVisibility(View.GONE);
 
         previewLoadingIndicator.setColor(messageViewContainer.getControllerFactory().getAccentColorController().getColor());
         previewLoadingIndicator.setType(LoadingIndicatorView.INFINITE_LOADING_BAR);
@@ -408,11 +413,21 @@ public class ImageMessageViewController extends MessageViewController implements
         if (previewLoadingIndicator != null) {
             previewLoadingIndicator.setColor(color);
         }
+        if (message != null &&
+            message.isEphemeral() &&
+            message.isExpired()) {
+            imageContainer.setBackgroundColor(ColorUtils.injectAlpha(ThemeUtils.getEphemeralBackgroundAlpha(context),
+                                                                     messageViewsContainer.getControllerFactory().getAccentColorController().getColor()));
+        }
+        ephemeralDotAnimationView.setPrimaryColor(color);
+        ephemeralDotAnimationView.setSecondaryColor(ColorUtils.injectAlpha(ResourceUtils.getResourceFloat(context.getResources(), R.dimen.ephemeral__accent__timer_alpha),
+                                                                           color));
     }
 
     private void checkMessageExpired() {
         if (message.isEphemeral() && message.isExpired()) {
-            imageContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.ephemera));
+            imageContainer.setBackgroundColor(ColorUtils.injectAlpha(ThemeUtils.getEphemeralBackgroundAlpha(context),
+                                                                     messageViewsContainer.getControllerFactory().getAccentColorController().getColor()));
             gifImageView.setVisibility(View.INVISIBLE);
             gifImageView.setImageBitmap(null);
             polkadotView.setVisibility(View.INVISIBLE);
@@ -425,10 +440,12 @@ public class ImageMessageViewController extends MessageViewController implements
             singleImageButton.setVisibility(View.GONE);
             sketchButton.setVisibility(View.GONE);
             tapButtonsVisible = false;
+            ephemeralTypeView.setVisibility(View.VISIBLE);
         } else {
             imageContainer.setBackground(null);
             gifImageView.setVisibility(View.VISIBLE);
             polkadotView.setVisibility(View.VISIBLE);
+            ephemeralTypeView.setVisibility(View.GONE);
         }
     }
 
