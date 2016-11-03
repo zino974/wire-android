@@ -33,6 +33,7 @@ import com.waz.zclient.controllers.tracking.events.connect.SentInviteToContactEv
 import com.waz.zclient.controllers.tracking.events.optionsmenu.OptionsMenuItemSelectedEvent;
 import com.waz.zclient.core.controllers.tracking.attributes.CompletedMediaType;
 import com.waz.zclient.core.controllers.tracking.attributes.ConversationType;
+import com.waz.zclient.core.controllers.tracking.attributes.OpenedMediaAction;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.media.CompletedMediaActionEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.OpenedMediaActionEvent;
@@ -381,7 +382,7 @@ public class TrackingUtils {
 
     public static void onSentPingMessage(ITrackingController trackingController, IConversation conversation) {
         boolean isGroupConversation = conversation.getType() == IConversation.Type.GROUP;
-        trackingController.tagEvent(OpenedMediaActionEvent.ping(isGroupConversation));
+        trackingController.tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.PING, conversation));
         trackingController.tagEvent(new CompletedMediaActionEvent(CompletedMediaType.PING,
                                                                   isGroupConversation ? "GROUP" : "ONE_TO_ONE",
                                                                   conversation.isOtto(),

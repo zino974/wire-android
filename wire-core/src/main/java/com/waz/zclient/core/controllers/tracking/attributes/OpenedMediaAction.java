@@ -27,6 +27,7 @@ public enum OpenedMediaAction {
     GIPHY("giphy"),
     FILE("file_transfer"),
     LOCATION("location"),
+    EPHEMERAL("ephemeral"),
     VIDEO_MESSAGE("video_message"),
     AUDIO_MESSAGE("audio_message");
 
