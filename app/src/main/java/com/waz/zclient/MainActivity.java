@@ -975,14 +975,4 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
             userPreferencesController.setUnsupportedEmoji(unsupported, Emojis.VERSION);
         }
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (getSupportFragmentManager().getFragments() != null) {
-            for (Fragment currentFragment : getSupportFragmentManager().getFragments()) {
-                currentFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
-            }
-        }
-    }
 }
