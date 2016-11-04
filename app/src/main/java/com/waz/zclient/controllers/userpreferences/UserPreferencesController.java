@@ -354,7 +354,7 @@ public class UserPreferencesController implements IUserPreferencesController {
 
     @Override
     public boolean hasShareContactsEnabled() {
-        return userPreferences.getBoolean(context.getString(R.string.pref_share_contacts_key), false);
+        return userPreferences.getBoolean(context.getString(R.string.pref_share_contacts_key), true);
     }
 
     @Override
