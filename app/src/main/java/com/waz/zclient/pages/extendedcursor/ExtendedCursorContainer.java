@@ -158,13 +158,14 @@ public class ExtendedCursorContainer extends FrameLayout implements KeyboardHeig
     }
 
     public void close(boolean immediate) {
+        Type lastType = type;
         type = Type.NONE;
         if (!isExpanded) {
             return;
         }
 
         if (callback != null) {
-            callback.onExtendedCursorClosed();
+            callback.onExtendedCursorClosed(lastType);
         }
 
         isExpanded = false;
@@ -327,6 +328,6 @@ public class ExtendedCursorContainer extends FrameLayout implements KeyboardHeig
     }
 
     public interface Callback {
-        void onExtendedCursorClosed();
+        void onExtendedCursorClosed(ExtendedCursorContainer.Type lastType);
     }
 }

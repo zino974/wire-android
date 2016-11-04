@@ -119,4 +119,8 @@ public interface IUserPreferencesController {
     boolean hasShareContactsEnabled();
 
     void setShareContactsEnabled(boolean enabled);
+
+    long getLastEphemeralValue();
+
+    void setLastEphemeralValue(long value);
 }

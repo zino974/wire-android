@@ -67,7 +67,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.waz.zclient.R;
 import com.waz.zclient.ui.utils.ColorUtils;
 import com.waz.zclient.ui.utils.MathUtils;
-import com.waz.zclient.views.OnDoubleClickListener;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 
 public class CircularSeekBar extends RoundedImageView {
 

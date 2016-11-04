@@ -104,10 +104,8 @@ public class BuildConfigUtils {
     }
 
     public static BackendConfig defaultBackend() {
-        if (BuildConfig.USE_EDGE_BACKEND) {
-            return BackendConfig.EdgeBackend();
-        } else if (BuildConfig.USE_STAGING_BACKEND) {
-            return BackendConfig.DevBackend();
+        if (BuildConfig.USE_STAGING_BACKEND) {
+            return BackendConfig.StagingBackend();
         } else {
             return BackendConfig.ProdBackend();
         }

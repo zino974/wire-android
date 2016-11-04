@@ -26,11 +26,13 @@ import com.waz.zclient.utils.AssetUtils;
 
 public class InitiatedFileUploadEvent extends Event {
 
-    public InitiatedFileUploadEvent(String fileMimeType, int fileSizeInBytes, String conversationType) {
+    public InitiatedFileUploadEvent(String fileMimeType, int fileSizeInBytes, String conversationType, boolean isEphemeral, String ephemeralExpiration) {
         attributes.put(Attribute.TYPE, AssetUtils.assetMimeTypeToExtension(fileMimeType));
         attributes.put(Attribute.CONVERSATION_TYPE, conversationType);
         attributes.put(Attribute.FILE_SIZE_BYTES, String.valueOf(fileSizeInBytes));
         rangedAttributes.put(RangedAttribute.FILE_SIZE_MB, AssetUtils.assetSizeToMB(fileSizeInBytes));
+        attributes.put(Attribute.IS_EPHEMERAL, String.valueOf(isEphemeral));
+        attributes.put(Attribute.EPHEMERAL_EXPIRATION, ephemeralExpiration);
     }
 
     @NonNull
