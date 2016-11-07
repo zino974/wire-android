@@ -158,7 +158,7 @@
     <!-- Invite -->
     <string name="people_picker__invite__share_details_label">Send an invitation</string>
     <!-- Should not use newline in the dialog message, not supported by all devices, text will be cut off -->
-    <string name="people_picker__invite__share_details_dialog">Share Wire with your friends. The invitation can be used for 2 weeks.</string>
+    <string name="people_picker__invite__share_details_dialog">Share Wire with your friends.</string>
     <string name="people_picker__invite__share_text__header">%1$s wants to connect on Wire</string>
     <string name="people_picker__invite__share_text__body">I\'m on Wire, talk to you there https://get.wire.com</string>
     <string name="people_picker__invite__message">Hi,\nThanks for the invitation. Let\'s connect.\n%1$s</string>
