@@ -144,7 +144,7 @@
             android:minWidth="@dimen/drawing__text_min_width"
             android:background="@null"
             android:clickable="false"
-            android:ellipsize="end"
+            android:ellipsize="middle"
             android:inputType="textNoSuggestions"
             android:textColor="@color/white"
             android:textSize="@dimen/wire__text_size__medium"
@@ -152,6 +152,9 @@
             android:gravity="center"
             android:textAlignment="center"
             tools:ignore="LabelFor"
+            android:textCursorDrawable="@null"
+            android:hint="@string/drawing__text_hint"
+            android:textColorHint="@color/white_32"
             />
 
     </FrameLayout>

@@ -20,17 +20,42 @@ package com.waz.zclient.ui.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.EditText;
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 public class NoResizeEditText extends EditText {
 
+    public Set<NoResizeEditTextListener> weakListenerSet;
+
     public NoResizeEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
+        weakListenerSet = Collections.newSetFromMap(
+            new WeakHashMap<NoResizeEditTextListener, Boolean>());
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(MeasureSpec.UNSPECIFIED,MeasureSpec.UNSPECIFIED);
+        super.onMeasure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+        notifyListeners();
     }
 
+    public void addListener(NoResizeEditTextListener listener) {
+        weakListenerSet.add(listener);
+    }
+
+    public void removeListener(NoResizeEditTextListener listener) {
+        weakListenerSet.remove(listener);
+    }
+
+    public void notifyListeners() {
+        for (NoResizeEditTextListener listener : weakListenerSet) {
+            listener.editTextChanged();
+        }
+    }
+
+    public interface NoResizeEditTextListener {
+        void editTextChanged();
+    }
 }
 
