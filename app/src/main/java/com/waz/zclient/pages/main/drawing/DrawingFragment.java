@@ -100,6 +100,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     private CursorIconButton sendDrawingButton;
     private NoResizeEditText sketchEditTextView;
     private boolean shouldOpenEditText = false;
+    private int currentBackgroundColor;
     private TextView actionButtonText;
     private TextView actionButtonEmoji;
     private TextView actionButtonSketch;
@@ -231,7 +232,8 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         sketchEditTextView = ViewUtils.getView(rootView, R.id.et__sketch_text);
         sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
         sketchEditTextView.setVisibility(View.INVISIBLE);
-        sketchEditTextView.setBackground(getTextBackground(getControllerFactory().getAccentColorController().getColor(), 56));
+        currentBackgroundColor = getControllerFactory().getAccentColorController().getColor();
+        sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, 56));
         sketchEditTextView.setOnTouchListener(new View.OnTouchListener() {
             private float initialX;
             private float initialY;
@@ -262,7 +264,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         sketchEditTextView.addListener(new NoResizeEditText.NoResizeEditTextListener() {
             @Override
             public void editTextChanged() {
-                sketchEditTextView.setBackground(getTextBackground(getControllerFactory().getAccentColorController().getColor(), sketchEditTextView.getHeight()));
+                sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, sketchEditTextView.getMeasuredHeight()));
             }
         });
 
@@ -500,6 +502,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         }
         drawingCanvasView.setDrawingColor(color);
         drawingCanvasView.setStrokeSize(strokeSize);
+        currentBackgroundColor = color;
         sketchEditTextView.setBackground(getTextBackground(color, sketchEditTextView.getHeight()));
     }
 
@@ -524,7 +527,9 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     }
 
     private void closeKeyboard() {
-        sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
+        if (sketchEditTextView.getVisibility() == View.VISIBLE) {
+            sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
+        }
         sketchEditTextView.setCursorVisible(false);
         //This has to be on a post otherwise the setAlpha and setCursor won't be noticeable in the drawing cache
         getView().post(new Runnable() {
@@ -575,6 +580,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
             if (sketchEditTextView.getVisibility() != View.VISIBLE) {
                 shouldOpenEditText = true;
                 sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
+                sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, sketchEditTextView.getMeasuredHeight()));
             }
             sketchEditTextView.setVisibility(View.VISIBLE);
             showKeyboard();
