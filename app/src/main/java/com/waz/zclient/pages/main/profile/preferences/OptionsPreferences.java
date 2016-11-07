@@ -17,17 +17,21 @@
  */
 package com.waz.zclient.pages.main.profile.preferences;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.RawRes;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
 import android.text.TextUtils;
 import android.widget.Toast;
 import com.waz.api.MediaProvider;
 import com.waz.zclient.R;
+import com.waz.zclient.controllers.permission.RequestPermissionsObserver;
 import com.waz.zclient.controllers.spotify.SpotifyObserver;
 import com.waz.zclient.core.controllers.tracking.events.settings.ChangedImageDownloadPreferenceEvent;
 import com.waz.zclient.core.controllers.tracking.events.Event;
@@ -37,12 +41,15 @@ import com.waz.zclient.core.controllers.tracking.events.settings.ChangedThemeEve
 import com.waz.zclient.pages.BasePreferenceFragment;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.WireRingtonePreferenceDialogFragment;
 import com.waz.zclient.utils.LayoutSpec;
+import com.waz.zclient.utils.PermissionUtils;
 import com.waz.zclient.utils.TrackingUtils;
 import net.xpece.android.support.preference.RingtonePreference;
 import net.xpece.android.support.preference.SwitchPreference;
 
+
 public class OptionsPreferences extends BasePreferenceFragment<OptionsPreferences.Container> implements SharedPreferences.OnSharedPreferenceChangeListener,
-                                                                                                        SpotifyObserver {
+                                                                                                        SpotifyObserver,
+                                                                                                        RequestPermissionsObserver {
 
     private Preference.OnPreferenceChangeListener bindPreferenceSummaryToValueListener = new PreferenceSummaryChangeListener();
     private RingtonePreference ringtonePreference;
@@ -108,11 +115,13 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
     public void onStart() {
         super.onStart();
         getControllerFactory().getSpotifyController().addSpotifyObserver(this);
+        getControllerFactory().getRequestPermissionsController().addObserver(this);
     }
 
     @Override
     public void onStop() {
         getControllerFactory().getSpotifyController().removeSpotifyObserver(this);
+        getControllerFactory().getRequestPermissionsController().removeObserver(this);
         super.onStop();
     }
 
@@ -185,6 +194,10 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
         } else if (key.equals(getString(R.string.pref_options_contacts_key))) {
             boolean shareContacts = sharedPreferences.getBoolean(key, false);
             event = new ChangedContactsPermissionEvent(shareContacts, true);
+            boolean hasContactsReadPermission = PermissionUtils.hasSelfPermissions(getContext(), Manifest.permission.READ_CONTACTS);
+            if (shareContacts && !hasContactsReadPermission) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, PermissionUtils.REQUEST_READ_CONTACTS);
+            }
         } else if (key.equals(getString(R.string.pref_options_theme_switch_key))) {
             getControllerFactory().getThemeController().toggleThemePending(true);
             event = new ChangedThemeEvent(getControllerFactory().getThemeController().isDarkTheme());
@@ -231,5 +244,16 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
     }
 
     public interface Container {
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, int[] grantResults) {
+        if (requestCode == PermissionUtils.REQUEST_READ_CONTACTS &&
+            grantResults.length > 0 &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            boolean oldConfig = getControllerFactory().getUserPreferencesController().hasShareContactsEnabled();
+            getControllerFactory().getUserPreferencesController().setShareContactsEnabled(!oldConfig);
+            getControllerFactory().getUserPreferencesController().setShareContactsEnabled(oldConfig);
+        }
     }
 }

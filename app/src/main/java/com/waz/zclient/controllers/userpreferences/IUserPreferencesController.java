@@ -116,6 +116,10 @@ public interface IUserPreferencesController {
 
     boolean hasCheckedForUnsupportedEmojis(int version);
 
+    boolean hasShareContactsEnabled();
+
+    void setShareContactsEnabled(boolean enabled);
+
     long getLastEphemeralValue();
 
     void setLastEphemeralValue(long value);
