@@ -146,7 +146,7 @@ public class TextMessageViewController extends MessageViewController implements 
                                                                            color));
         if (message != null &&
             message.isEphemeral() &&
-            message.isEphemeral()) {
+            message.isExpired()) {
             textView.setTextColor(color);
         }
     }
