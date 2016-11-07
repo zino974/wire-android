@@ -148,7 +148,7 @@ public class CursorLayout extends FrameLayout implements
             }
 
             if (!isEditingMessage &&
-                conversation.getType() == IConversation.Type.ONE_TO_ONE &&
+                conversation.isActive() &&
                 StringUtils.isBlank(newCursorEditText.getText().toString()) &&
                 !sendButtonIsVisible) {
                 ephemeralButton.setVisibility(VISIBLE);
@@ -486,7 +486,8 @@ public class CursorLayout extends FrameLayout implements
                 }
             });
         } else {
-            if (conversation != null && conversation.getType() == IConversation.Type.ONE_TO_ONE) {
+            if (conversation != null &&
+                conversation.isActive()) {
                 ephemeralButton.setVisibility(VISIBLE);
             }
             sendButton.setVisibility(View.INVISIBLE);
