@@ -148,6 +148,7 @@ import com.waz.zclient.pages.main.conversation.views.TypingIndicatorView;
 import com.waz.zclient.pages.main.conversation.views.header.StreamMediaPlayerBarFragment;
 import com.waz.zclient.pages.main.conversation.views.listview.ConversationListView;
 import com.waz.zclient.pages.main.conversation.views.listview.ConversationScrollListener;
+import com.waz.zclient.pages.main.conversation.views.row.message.MessageAndSeparatorViewController;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.message.views.ImageMessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.message.views.MediaPlayerViewController;
@@ -1362,6 +1363,16 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
     @Override
     public ExpandableView getExpandedView() {
         return currentExpandableView;
+    }
+
+    @Override
+    public void closeMessageViewsExtras() {
+        for (View v : messageAdapter.getActiveViews()) {
+            MessageAndSeparatorViewController messageVC = (MessageAndSeparatorViewController) v.getTag();
+            if (messageVC != null) {
+                messageVC.closeMessageViewControllerExtras();
+            }
+        }
     }
 
     @Override

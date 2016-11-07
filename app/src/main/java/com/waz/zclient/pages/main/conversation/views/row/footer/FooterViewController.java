@@ -150,6 +150,7 @@ public class FooterViewController implements ConversationItemViewController,
         likeButtonColorLiked = ContextCompat.getColor(context, R.color.accent_red);
         likeButtonColorUnliked = ContextCompat.getColor(context, R.color.text__secondary_light);
         height = context.getResources().getDimension(R.dimen.content__footer__height);
+
     }
 
     public void setMessage(Message message) {
@@ -371,9 +372,6 @@ public class FooterViewController implements ConversationItemViewController,
     }
 
     private void expand() {
-        if (container.getExpandedView() != null && container.getExpandedView() != this) {
-            container.getExpandedView().close();
-        }
         container.setExpandedMessageId(message.getId());
         container.setExpandedView(this);
         view.setVisibility(View.VISIBLE);
@@ -415,9 +413,9 @@ public class FooterViewController implements ConversationItemViewController,
         animator.start();
     }
 
-    private void collapse() {
+    private boolean collapse() {
         if (shouldBeExpanded()) {
-            return;
+            return false;
         }
         if (message.getId().equals(container.getExpandedMessageId())) {
             container.setExpandedMessageId(null);
@@ -432,6 +430,7 @@ public class FooterViewController implements ConversationItemViewController,
             }
         });
         animator.start();
+        return true;
     }
 
     private void showLikeDetails() {
@@ -511,6 +510,9 @@ public class FooterViewController implements ConversationItemViewController,
         if (message == null) {
             return false;
         }
+        if (container.getExpandedView() != null && container.getExpandedView() != this) {
+            container.getExpandedView().close();
+        }
         if (view.getVisibility() == View.GONE || view.getMeasuredHeight() == 0) {
             expand();
             return true;
@@ -521,8 +523,7 @@ public class FooterViewController implements ConversationItemViewController,
             showTimestampForABit();
             return true;
         } else {
-            collapse();
-            return false;
+            return !collapse();
         }
     }
 

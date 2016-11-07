@@ -237,6 +237,7 @@
     <dimen name="content__divider__padding_left">20dp</dimen>
     <dimen name="content__padding_half_right">12dp</dimen>
     <dimen name="content__padding_right">24dp</dimen>
+    <dimen name="content__min_container_width">96dp</dimen>
     <dimen name="content__line_spacing_extra">3dp</dimen>
     <dimen name="content__card__corner_radius">4dp</dimen>
     <dimen name="content__separator__padding__before_started">24dp</dimen>
