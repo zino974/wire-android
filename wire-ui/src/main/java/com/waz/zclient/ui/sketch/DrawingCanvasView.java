@@ -89,7 +89,7 @@ public class DrawingCanvasView extends View {
 
     private void init() {
         path = new Path();
-        bitmapConfig = Bitmap.Config.RGB_565;
+        bitmapConfig = Bitmap.Config.ARGB_8888;
         historyItems = new LinkedList<>();
         bitmapPaint = new Paint(Paint.DITHER_FLAG);
         drawingPaint = new Paint(Paint.DITHER_FLAG | Paint.ANTI_ALIAS_FLAG);
