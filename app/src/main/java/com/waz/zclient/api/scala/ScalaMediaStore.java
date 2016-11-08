@@ -70,13 +70,15 @@ public class ScalaMediaStore extends MediaStore {
 
     @Override
     public void setCustomSoundUri(@RawRes int resourceId, String uri) {
-        if (TextUtils.isEmpty(uri)) {
-            return;
-        }
         try {
-            final Uri parsedUri = Uri.parse(uri);
-            Timber.i("Set '%s' for sound '%s'", uri, context.getResources().getResourceEntryName(resourceId));
-            zMessagingApi.getMediaManager().registerMediaFileUrl(context.getResources().getResourceEntryName(resourceId), parsedUri);
+            if (TextUtils.isEmpty(uri)) {
+                Timber.i("Set no sound for '%s'", context.getResources().getResourceEntryName(resourceId));
+                zMessagingApi.getMediaManager().unregisterMedia(context.getResources().getResourceEntryName(resourceId));
+            } else {
+                final Uri parsedUri = Uri.parse(uri);
+                Timber.i("Set '%s' for sound '%s'", uri, context.getResources().getResourceEntryName(resourceId));
+                zMessagingApi.getMediaManager().registerMediaFileUrl(context.getResources().getResourceEntryName(resourceId), parsedUri);
+            }
         } catch (Exception e) {
             Timber.e(e, "Could not set custom uri: %s", uri);
         }
@@ -85,7 +87,7 @@ public class ScalaMediaStore extends MediaStore {
     @Override
     public void setCustomSoundUrisFromPreferences(SharedPreferences preferences) {
         String value = preferences.getString(context.getString(R.string.pref_options_ringtones_ringtone_key), null);
-        if (!TextUtils.isEmpty(value)) {
+        if (value != null) {
             setCustomSoundUri(R.raw.ringing_from_them, value);
             if (RingtoneUtils.isDefaultValue(context, value, R.raw.ringing_from_them)) {
                 setCustomSoundUri(R.raw.ringing_from_me, RingtoneUtils.getUriForRawId(context, R.raw.ringing_from_me).toString());
@@ -99,7 +101,7 @@ public class ScalaMediaStore extends MediaStore {
         }
 
         value = preferences.getString(context.getString(R.string.pref_options_ringtones_ping_key), null);
-        if (!TextUtils.isEmpty(value)) {
+        if (value != null) {
             setCustomSoundUri(R.raw.ping_from_them, value);
             if (RingtoneUtils.isDefaultValue(context, value, R.raw.ping_from_them)) {
                 setCustomSoundUri(R.raw.hotping_from_them, RingtoneUtils.getUriForRawId(context, R.raw.hotping_from_them).toString());
@@ -113,7 +115,7 @@ public class ScalaMediaStore extends MediaStore {
         }
 
         value = preferences.getString(context.getString(R.string.pref_options_ringtones_text_key), null);
-        if (!TextUtils.isEmpty(value)) {
+        if (value != null) {
             setCustomSoundUri(R.raw.new_message, value);
             if (RingtoneUtils.isDefaultValue(context, value, R.raw.new_message)) {
                 setCustomSoundUri(R.raw.first_message, RingtoneUtils.getUriForRawId(context, R.raw.first_message).toString());

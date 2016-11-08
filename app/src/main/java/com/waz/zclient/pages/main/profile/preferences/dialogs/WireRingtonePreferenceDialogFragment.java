@@ -56,7 +56,7 @@ public class WireRingtonePreferenceDialogFragment extends XpRingtonePreferenceDi
             fl.set(this, defaultUri);
             fl.setAccessible(false);
 
-            if (TextUtils.isEmpty(value) || defaultUri.compareTo(Uri.parse(value)) == 0) {
+            if (defaultUri.compareTo(Uri.parse(value)) == 0) {
                 // We selected the default value
                 fl = XpRingtonePreferenceDialogFragment.class.getDeclaredField("mClickedPos");
                 fl.setAccessible(true);

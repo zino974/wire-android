@@ -74,6 +74,9 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
         ringtonePreference = (RingtonePreference) findPreference(getString(R.string.pref_options_ringtones_ringtone_key));
         textTonePreference = (RingtonePreference) findPreference(getString(R.string.pref_options_ringtones_text_key));
         pingPreference = (RingtonePreference) findPreference(getString(R.string.pref_options_ringtones_ping_key));
+        ringtonePreference.setShowSilent(true);
+        textTonePreference.setShowSilent(true);
+        pingPreference.setShowSilent(true);
         setDefaultRingtones();
 
         bindPreferenceSummaryToValue(ringtonePreference);
@@ -226,7 +229,7 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
             }
 
             if (TextUtils.isEmpty(value)) {
-                preference.setSummary(R.string.pref_options_ringtones_default_summary);
+                preference.setSummary(R.string.pref_options_sounds_none);
                 return true;
             }
 
