@@ -84,6 +84,16 @@ public class GlobalLayoutController implements IGlobalLayoutController {
     }
 
     @Override
+    public void keepScreenAwake() {
+        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    @Override
+    public void resetScreenAwakeState() {
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    @Override
     public void tearDown() {
         if (globalLayout != null) {
             this.globalLayout.getViewTreeObserver().removeOnGlobalLayoutListener(globalLayoutListener);

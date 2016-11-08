@@ -1961,6 +1961,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public void onAudioMessageRecordingStarted() {
+        getControllerFactory().getGlobalLayoutController().keepScreenAwake();
         getControllerFactory().getTrackingController().tagEvent(new StartedRecordingAudioMessageEvent(
             getConversationTypeString(),
             false));
@@ -1992,12 +1993,18 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
         getControllerFactory().getTrackingController().tagEvent(new PreviewedAudioMessageEvent(getConversationTypeString()));
     }
 
+    @Override
+    public void onStartedRecordingAudioMessage() {
+        getControllerFactory().getGlobalLayoutController().keepScreenAwake();
+    }
+
     private void hideAudioMessageRecording() {
         if (audioMessageRecordingView.getVisibility() == View.INVISIBLE) {
             return;
         }
         audioMessageRecordingView.reset();
         audioMessageRecordingView.setVisibility(View.INVISIBLE);
+        getControllerFactory().getGlobalLayoutController().resetScreenAwakeState();
     }
 
     private void onErrorCanNotSentMessageToUnverifiedConversation(final ErrorsList.ErrorDescription errorDescription) {
@@ -2313,6 +2320,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 getControllerFactory().getUserPreferencesController().setLastEphemeralValue(expiration.milliseconds);
             }
         }
+        getControllerFactory().getGlobalLayoutController().resetScreenAwakeState();
     }
 
     private void hideSendButtonIfNeeded() {
