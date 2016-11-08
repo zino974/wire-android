@@ -888,6 +888,11 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
         extendedCursorContainer.close(true);
 
+        final boolean changeToDifferentConversation = fromConversation == null ||
+                                                      !fromConversation.getId().equals(toConversation.getId());
+        if (changeToDifferentConversation) {
+            messageStreamManager.resetMessages();
+        }
         messageStreamManager.setConversation(toConversation,
                                              getControllerFactory().getNavigationController().getCurrentPage() != Page.MESSAGE_STREAM);
 
@@ -906,10 +911,6 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 if (cursorLayout == null) {
                     return;
                 }
-
-                final boolean changeToDifferentConversation = fromConversation == null ||
-                                                              !fromConversation.getId().equals(toConversation.getId());
-
 
                 // handle draft
                 if (fromConversation != null && changeToDifferentConversation &&
