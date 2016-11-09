@@ -107,7 +107,7 @@ public class FooterViewController implements ConversationItemViewController,
             updateLikeButton();
             updateMessageStatusLabel();
 
-            boolean showHint = !container.isTornDown() && container.getControllerFactory().getUserPreferencesController().hasPerformedAction(
+            boolean showHint = !container.isTornDown() && !container.getControllerFactory().getUserPreferencesController().hasPerformedAction(
                 IUserPreferencesController.LIKED_MESSAGE);
             likeDetails.setUsers(message.isLiked() ? message.getLikes() : null, showHint);
         }
