@@ -27,7 +27,6 @@ import android.support.annotation.RawRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
-import android.text.TextUtils;
 import android.widget.Toast;
 import com.waz.api.MediaProvider;
 import com.waz.zclient.R;
@@ -223,13 +222,12 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
         @Override
         public boolean onPreferenceChange(Preference preference, Object o) {
             final String value = (String) o;
-            final Context context = preference.getContext();
-
             if (!(preference instanceof RingtonePreference)) {
                 preference.setSummary(value);
                 return true;
             }
 
+            final Context context = preference.getContext();
             if (value == null) {
                 preference.setSummary(R.string.pref_options_ringtones_default_summary);
                 return true;
