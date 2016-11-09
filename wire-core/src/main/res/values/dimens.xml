@@ -229,6 +229,9 @@
     <dimen name="connect_request__common_users__chathead__width">36dp</dimen>
     <dimen name="connect_request__common_users__chathead_name__width">60dp</dimen>
 
+    <!-- Message bottom menu -->
+    <dimen name="message__bottom__menu__peek_height">500dp</dimen>
+
     <dimen name="content__separator__avatar_container__width">@dimen/content__padding_left</dimen>
     <dimen name="content__separator__label_container__width">@dimen/framework__wrap_content</dimen>
     <dimen name="content__width">0dp</dimen>

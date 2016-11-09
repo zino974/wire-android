@@ -43,6 +43,17 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+
+    <!-- Dialogs -->
+
+    <style name="message__bottom_sheet__base" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/message__bottom_sheet__modal__base</item>
+    </style>
+
+    <style name="message__bottom_sheet__modal__base" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">@dimen/message__bottom__menu__peek_height</item>
+    </style>
+
     <!-- messageStream -->
     <style name="message_stream__message__base">
         <item name="android:textSize">@dimen/wire__text_size__regular</item>
