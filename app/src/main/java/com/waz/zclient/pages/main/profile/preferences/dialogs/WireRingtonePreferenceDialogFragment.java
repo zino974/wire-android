@@ -21,7 +21,6 @@ import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.RawRes;
-import android.text.TextUtils;
 import net.xpece.android.support.preference.XpRingtonePreferenceDialogFragment;
 import timber.log.Timber;
 
