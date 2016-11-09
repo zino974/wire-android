@@ -215,25 +215,29 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
     private void bindPreferenceSummaryToValue(Preference preference) {
         preference.setOnPreferenceChangeListener(bindPreferenceSummaryToValueListener);
         final String key = preference.getKey();
-        String value = getPreferenceManager().getSharedPreferences().getString(key, "");
+        String value = getPreferenceManager().getSharedPreferences().getString(key, null);
         bindPreferenceSummaryToValueListener.onPreferenceChange(preference, value);
     }
 
     private static class PreferenceSummaryChangeListener implements Preference.OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference preference, Object o) {
-            final String value = o.toString();
+            final String value = (String) o;
+            final Context context = preference.getContext();
+
             if (!(preference instanceof RingtonePreference)) {
                 preference.setSummary(value);
                 return true;
             }
 
-            if (TextUtils.isEmpty(value)) {
-                preference.setSummary(R.string.pref_options_sounds_none);
+            if (value == null) {
+                preference.setSummary(R.string.pref_options_ringtones_default_summary);
+                return true;
+            } else if (value.isEmpty()) {
+                preference.setSummary(RingtonePreference.getRingtoneSilentString(context));
                 return true;
             }
 
-            final Context context = preference.getContext();
             final Uri uri = Uri.parse(value);
             final int rawId = preference.getExtras().getInt(WireRingtonePreferenceDialogFragment.EXTRA_DEFAULT);
             if (uri.compareTo(Uri.parse("android.resource://" + context.getPackageName() + "/" + rawId)) == 0) {

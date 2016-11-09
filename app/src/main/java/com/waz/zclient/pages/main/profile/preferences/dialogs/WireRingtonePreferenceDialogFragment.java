@@ -47,7 +47,7 @@ public class WireRingtonePreferenceDialogFragment extends XpRingtonePreferenceDi
         if (rawId == 0) {
             return;
         }
-        final String value = getPreference().getSharedPreferences().getString(getPreference().getKey(), "");
+        final String value = getPreference().getSharedPreferences().getString(getPreference().getKey(), null);
         try {
             final Uri defaultUri = Uri.parse("android.resource://" + getContext().getPackageName() + "/" + rawId);
             Field fl = XpRingtonePreferenceDialogFragment.class.getDeclaredField("mUriForDefaultItem");
@@ -55,7 +55,7 @@ public class WireRingtonePreferenceDialogFragment extends XpRingtonePreferenceDi
             fl.set(this, defaultUri);
             fl.setAccessible(false);
 
-            if (defaultUri.compareTo(Uri.parse(value)) == 0) {
+            if (value == null || defaultUri.compareTo(Uri.parse(value)) == 0) {
                 // We selected the default value
                 fl = XpRingtonePreferenceDialogFragment.class.getDeclaredField("mClickedPos");
                 fl.setAccessible(true);
