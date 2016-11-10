@@ -32,7 +32,7 @@ import java.util.WeakHashMap;
 
 public class SketchEditText extends EditText {
 
-    public Set<NoResizeEditTextListener> weakListenerSet;
+    public Set<SketchEditTextListener> weakListenerSet;
     private String customHint;
     private int textFontId;
     private int hintFontId;
@@ -42,7 +42,7 @@ public class SketchEditText extends EditText {
     public SketchEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
         weakListenerSet = Collections.newSetFromMap(
-            new WeakHashMap<NoResizeEditTextListener, Boolean>());
+            new WeakHashMap<SketchEditTextListener, Boolean>());
         addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -65,16 +65,16 @@ public class SketchEditText extends EditText {
         notifyListeners();
     }
 
-    public void addListener(NoResizeEditTextListener listener) {
+    public void addListener(SketchEditTextListener listener) {
         weakListenerSet.add(listener);
     }
 
-    public void removeListener(NoResizeEditTextListener listener) {
+    public void removeListener(SketchEditTextListener listener) {
         weakListenerSet.remove(listener);
     }
 
     public void notifyListeners() {
-        for (NoResizeEditTextListener listener : weakListenerSet) {
+        for (SketchEditTextListener listener : weakListenerSet) {
             listener.editTextChanged();
         }
     }
@@ -139,7 +139,7 @@ public class SketchEditText extends EditText {
         updateField();
     }
 
-    public interface NoResizeEditTextListener {
+    public interface SketchEditTextListener {
         void editTextChanged();
     }
 }
