@@ -233,7 +233,8 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
         sketchEditTextView.setVisibility(View.INVISIBLE);
         currentBackgroundColor = getControllerFactory().getAccentColorController().getColor();
-        sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, 56));
+        //sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, 56));
+        sketchEditTextView.setBackground(getTransparentBackground());
         sketchEditTextView.setOnTouchListener(new View.OnTouchListener() {
             private float initialX;
             private float initialY;
@@ -259,12 +260,6 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
                     }
                 }
                 return drawingCanvasView.onTouchEvent(event);
-            }
-        });
-        sketchEditTextView.addListener(new NoResizeEditText.NoResizeEditTextListener() {
-            @Override
-            public void editTextChanged() {
-                sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, sketchEditTextView.getMeasuredHeight()));
             }
         });
 
@@ -495,6 +490,13 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         return drawable;
     }
 
+    private Drawable getTransparentBackground() {
+        GradientDrawable drawable = new GradientDrawable();
+        int color = 0x00FFFFFF;
+        drawable.setColor(color);
+        return drawable;
+    }
+
     @Override
     public void onColorSelected(int color, int strokeSize) {
         if (drawingCanvasView == null) {
@@ -529,30 +531,29 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     private void closeKeyboard() {
         if (sketchEditTextView.getVisibility() == View.VISIBLE) {
             sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
-        }
-        sketchEditTextView.setCursorVisible(false);
-        //This has to be on a post otherwise the setAlpha and setCursor won't be noticeable in the drawing cache
-        getView().post(new Runnable() {
-            @Override
-            public void run() {
-                sketchEditTextView.setDrawingCacheEnabled(true);
-                Bitmap bitmapDrawingCache = sketchEditTextView.getDrawingCache();
-                if (bitmapDrawingCache != null) {
-                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
-                    drawingCanvasView.drawTextBitmap(bitmapDrawingCache.copy(bitmapDrawingCache.getConfig(), true), params.leftMargin, params.topMargin);
-                } else {
-                    drawingCanvasView.drawTextBitmap(null, 0, 0);
+            sketchEditTextView.setCursorVisible(false);
+            //This has to be on a post otherwise the setAlpha and setCursor won't be noticeable in the drawing cache
+            getView().post(new Runnable() {
+                @Override
+                public void run() {
+                    sketchEditTextView.setDrawingCacheEnabled(true);
+                    Bitmap bitmapDrawingCache = sketchEditTextView.getDrawingCache();
+                    if (bitmapDrawingCache != null) {
+                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
+                        drawingCanvasView.drawTextBitmap(bitmapDrawingCache.copy(bitmapDrawingCache.getConfig(), true), params.leftMargin, params.topMargin);
+                    } else {
+                        drawingCanvasView.drawTextBitmap(null, 0, 0);
+                    }
+                    sketchEditTextView.setDrawingCacheEnabled(false);
+                    KeyboardUtils.hideKeyboard(getActivity());
+                    sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
                 }
-                sketchEditTextView.setDrawingCacheEnabled(false);
-                KeyboardUtils.hideKeyboard(getActivity());
-                sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
-            }
-        });
+            });
+        }
     }
 
     private void showKeyboard() {
         drawingCanvasView.drawTextBitmap(null, 0, 0);
-        sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
         sketchEditTextView.setCursorVisible(true);
         sketchEditTextView.requestFocus();
         KeyboardUtils.showKeyboard(getActivity());
@@ -580,7 +581,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
             if (sketchEditTextView.getVisibility() != View.VISIBLE) {
                 shouldOpenEditText = true;
                 sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
-                sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, sketchEditTextView.getMeasuredHeight()));
+                sketchEditTextView.setBackground(getTransparentBackground());
             }
             sketchEditTextView.setVisibility(View.VISIBLE);
             showKeyboard();
@@ -641,8 +642,24 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
             params.leftMargin = (((ViewGroup) sketchEditTextView.getParent()).getMeasuredWidth() - sketchEditTextView.getMeasuredWidth()) / 2;
             params.topMargin = ((ViewGroup) sketchEditTextView.getParent()).getMeasuredHeight() - keyboardHeight - sketchEditTextView.getMeasuredHeight();
             sketchEditTextView.setLayoutParams(params);
+
+            getView().post(new Runnable() {
+                @Override
+                public void run() {
+                    sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, sketchEditTextView.getMeasuredHeight()));
+                    sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
+                    sketchEditTextView.addListener(new NoResizeEditText.NoResizeEditTextListener() {
+                        @Override
+                        public void editTextChanged() {
+                            sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, sketchEditTextView.getMeasuredHeight()));
+                        }
+                    });
+                }
+            });
+        } else {
             sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
         }
+
     }
 
     public interface Container { }
