@@ -29,7 +29,6 @@ import android.media.ExifInterface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -235,6 +234,10 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         sketchEditTextView.setCustomHint(getString(R.string.drawing__text_hint));
         currentBackgroundColor = getControllerFactory().getAccentColorController().getColor();
         sketchEditTextView.setBackground(getTransparentBackground());
+        sketchEditTextView.setHintFontId(R.string.wire__typeface__medium);
+        sketchEditTextView.setTextFontId(R.string.wire__typeface__regular);
+        setRegularTextSize(1.0f);
+        setHintTextSize(1.0f);
         sketchEditTextView.setOnTouchListener(new View.OnTouchListener() {
             private float initialX;
             private float initialY;
@@ -615,9 +618,8 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
 
     @Override
     public void onScaleChanged(float scale) {
-        float mediumTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__medium);
-        float newSize = mediumTextSize * scale;
-        sketchEditTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, newSize);
+        setRegularTextSize(scale);
+        setHintTextSize(scale);
     }
 
     @Override
@@ -660,6 +662,18 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
             sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
         }
 
+    }
+
+    private void setRegularTextSize(float scale) {
+        float mediumRegularTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__regular);
+        float newRegularSize = mediumRegularTextSize * scale;
+        sketchEditTextView.setRegularTextSize(newRegularSize);
+    }
+
+    private void setHintTextSize(float scale) {
+        float mediumHintTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__small);
+        float newHintSize = mediumHintTextSize  * scale;
+        sketchEditTextView.setHintTextSize(newHintSize);
     }
 
     public interface Container { }
