@@ -1440,7 +1440,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                     if (getActivity() == null) {
                         return;
                     }
-                    messageBottomSheetDialog = new MessageBottomSheetDialog(getContext(), message, isMemberOfConversation, messageBottomSheetDialogCallback);
+                    messageBottomSheetDialog = new MessageBottomSheetDialog(getContext(), R.style.message__bottom_sheet__base, message, isMemberOfConversation, messageBottomSheetDialogCallback);
                     messageBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
@@ -1451,7 +1451,7 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 }
             }, BOTTOM_MENU_DISPLAY_DELAY_MS);
         } else {
-            messageBottomSheetDialog = new MessageBottomSheetDialog(getContext(), message, isMemberOfConversation, messageBottomSheetDialogCallback);
+            messageBottomSheetDialog = new MessageBottomSheetDialog(getContext(), R.style.message__bottom_sheet__base, message, isMemberOfConversation, messageBottomSheetDialogCallback);
             messageBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
