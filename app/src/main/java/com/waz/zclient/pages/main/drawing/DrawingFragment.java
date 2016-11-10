@@ -620,6 +620,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     public void onScaleChanged(float scale) {
         setRegularTextSize(scale);
         setHintTextSize(scale);
+        setTextPaddingSize(scale);
     }
 
     @Override
@@ -674,6 +675,12 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         float mediumHintTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__small);
         float newHintSize = mediumHintTextSize  * scale;
         sketchEditTextView.setHintTextSize(newHintSize);
+    }
+
+    private void setTextPaddingSize(float scale) {
+        float mediumPaddingSize = getResources().getDimensionPixelSize(R.dimen.wire__padding__regular);
+        int newPaddingSize = (int) (mediumPaddingSize  * scale);
+        sketchEditTextView.setPadding(newPaddingSize, newPaddingSize, newPaddingSize, newPaddingSize);
     }
 
     public interface Container { }
