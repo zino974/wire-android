@@ -122,4 +122,8 @@ public abstract class MessageViewController implements ConversationItemViewContr
         v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         return messageViewsContainer.onItemLongClick(message);
     }
+
+    public void closeExtras(){
+
+    }
 }

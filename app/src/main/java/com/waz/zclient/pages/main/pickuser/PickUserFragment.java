@@ -17,11 +17,14 @@
  */
 package com.waz.zclient.pages.main.pickuser;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,6 +52,7 @@ import com.waz.zclient.controllers.currentfocus.IFocusController;
 import com.waz.zclient.controllers.globallayout.KeyboardHeightObserver;
 import com.waz.zclient.controllers.globallayout.KeyboardVisibilityObserver;
 import com.waz.zclient.controllers.navigation.NavigationController;
+import com.waz.zclient.controllers.permission.RequestPermissionsObserver;
 import com.waz.zclient.controllers.tracking.events.connect.OpenedGenericInviteMenuEvent;
 import com.waz.zclient.controllers.tracking.events.connect.SentConnectRequestEvent;
 import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerSelectSearchUser;
@@ -76,6 +80,7 @@ import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.KeyboardUtils;
 import com.waz.zclient.ui.views.ZetaButton;
 import com.waz.zclient.utils.LayoutSpec;
+import com.waz.zclient.utils.PermissionUtils;
 import com.waz.zclient.utils.TrackingUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.device.DeviceDetector;
@@ -98,7 +103,8 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
                                                                                           OnBackPressedListener,
                                                                                           SearchResultOnItemTouchListener.Callback,
                                                                                           SearchResultAdapter.Callback,
-                                                                                          PickUserControllerSearchObserver {
+                                                                                          PickUserControllerSearchObserver,
+                                                                                          RequestPermissionsObserver {
     public static final String TAG = PickUserFragment.class.getName();
 
     public static final String ARGUMENT_ADD_TO_CONVERSATION = "ARGUMENT_ADD_TO_CONVERSATION";
@@ -110,6 +116,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
 
     private static final int DEFAULT_SELECTED_INVITE_METHOD = 0;
     private static final int SHOW_KEYBOARD_THRETHOLD = 10;
+
     private RecyclerView searchResultRecyclerView;
     private SearchResultAdapter searchResultAdapter;
 
@@ -347,6 +354,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         getControllerFactory().getGlobalLayoutController().addKeyboardVisibilityObserver(this);
         getControllerFactory().getAccentColorController().addAccentColorObserver(this);
         getControllerFactory().getPickUserController().addPickUserSearchControllerObserver(this);
+        getControllerFactory().getRequestPermissionsController().addObserver(this);
         if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION) && !getArguments().getBoolean(ARGUMENT_GROUP_CONVERSATION)) {
             new Handler().post(new Runnable() {
                 @Override
@@ -366,6 +374,12 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         loadStartUi();
         usersSearchModelObserver.resumeListening();
         usersSearchModelObserver.forceUpdate();
+
+        boolean hasShareContactsEnabled = getControllerFactory().getUserPreferencesController().hasShareContactsEnabled();
+        boolean hasContactsReadPermission = PermissionUtils.hasSelfPermissions(getContext(), Manifest.permission.READ_CONTACTS);
+        if (hasShareContactsEnabled && !hasContactsReadPermission) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, PermissionUtils.REQUEST_READ_CONTACTS);
+        }
     }
 
     @Override
@@ -410,6 +424,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         getControllerFactory().getGlobalLayoutController().removeKeyboardHeightObserver(this);
         getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         getControllerFactory().getPickUserController().removePickUserSearchControllerObserver(this);
+        getControllerFactory().getRequestPermissionsController().removeObserver(this);
         usersSearchModelObserver.pauseListening();
         super.onStop();
     }
@@ -1155,5 +1170,19 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         LoadingIndicatorView getLoadingViewIndicator();
 
         IPickUserController.Destination getCurrentPickerDestination();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, int[] grantResults) {
+        if (requestCode == PermissionUtils.REQUEST_READ_CONTACTS &&
+            grantResults.length > 0 &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            //Changing the value of the shareContacts seems to be the
+            //only way to trigger a refresh on the sync engine...
+            boolean oldConfig = getControllerFactory().getUserPreferencesController().hasShareContactsEnabled();
+            getControllerFactory().getUserPreferencesController().setShareContactsEnabled(!oldConfig);
+            getControllerFactory().getUserPreferencesController().setShareContactsEnabled(oldConfig);
+        }
     }
 }

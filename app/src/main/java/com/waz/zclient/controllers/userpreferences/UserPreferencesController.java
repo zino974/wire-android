@@ -353,6 +353,16 @@ public class UserPreferencesController implements IUserPreferencesController {
     }
 
     @Override
+    public boolean hasShareContactsEnabled() {
+        return userPreferences.getBoolean(context.getString(R.string.pref_share_contacts_key), true);
+    }
+
+    @Override
+    public void setShareContactsEnabled(boolean enabled) {
+        userPreferences.edit().putBoolean(context.getString(R.string.pref_share_contacts_key), enabled).apply();
+    }
+
+    @Override
     public long getLastEphemeralValue() {
         return userPreferences.getLong(USER_PREF_LAST_EPHEMERAL_VALUE, 0);
     }

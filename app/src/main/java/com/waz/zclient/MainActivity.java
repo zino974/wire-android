@@ -67,6 +67,7 @@ import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
 import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.controllers.userpreferences.UserPreferencesController;
 import com.waz.zclient.core.api.scala.AppEntryStore;
+import com.waz.zclient.core.controllers.tracking.attributes.OpenedMediaAction;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
 import com.waz.zclient.core.controllers.tracking.events.media.OpenedMediaActionEvent;
@@ -767,11 +768,11 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
     @Override
     public void onStartCall(boolean withVideo) {
         handleOnStartCall(withVideo);
-        boolean isGroupConversation = getStoreFactory().getConversationStore().getCurrentConversation().getType() == IConversation.Type.GROUP;
+        IConversation conversation = getStoreFactory().getConversationStore().getCurrentConversation();
         if (withVideo) {
-            getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.videocall(isGroupConversation));
+            getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.VIDEO_CALL, conversation));
         } else {
-            getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.audiocall(isGroupConversation));
+            getControllerFactory().getTrackingController().tagEvent(OpenedMediaActionEvent.cursorAction(OpenedMediaAction.AUDIO_CALL, conversation));
         }
     }
 

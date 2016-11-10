@@ -79,6 +79,10 @@ public class MessageStreamManager {
         }
     }
 
+    public void resetMessages() {
+        adapter.resetState();
+    }
+
     public void onConfigurationChanged(Context context, MessageAdapter messageAdapter) {
         if (LayoutSpec.isTablet(context) && listView != null && messageAdapter != null) {
             final Parcelable onSaveInstanceState = listView.onSaveInstanceState();

@@ -24,6 +24,8 @@ import static android.support.v4.content.PermissionChecker.checkSelfPermission;
 
 public class PermissionUtils {
 
+    public static final int REQUEST_READ_CONTACTS = 1;
+
     private PermissionUtils() {
     }
 

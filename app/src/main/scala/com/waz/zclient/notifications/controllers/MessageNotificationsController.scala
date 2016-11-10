@@ -130,10 +130,19 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
            CONNECT_REQUEST |
            RENAME |
            LIKE =>
-        getSelectedSoundUri(sharedPreferences.getString(context.getString(R.string.pref_options_ringtones_text_key), null), R.raw.new_message_gcm)
+        val value = sharedPreferences.getString(context.getString(R.string.pref_options_ringtones_text_key), null);
+        if (value != null && value.isEmpty) {
+          null
+        } else {
+          getSelectedSoundUri(value, R.raw.new_message_gcm)
+        }
       case KNOCK =>
         val value = sharedPreferences.getString(context.getString(R.string.pref_options_ringtones_ping_key), null)
-        getSelectedSoundUri(value, R.raw.ping_from_them)
+        if (value != null && value.isEmpty) {
+          null
+        } else {
+          getSelectedSoundUri(value, R.raw.ping_from_them)
+        }
       case _ => null
     }
   }

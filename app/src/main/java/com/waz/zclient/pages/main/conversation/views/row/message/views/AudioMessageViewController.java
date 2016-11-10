@@ -96,6 +96,11 @@ public class AudioMessageViewController extends MessageViewController implements
     private final ModelObserver<PlaybackControls> playbackControlsModelObserver = new ModelObserver<PlaybackControls>() {
         @Override
         public void updated(PlaybackControls playbackControls) {
+            if (playbackControls.isPlaying()) {
+                messageViewsContainer.getControllerFactory().getGlobalLayoutController().keepScreenAwake();
+            } else {
+                messageViewsContainer.getControllerFactory().getGlobalLayoutController().resetScreenAwakeState();
+            }
             actionButton.setPlaybackControls(playbackControls);
             String time;
             if (playbackControls.getDuration().equals(playbackControls.getPlayhead()) || playbackControls.getPlayhead().isZero()) {

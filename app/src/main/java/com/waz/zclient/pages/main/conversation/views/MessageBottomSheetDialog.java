@@ -63,6 +63,13 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         init(isMemberOfConversation);
     }
 
+    public MessageBottomSheetDialog(@NonNull Context context, int theme, @NonNull Message message, boolean isMemberOfConversation, Callback callback) {
+        super(context, theme);
+        this.message = message;
+        this.callback = callback;
+        init(isMemberOfConversation);
+    }
+
     @SuppressLint("InflateParams")
     private void init(boolean isMemberOfConversation) {
         LinearLayout view = (LinearLayout) getLayoutInflater().inflate(R.layout.message__bottom__menu, null);
@@ -82,12 +89,12 @@ public class MessageBottomSheetDialog extends BottomSheetDialog {
         if (isSaveAllowed()) {
             addAction(view, MessageAction.SAVE);
         }
+        if (isForwardAllowed()) {
+            addAction(view, MessageAction.FORWARD);
+        }
         addAction(view, MessageAction.DELETE_LOCAL);
         if (isDeleteForEveryoneAllowed(isMemberOfConversation)) {
             addAction(view, MessageAction.DELETE_GLOBAL);
-        }
-        if (isForwardAllowed()) {
-            addAction(view, MessageAction.FORWARD);
         }
         setContentView(view);
     }

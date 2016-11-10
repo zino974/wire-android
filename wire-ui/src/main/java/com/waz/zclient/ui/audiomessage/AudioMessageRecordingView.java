@@ -384,6 +384,9 @@ public class AudioMessageRecordingView extends FrameLayout implements View.OnCli
                 recordingIndicatorContainerView.setVisibility(VISIBLE);
                 recordingSeekBar.setVisibility(GONE);
                 startRecordingIndicator();
+                if (callback != null) {
+                    callback.onStartedRecordingAudioMessage();
+                }
                 break;
             case SEND_FROM_RECORDING:
                 slideControl.setBackground(colorSlideControlBackground);
@@ -437,5 +440,7 @@ public class AudioMessageRecordingView extends FrameLayout implements View.OnCli
         void onCancelledAudioMessageRecording();
 
         void onPreviewedAudioMessage();
+
+        void onStartedRecordingAudioMessage();
     }
 }
