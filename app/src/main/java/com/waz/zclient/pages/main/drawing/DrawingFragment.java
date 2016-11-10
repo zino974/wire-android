@@ -56,7 +56,7 @@ import com.waz.zclient.ui.sketch.DrawingCanvasView;
 import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.KeyboardUtils;
 import com.waz.zclient.ui.views.CursorIconButton;
-import com.waz.zclient.ui.views.NoResizeEditText;
+import com.waz.zclient.ui.views.SketchEditText;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.TrackingUtils;
 import com.waz.zclient.utils.ViewUtils;
@@ -98,7 +98,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     private View drawingTipBackground;
 
     private CursorIconButton sendDrawingButton;
-    private NoResizeEditText sketchEditTextView;
+    private SketchEditText sketchEditTextView;
     private boolean shouldOpenEditText = false;
     private int currentBackgroundColor;
     private TextView actionButtonText;
@@ -232,8 +232,8 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         sketchEditTextView = ViewUtils.getView(rootView, R.id.et__sketch_text);
         sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
         sketchEditTextView.setVisibility(View.INVISIBLE);
+        sketchEditTextView.setCustomHint(getString(R.string.drawing__text_hint));
         currentBackgroundColor = getControllerFactory().getAccentColorController().getColor();
-        //sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, 56));
         sketchEditTextView.setBackground(getTransparentBackground());
         sketchEditTextView.setOnTouchListener(new View.OnTouchListener() {
             private float initialX;
@@ -648,7 +648,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
                 public void run() {
                     sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, sketchEditTextView.getMeasuredHeight()));
                     sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
-                    sketchEditTextView.addListener(new NoResizeEditText.NoResizeEditTextListener() {
+                    sketchEditTextView.addListener(new SketchEditText.NoResizeEditTextListener() {
                         @Override
                         public void editTextChanged() {
                             sketchEditTextView.setBackground(getTextBackground(currentBackgroundColor, sketchEditTextView.getMeasuredHeight()));

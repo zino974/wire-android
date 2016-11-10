@@ -135,7 +135,7 @@
 
         </FrameLayout>
 
-        <com.waz.zclient.ui.views.NoResizeEditText
+        <com.waz.zclient.ui.views.SketchEditText
             android:id="@+id/et__sketch_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -153,7 +153,6 @@
             android:textAlignment="textStart"
             tools:ignore="LabelFor"
             android:textCursorDrawable="@drawable/cursor_white"
-            android:hint="@string/drawing__text_hint"
             android:textColorHint="@color/white_32"
             android:fontFamily="@string/wire__typeface__light"
             />

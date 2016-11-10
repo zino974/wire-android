@@ -18,20 +18,43 @@
 package com.waz.zclient.ui.views;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.widget.EditText;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-public class NoResizeEditText extends EditText {
+public class SketchEditText extends EditText {
 
     public Set<NoResizeEditTextListener> weakListenerSet;
+    private String customHint;
 
-    public NoResizeEditText(Context context, AttributeSet attrs) {
+    public SketchEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
         weakListenerSet = Collections.newSetFromMap(
             new WeakHashMap<NoResizeEditTextListener, Boolean>());
+        addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.length() == 0) {
+                    setHint(customHint);
+                } else {
+                    setHint("");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     @Override
@@ -51,6 +74,17 @@ public class NoResizeEditText extends EditText {
     public void notifyListeners() {
         for (NoResizeEditTextListener listener : weakListenerSet) {
             listener.editTextChanged();
+        }
+    }
+
+    public String getCustomHint() {
+        return customHint;
+    }
+
+    public void setCustomHint(String customHint) {
+        this.customHint = customHint;
+        if (getText().length() == 0) {
+            setHint(customHint);
         }
     }
 
