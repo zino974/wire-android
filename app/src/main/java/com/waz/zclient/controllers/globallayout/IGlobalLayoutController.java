@@ -53,4 +53,8 @@ public interface IGlobalLayoutController {
     void setActivity(Activity activity);
 
     void setGlobalLayout(View view);
+
+    void keepScreenAwake();
+
+    void resetScreenAwakeState();
 }

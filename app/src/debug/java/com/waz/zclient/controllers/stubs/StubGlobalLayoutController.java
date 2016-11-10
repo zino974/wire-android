@@ -98,7 +98,17 @@ public class StubGlobalLayoutController implements IGlobalLayoutController {
     ;
   }
 
-  @Override
+    @Override
+    public void keepScreenAwake() {
+
+    }
+
+    @Override
+    public void resetScreenAwakeState() {
+
+    }
+
+    @Override
   public void addGlobalLayoutObserver(GlobalLayoutObserver globalLayoutObserver) {
     ;
   }
