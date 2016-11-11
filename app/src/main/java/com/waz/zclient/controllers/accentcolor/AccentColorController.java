@@ -38,7 +38,7 @@ public class AccentColorController implements IAccentColorController {
     private int color;
 
     public AccentColorController(Context context, IUserPreferencesController userPreferencesController) {
-        accentColors = context.getResources().getIntArray(R.array.accents_color);
+        accentColors = context.getResources().getIntArray(R.array.original_accents_color);
         color = userPreferencesController.getLastAccentColor();
 
         if (color == NO_COLOR_FOUND) {
