@@ -55,7 +55,7 @@ task licenseFormatAndroid(type: nl.javadude.gradle.plugins.license.License) {
 licenseFormat.dependsOn licenseFormatAndroid
 
 ext {
-    majorVersion = "2.21."
+    majorVersion = "2.22."
 
     compileSdkVersion = 23
     minSdkVersion = 17
@@ -83,7 +83,7 @@ ext {
     avsName = 'avs'
     avsGroup = 'com.wire'
 
-    // proprietary avs artifact config
+    // proprietary avs artifact configuration
     customAvsVersion = '2.9.13@aar'
     customAvsInternalVersion = customAvsVersion
     customAvsName = 'avs'
