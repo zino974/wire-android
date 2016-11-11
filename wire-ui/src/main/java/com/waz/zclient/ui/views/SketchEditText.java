@@ -40,6 +40,10 @@ public class SketchEditText extends EditText {
     private float regularTextSize;
     private float hintTextSize;
     private float sketchScale;
+    private int regularHorizontalPadding;
+    private int hintHorizontalPadding;
+    private int regularVerticalPadding;
+    private int hintVerticalPadding;
 
     public SketchEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -87,10 +91,12 @@ public class SketchEditText extends EditText {
             setHint("");
             setTypeface(TypefaceUtils.getTypeface(getContext().getString(textFontId)));
             setTextSize(TypedValue.COMPLEX_UNIT_PX, regularTextSize);
+            setPadding(regularHorizontalPadding, regularVerticalPadding, regularHorizontalPadding, regularVerticalPadding);
         } else {
             setHint(customHint);
             setTypeface(TypefaceUtils.getTypeface(getContext().getString(hintFontId)));
             setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSize);
+            setPadding(hintHorizontalPadding, hintVerticalPadding, hintHorizontalPadding, hintVerticalPadding);
         }
     }
 
@@ -141,6 +147,18 @@ public class SketchEditText extends EditText {
         updateField();
     }
 
+    private void setRegularPaddingSize(int horizontal, int vertical) {
+        this.regularVerticalPadding = vertical;
+        this.regularHorizontalPadding = horizontal;
+        updateField();
+    }
+
+    private void setHintPaddingSize(int horizontal, int vertical) {
+        this.hintVerticalPadding = vertical;
+        this.hintHorizontalPadding = horizontal;
+        updateField();
+    }
+
     public void setSketchScale(float scale) {
         sketchScale = scale;
         float mediumRegularTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__regular);
@@ -151,7 +169,10 @@ public class SketchEditText extends EditText {
         setHintTextSize(newHintSize);
         float mediumPaddingSize = getResources().getDimensionPixelSize(R.dimen.wire__padding__regular);
         int newPaddingSize = (int) (mediumPaddingSize  * scale);
-        setPadding(newPaddingSize, newPaddingSize, newPaddingSize, newPaddingSize);
+        setRegularPaddingSize(newPaddingSize, newPaddingSize);
+        float hintVerticalPadding = mediumPaddingSize + (mediumRegularTextSize - mediumHintTextSize) / 2;
+        int newHintVerticalPadding = (int) (hintVerticalPadding  * scale);
+        setHintPaddingSize(newPaddingSize, newHintVerticalPadding);
     }
 
     public float getSketchScale() {
