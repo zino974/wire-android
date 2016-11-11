@@ -505,6 +505,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         drawingCanvasView.setStrokeSize(strokeSize);
         currentBackgroundColor = color;
         sketchEditTextView.setBackground(ColorUtils.getRoundedTextBoxBackground(getContext(), color, sketchEditTextView.getHeight()));
+        drawSketchEditText();
     }
 
     public void onEmojiClick() {
@@ -527,32 +528,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     }
 
     private void closeKeyboard() {
-        if (sketchEditTextView.getVisibility() == View.VISIBLE) {
-            sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
-            sketchEditTextView.setCursorVisible(false);
-            //This has to be on a post otherwise the setAlpha and setCursor won't be noticeable in the drawing cache
-            getView().post(new Runnable() {
-                @Override
-                public void run() {
-                    sketchEditTextView.setDrawingCacheEnabled(true);
-                    Bitmap bitmapDrawingCache = sketchEditTextView.getDrawingCache();
-                    if (bitmapDrawingCache != null) {
-                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
-                        drawingCanvasView.showText();
-                        drawingCanvasView.drawTextBitmap(
-                            bitmapDrawingCache.copy(bitmapDrawingCache.getConfig(), true),
-                            params.leftMargin,
-                            params.topMargin,
-                            sketchEditTextView.getText().toString(),
-                            sketchEditTextView.getSketchScale());
-                    } else {
-                        drawingCanvasView.drawTextBitmap(null, 0, 0, "", 1.0f);
-                    }
-                    sketchEditTextView.setDrawingCacheEnabled(false);
-                    sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
-                }
-            });
-        }
+        drawSketchEditText();
         KeyboardUtils.hideKeyboard(getActivity());
     }
 
@@ -676,6 +652,35 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
             sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
         }
 
+    }
+
+    private void drawSketchEditText(){
+        if (sketchEditTextView.getVisibility() == View.VISIBLE) {
+            sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
+            sketchEditTextView.setCursorVisible(false);
+            //This has to be on a post otherwise the setAlpha and setCursor won't be noticeable in the drawing cache
+            getView().post(new Runnable() {
+                @Override
+                public void run() {
+                    sketchEditTextView.setDrawingCacheEnabled(true);
+                    Bitmap bitmapDrawingCache = sketchEditTextView.getDrawingCache();
+                    if (bitmapDrawingCache != null) {
+                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
+                        drawingCanvasView.showText();
+                        drawingCanvasView.drawTextBitmap(
+                            bitmapDrawingCache.copy(bitmapDrawingCache.getConfig(), true),
+                            params.leftMargin,
+                            params.topMargin,
+                            sketchEditTextView.getText().toString(),
+                            sketchEditTextView.getSketchScale());
+                    } else {
+                        drawingCanvasView.drawTextBitmap(null, 0, 0, "", 1.0f);
+                    }
+                    sketchEditTextView.setDrawingCacheEnabled(false);
+                    sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
+                }
+            });
+        }
     }
 
     public interface Container { }
