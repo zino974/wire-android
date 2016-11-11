@@ -24,6 +24,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.EditText;
 
+import com.waz.zclient.ui.R;
 import com.waz.zclient.ui.utils.TypefaceUtils;
 
 import java.util.Collections;
@@ -38,6 +39,7 @@ public class SketchEditText extends EditText {
     private int hintFontId;
     private float regularTextSize;
     private float hintTextSize;
+    private float sketchScale;
 
     public SketchEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -137,6 +139,23 @@ public class SketchEditText extends EditText {
     public void setHintTextSize(float hintSize) {
         this.hintTextSize = hintSize;
         updateField();
+    }
+
+    public void setSketchScale(float scale) {
+        sketchScale = scale;
+        float mediumRegularTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__regular);
+        float newRegularSize = mediumRegularTextSize * scale;
+        setRegularTextSize(newRegularSize);
+        float mediumHintTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__small);
+        float newHintSize = mediumHintTextSize  * scale;
+        setHintTextSize(newHintSize);
+        float mediumPaddingSize = getResources().getDimensionPixelSize(R.dimen.wire__padding__regular);
+        int newPaddingSize = (int) (mediumPaddingSize  * scale);
+        setPadding(newPaddingSize, newPaddingSize, newPaddingSize, newPaddingSize);
+    }
+
+    public float getSketchScale() {
+        return sketchScale;
     }
 
     public interface SketchEditTextListener {
