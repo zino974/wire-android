@@ -49,6 +49,7 @@ import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.ui.colorpicker.ColorPickerLayout;
 import com.waz.zclient.ui.colorpicker.EmojiBottomSheetDialog;
 import com.waz.zclient.ui.colorpicker.EmojiSize;
+import com.waz.zclient.ui.sketch.DrawingCanvasCallback;
 import com.waz.zclient.ui.sketch.DrawingCanvasView;
 import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.ColorUtils;
@@ -64,7 +65,7 @@ import java.util.Locale;
 
 public class DrawingFragment extends BaseFragment<DrawingFragment.Container> implements OnBackPressedListener,
                                                                                         ColorPickerLayout.OnColorSelectedListener,
-                                                                                        DrawingCanvasView.DrawingCanvasCallback,
+                                                                                        DrawingCanvasCallback,
                                                                                         ViewTreeObserver.OnScrollChangedListener,
                                                                                         AccentColorObserver,
                                                                                         ColorPickerLayout.OnWidthChangedListener,
@@ -274,8 +275,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         sketchEditTextView.setBackground(ColorUtils.getTransparentDrawable());
         sketchEditTextView.setHintFontId(R.string.wire__typeface__medium);
         sketchEditTextView.setTextFontId(R.string.wire__typeface__regular);
-        setRegularTextSize(1.0f);
-        setHintTextSize(1.0f);
+        sketchEditTextView.setSketchScale(1.0f);
         sketchEditTextView.setOnTouchListener(sketchEditTextOnTouchListener);
 
         if (savedInstanceState != null) {
@@ -538,9 +538,15 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
                     Bitmap bitmapDrawingCache = sketchEditTextView.getDrawingCache();
                     if (bitmapDrawingCache != null) {
                         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
-                        drawingCanvasView.drawTextBitmap(bitmapDrawingCache.copy(bitmapDrawingCache.getConfig(), true), params.leftMargin, params.topMargin);
+                        drawingCanvasView.showText();
+                        drawingCanvasView.drawTextBitmap(
+                            bitmapDrawingCache.copy(bitmapDrawingCache.getConfig(), true),
+                            params.leftMargin,
+                            params.topMargin,
+                            sketchEditTextView.getText().toString(),
+                            sketchEditTextView.getSketchScale());
                     } else {
-                        drawingCanvasView.drawTextBitmap(null, 0, 0);
+                        drawingCanvasView.drawTextBitmap(null, 0, 0, "", 1.0f);
                     }
                     sketchEditTextView.setDrawingCacheEnabled(false);
                     sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
@@ -551,7 +557,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     }
 
     private void showKeyboard() {
-        drawingCanvasView.drawTextBitmap(null, 0, 0);
+        drawingCanvasView.hideText();
         sketchEditTextView.setCursorVisible(true);
         sketchEditTextView.requestFocus();
         KeyboardUtils.showKeyboard(getActivity());
@@ -614,20 +620,29 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
 
     @Override
     public void onScaleChanged(float scale) {
-        setRegularTextSize(scale);
-        setHintTextSize(scale);
-        setTextPaddingSize(scale);
+        sketchEditTextView.setSketchScale(scale);
     }
 
     @Override
     public void onScaleStart() {
-        drawingCanvasView.drawTextBitmap(null, 0, 0);
+        drawingCanvasView.hideText();
         sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
     }
 
     @Override
     public void onScaleEnd() {
         closeKeyboard();
+    }
+
+    @Override
+    public void onTextChanged(String text, int x, int y, float scale) {
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
+        params.leftMargin = x;
+        params.topMargin = y;
+        sketchEditTextView.setLayoutParams(params);
+        sketchEditTextView.setSketchScale(scale);
+        sketchEditTextView.setText(text);
+        sketchEditTextView.setSelection(text.length());
     }
 
     @Override
@@ -655,24 +670,6 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
             sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
         }
 
-    }
-
-    private void setRegularTextSize(float scale) {
-        float mediumRegularTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__regular);
-        float newRegularSize = mediumRegularTextSize * scale;
-        sketchEditTextView.setRegularTextSize(newRegularSize);
-    }
-
-    private void setHintTextSize(float scale) {
-        float mediumHintTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__small);
-        float newHintSize = mediumHintTextSize  * scale;
-        sketchEditTextView.setHintTextSize(newHintSize);
-    }
-
-    private void setTextPaddingSize(float scale) {
-        float mediumPaddingSize = getResources().getDimensionPixelSize(R.dimen.wire__padding__regular);
-        int newPaddingSize = (int) (mediumPaddingSize  * scale);
-        sketchEditTextView.setPadding(newPaddingSize, newPaddingSize, newPaddingSize, newPaddingSize);
     }
 
     public interface Container { }

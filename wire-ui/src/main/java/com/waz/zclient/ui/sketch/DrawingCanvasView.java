@@ -63,8 +63,6 @@ public class DrawingCanvasView extends View {
     private String emoji;
     private boolean drawEmoji;
 
-    private Text textHistoryItem;
-
     private LinkedList<HistoryItem> historyItems; // NOPMD
 
     public enum Mode {
@@ -125,9 +123,7 @@ public class DrawingCanvasView extends View {
                 canvas = new Canvas(bitmap);
             }
         }
-        canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), whitePaint);
-        //needed for tablet view switching
-        drawBackgroundBitmap();
+        redraw();
     }
 
     @Override
@@ -386,36 +382,26 @@ public class DrawingCanvasView extends View {
         if (historyItems.size() == 1) {
             paintedOn(false);
         }
-        canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), whitePaint);
-        historyItems.removeLast();
-        if (includeBackgroundImage) {
-            drawBackgroundBitmap();
+        HistoryItem last = historyItems.removeLast();
+        if (last instanceof Text) {
+            Text newLastText = getLastText();
+            if (newLastText != null) {
+                drawingCanvasCallback.onTextChanged(newLastText.text, (int) newLastText.x, (int) newLastText.y, newLastText.scale);
+            }
         }
-        for (HistoryItem item : historyItems) {
-            item.draw(canvas);
-        }
-        invalidate();
+        redraw();
         return true;
     }
 
-    public void drawTextBitmap(Bitmap textBitmap, float x, float y) {
-        if (textHistoryItem != null) {
-            historyItems.remove(textHistoryItem);
-            textHistoryItem.recycle();
+    public void drawTextBitmap(Bitmap textBitmap, float x, float y, String text, float scale) {
+        Text newTextHistoryItem;
+        if (textBitmap == null) {
+            newTextHistoryItem = new ErasedText();
+        } else {
+            newTextHistoryItem = new Text(textBitmap, x, y, bitmapPaint, text, scale);
         }
-        if (textBitmap != null) {
-            textHistoryItem = new Text(textBitmap, x, y, bitmapPaint);
-            historyItems.add(textHistoryItem);
-        }
-        canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), whitePaint);
-        paintedOn(historyItems.size() > 0);
-        if (includeBackgroundImage) {
-            drawBackgroundBitmap();
-        }
-        for (HistoryItem item : historyItems) {
-            item.draw(canvas);
-        }
-        invalidate();
+        historyItems.add(newTextHistoryItem);
+        redraw();
     }
 
     private void paintedOn(boolean isPaintedOn) {
@@ -472,19 +458,11 @@ public class DrawingCanvasView extends View {
         matrix.postTranslate(horizontalMargin, 0);
 
         canvas.drawBitmap(backgroundBitmap, matrix, null);
-        for (HistoryItem item : historyItems) {
-            item.draw(canvas);
-        }
-        invalidate();
     }
 
     public void removeBackgroundBitmap() {
         includeBackgroundImage = false;
-        canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), whitePaint);
-        for (HistoryItem item : historyItems) {
-            item.draw(canvas);
-        }
-        invalidate();
+        redraw();
     }
 
     public boolean isEmpty() {
@@ -496,6 +474,49 @@ public class DrawingCanvasView extends View {
         canvas = null;
         if (drawingCanvasCallback != null) {
             drawingCanvasCallback.reserveBitmapMemory(width, height);
+        }
+    }
+
+    private Text getLastText() {
+        Text lastText = null;
+        for (int i = historyItems.size() - 1; i >= 0; i--) {
+            if (historyItems.get(i) instanceof Text) {
+                lastText = (Text) historyItems.get(i);
+                break;
+            }
+        }
+        return lastText;
+    }
+
+    public void hideText() {
+        historyItems.add(new HiddenText());
+        redraw();
+    }
+
+    public void showText() {
+        Text lastText = getLastText();
+        if (lastText != null && lastText instanceof HiddenText) {
+            historyItems.remove(lastText);
+        }
+        redraw();
+    }
+
+    private void redraw() {
+        canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), whitePaint);
+        paintedOn(historyItems.size() > 0);
+        if (includeBackgroundImage) {
+            drawBackgroundBitmap();
+        }
+        drawHistory();
+        invalidate();
+    }
+
+    private void drawHistory() {
+        Text lastText = getLastText();
+        for (HistoryItem item : historyItems) {
+            if (!(item instanceof Text) || item == lastText) {
+                item.draw(canvas);
+            }
         }
     }
 
@@ -544,11 +565,16 @@ public class DrawingCanvasView extends View {
         private final float y;
         private final Bitmap bitmap;
         private final Paint paint;
-        Text(Bitmap bitmap, float currentX, float currentY, Paint paint) {
+        private final String text;
+        private final float scale;
+
+        Text(Bitmap bitmap, float currentX, float currentY, Paint paint, String text, float scale) {
             this.bitmap = bitmap;
             this.x = currentX;
             this.y = currentY;
             this.paint = paint;
+            this.text = text;
+            this.scale = scale;
         }
 
         @Override
@@ -558,6 +584,24 @@ public class DrawingCanvasView extends View {
 
         public void recycle() {
             bitmap.recycle();
+        }
+    }
+
+    private class HiddenText extends Text {
+        HiddenText() {
+            super(null, 0, 0, null, "", 1.0f);
+        }
+        @Override
+        public void draw(Canvas canvas) {
+        }
+    }
+
+    private class ErasedText extends Text {
+        ErasedText() {
+            super(null, 0, 0, null, "", 1.0f);
+        }
+        @Override
+        public void draw(Canvas canvas) {
         }
     }
 
@@ -590,20 +634,6 @@ public class DrawingCanvasView extends View {
 
     private interface HistoryItem {
         void draw(Canvas canvas);
-    }
-
-    public interface DrawingCanvasCallback {
-        void drawingAdded();
-
-        void drawingCleared();
-
-        void reserveBitmapMemory(int width, int height);
-
-        void onScaleChanged(float scale);
-
-        void onScaleStart();
-
-        void onScaleEnd();
     }
 
 }
