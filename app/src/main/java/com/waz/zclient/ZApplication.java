@@ -124,7 +124,7 @@ public class ZApplication extends WireApplication implements NotificationsHandle
         Thread.setDefaultUncaughtExceptionHandler(new WireUncaughtExceptionHandler(getControllerFactory(),
                                                                                    Thread.getDefaultUncaughtExceptionHandler()));
         // refresh
-        AccentColors.setColors(AccentColors.loadArray(getApplicationContext(), R.array.accents_color));
+        AccentColors.setColors(AccentColors.loadArray(getApplicationContext(), R.array.original_accents_color));
 
         // Register LocalyticsActivityLifecycleCallbacks
         registerActivityLifecycleCallbacks(new LocalyticsActivityLifecycleCallbacks(this));
