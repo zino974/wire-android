@@ -552,15 +552,16 @@
     <dimen name="drawing__conversation__name__height">14dp</dimen>
     <dimen name="drawing__conversation__name__margin_top">10dp</dimen>
     <dimen name="drawing__conversation__name__text_size">12dp</dimen>
-    <dimen name="drawing__color__picker__height">42dp</dimen>
+    <dimen name="drawing__color__picker__height">44dp</dimen>
     <dimen name="drawing__color__picker__margin_top">8dp</dimen>
     <dimen name="drawing__color__picker__margin_bottom">8dp</dimen>
-    <dimen name="drawing__bottom_bar__height">80dp</dimen>
+
     <dimen name="drawing__button__padding">8dp</dimen>
     <dimen name="drawing__send__button__padding">10dp</dimen>
     <dimen name="drawing__border_scroll_bar__height">@dimen/wire__divider__height__thin</dimen>
     <dimen name="drawing__border_line__height">@dimen/wire__divider__height__thin</dimen>
     <dimen name="drawing__tip__font__size">12dp</dimen>
+    <dimen name="drawing__text_min_width">40dp</dimen>
 
     <dimen name="forced_update__header__font_size">32dp</dimen>
     <dimen name="forced_update__sub_header__font_size">16dp</dimen>
