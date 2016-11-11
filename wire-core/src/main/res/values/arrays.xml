@@ -31,8 +31,8 @@
     <array name="original_accents_color">
         <item>@color/accent_blue</item>
         <item>@color/accent_green</item>
-        <item>@color/accent_red</item>
         <item>@color/accent_yellow</item>
+        <item>@color/accent_red</item>
         <item>@color/accent_orange</item>
         <item>@color/accent_pink</item>
         <item>@color/accent_magenta</item>
