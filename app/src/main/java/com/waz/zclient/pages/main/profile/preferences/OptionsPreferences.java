@@ -27,7 +27,6 @@ import android.support.annotation.RawRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
-import android.text.TextUtils;
 import android.widget.Toast;
 import com.waz.api.MediaProvider;
 import com.waz.zclient.R;
@@ -74,6 +73,9 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
         ringtonePreference = (RingtonePreference) findPreference(getString(R.string.pref_options_ringtones_ringtone_key));
         textTonePreference = (RingtonePreference) findPreference(getString(R.string.pref_options_ringtones_text_key));
         pingPreference = (RingtonePreference) findPreference(getString(R.string.pref_options_ringtones_ping_key));
+        ringtonePreference.setShowSilent(true);
+        textTonePreference.setShowSilent(true);
+        pingPreference.setShowSilent(true);
         setDefaultRingtones();
 
         bindPreferenceSummaryToValue(ringtonePreference);
@@ -212,25 +214,28 @@ public class OptionsPreferences extends BasePreferenceFragment<OptionsPreference
     private void bindPreferenceSummaryToValue(Preference preference) {
         preference.setOnPreferenceChangeListener(bindPreferenceSummaryToValueListener);
         final String key = preference.getKey();
-        String value = getPreferenceManager().getSharedPreferences().getString(key, "");
+        String value = getPreferenceManager().getSharedPreferences().getString(key, null);
         bindPreferenceSummaryToValueListener.onPreferenceChange(preference, value);
     }
 
     private static class PreferenceSummaryChangeListener implements Preference.OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference preference, Object o) {
-            final String value = o.toString();
+            final String value = (String) o;
             if (!(preference instanceof RingtonePreference)) {
                 preference.setSummary(value);
                 return true;
             }
 
-            if (TextUtils.isEmpty(value)) {
+            final Context context = preference.getContext();
+            if (value == null) {
                 preference.setSummary(R.string.pref_options_ringtones_default_summary);
+                return true;
+            } else if (value.isEmpty()) {
+                preference.setSummary(RingtonePreference.getRingtoneSilentString(context));
                 return true;
             }
 
-            final Context context = preference.getContext();
             final Uri uri = Uri.parse(value);
             final int rawId = preference.getExtras().getInt(WireRingtonePreferenceDialogFragment.EXTRA_DEFAULT);
             if (uri.compareTo(Uri.parse("android.resource://" + context.getPackageName() + "/" + rawId)) == 0) {

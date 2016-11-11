@@ -20,14 +20,17 @@ package com.waz.zclient.ui.utils;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import com.waz.zclient.utils.ViewUtils;
 
 public class ColorUtils {
     private static final int PRESSED_ALPHA = 180;
+    private static final int ROUNDED_TEXT_BOX_BACK_ALPHA = 163;
 
     private ColorUtils() {
     }
@@ -89,5 +92,19 @@ public class ColorUtils {
         states.addState(new int[] {}, gradientDrawable);
 
         return states;
+    }
+
+    public static Drawable getRoundedTextBoxBackground(Context context, int color, int targetHeight) {
+        GradientDrawable drawable = new GradientDrawable();
+        color = injectAlpha(ROUNDED_TEXT_BOX_BACK_ALPHA, color);
+        drawable.setColor(color);
+        drawable.setCornerRadius(ViewUtils.toPx(context, targetHeight / 2));
+        return drawable;
+    }
+
+    public static Drawable getTransparentDrawable() {
+        ColorDrawable drawable = new ColorDrawable();
+        drawable.setColor(Color.TRANSPARENT);
+        return drawable;
     }
 }

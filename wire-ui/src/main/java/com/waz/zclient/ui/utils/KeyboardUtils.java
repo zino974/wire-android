@@ -70,4 +70,11 @@ public class KeyboardUtils {
     private static InputMethodManager getInputMethodManager(Context context) {
         return (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
     }
+
+    public static int getKeyboardHeight(View contentView) {
+        Rect r = new Rect();
+        contentView.getWindowVisibleDisplayFrame(r);
+        int screenHeight = contentView.getRootView().getHeight();
+        return screenHeight - r.bottom;
+    }
 }
