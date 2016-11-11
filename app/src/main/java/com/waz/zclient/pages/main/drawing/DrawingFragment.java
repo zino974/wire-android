@@ -79,10 +79,9 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     private static final float TEXT_ALPHA_INVISIBLE = 0F;
     private static final float TEXT_ALPHA_MOVE = 0.2F;
     private static final float TEXT_ALPHA_VISIBLE = 1F;
-
     private static final int SEND_BUTTON_DISABLED_ALPHA = 102;
-
     private static final int DEFAULT_TEXT_COLOR = Color.WHITE;
+    private static final int EDIT_BOX_POS_MARGIN = 10;
 
     private ShakeEventListener shakeEventListener;
     private SensorManager sensorManager;
@@ -164,6 +163,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
                     case MotionEvent.ACTION_MOVE:
                         params.leftMargin += (int) (event.getX() - initialX);
                         params.topMargin += (int) (event.getY() - initialY);
+                        clampSketchEditBoxPosition(params);
                         sketchEditTextView.setLayoutParams(params);
                         break;
                     case MotionEvent.ACTION_UP:
@@ -597,6 +597,9 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     @Override
     public void onScaleChanged(float scale) {
         sketchEditTextView.setSketchScale(scale);
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
+        clampSketchEditBoxPosition(params);
+        sketchEditTextView.setLayoutParams(params);
     }
 
     @Override
@@ -654,7 +657,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
 
     }
 
-    private void drawSketchEditText(){
+    private void drawSketchEditText() {
         if (sketchEditTextView.getVisibility() == View.VISIBLE) {
             sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
             sketchEditTextView.setCursorVisible(false);
@@ -681,6 +684,18 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
                 }
             });
         }
+    }
+
+    private void clampSketchEditBoxPosition(FrameLayout.LayoutParams params) {
+        int sketchWidth = (((ViewGroup) sketchEditTextView.getParent()).getMeasuredWidth());
+        int sketchHeight = (((ViewGroup) sketchEditTextView.getParent()).getMeasuredHeight());
+        int textWidth = sketchEditTextView.getMeasuredWidth();
+        int textHeight = sketchEditTextView.getMeasuredHeight();
+
+        params.leftMargin = Math.min(params.leftMargin, sketchWidth - textWidth / 2);
+        params.topMargin = Math.min(params.topMargin, sketchHeight - textHeight / 2);
+        params.leftMargin = Math.max(params.leftMargin, -textWidth / 2);
+        params.topMargin = Math.max(params.topMargin, -textHeight / 2);
     }
 
     public interface Container { }
