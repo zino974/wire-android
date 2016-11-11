@@ -33,8 +33,6 @@ import android.view.View;
 import com.waz.zclient.ui.R;
 import net.hockeyapp.android.ExceptionHandler;
 
-import java.util.LinkedList;
-
 public class DrawingCanvasView extends View {
 
     private Bitmap bitmap;
@@ -63,7 +61,7 @@ public class DrawingCanvasView extends View {
     private String emoji;
     private boolean drawEmoji;
 
-    private LinkedList<HistoryItem> historyItems; // NOPMD
+    SketchCanvasHistory canvasHistory;
 
     public enum Mode {
         SKETCH,
@@ -88,7 +86,6 @@ public class DrawingCanvasView extends View {
     private void init() {
         path = new Path();
         bitmapConfig = Bitmap.Config.ARGB_8888;
-        historyItems = new LinkedList<>();
         bitmapPaint = new Paint(Paint.DITHER_FLAG);
         drawingPaint = new Paint(Paint.DITHER_FLAG | Paint.ANTI_ALIAS_FLAG);
         drawingPaint.setColor(Color.BLACK);
@@ -102,6 +99,7 @@ public class DrawingCanvasView extends View {
         emojiPaint.setStrokeWidth(1);
         emoji = null;
         currentMode = Mode.SKETCH;
+        canvasHistory = new SketchCanvasHistory();
 
         trimBuffer = getResources().getDimensionPixelSize(R.dimen.draw_image_trim_buffer);
     }
@@ -150,7 +148,7 @@ public class DrawingCanvasView extends View {
 
     public void reset() {
         paintedOn(false);
-        historyItems.clear();
+        canvasHistory.clear();
         canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), whitePaint);
         drawBackgroundBitmap();
         invalidate();
@@ -166,7 +164,7 @@ public class DrawingCanvasView extends View {
             return true;
         }
         if (backgroundBitmap == null &&
-            historyItems.isEmpty() &&
+            canvasHistory.size() == 0 &&
             drawingPaint.getColor() == getResources().getColor(R.color.draw_white)) {
             return true;
         }
@@ -229,7 +227,7 @@ public class DrawingCanvasView extends View {
             }
             drawingPaint.setStyle(Paint.Style.FILL);
             canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), drawingPaint);
-            historyItems.add(new FilledScreen(bitmap.getWidth(), bitmap.getHeight(), new Paint(drawingPaint)));
+            canvasHistory.addFillScreen(bitmap.getWidth(), bitmap.getHeight(), new Paint(drawingPaint));
             paintedOn(true);
             drawingPaint.setStyle(Paint.Style.STROKE);
             invalidate();
@@ -270,7 +268,7 @@ public class DrawingCanvasView extends View {
         if (drawEmoji) {
             drawEmoji = false;
             canvas.drawText(emoji, currentX, currentY, emojiPaint);
-            historyItems.add(new Emoji(emoji, currentX, currentY, new Paint(emojiPaint)));
+            canvasHistory.addEmoji(emoji, currentX, currentY, new Paint(emojiPaint));
             paintedOn(true);
         } else {
             path.lineTo(currentX, currentY);
@@ -279,7 +277,7 @@ public class DrawingCanvasView extends View {
                 touchMoved = false;
                 RectF bounds = new RectF();
                 path.computeBounds(bounds, true);
-                historyItems.add(new Stroke(new Path(path), new Paint(drawingPaint), bounds));
+                canvasHistory.addStroke(new Path(path), new Paint(drawingPaint), bounds);
             }
             path.reset();
         }
@@ -305,19 +303,19 @@ public class DrawingCanvasView extends View {
 
         int topTrimValue = bitmap.getHeight();
 
-        for (HistoryItem historyItem: historyItems) {
-            if (historyItem instanceof FilledScreen) {
+        for (SketchCanvasHistory.HistoryItem historyItem: canvasHistory.getHistoryItems()) {
+            if (historyItem instanceof SketchCanvasHistory.FilledScreen) {
                 topTrimValue = 0;
                 break;
-            } else if (historyItem instanceof Stroke) {
-                RectF bounds = ((Stroke) historyItem).getBounds();
+            } else if (historyItem instanceof SketchCanvasHistory.Stroke) {
+                RectF bounds = ((SketchCanvasHistory.Stroke) historyItem).getBounds();
                 if (isLandscape) {
                     topTrimValue = Math.min(topTrimValue, (int) bounds.top);
                 } else {
                     topTrimValue = Math.min(topTrimValue, (int) bounds.top);
                 }
-            } else if (historyItem instanceof Emoji) {
-                Emoji emoji = (Emoji) historyItem;
+            } else if (historyItem instanceof SketchCanvasHistory.Emoji) {
+                SketchCanvasHistory.Emoji emoji = (SketchCanvasHistory.Emoji) historyItem;
                 topTrimValue = (int) Math.min(topTrimValue, emoji.y - emoji.paint.getTextSize());
             }
         }
@@ -330,19 +328,19 @@ public class DrawingCanvasView extends View {
         }
 
         int bottomTrimValue = 0;
-        for (HistoryItem historyItem: historyItems) {
-            if (historyItem instanceof FilledScreen) {
+        for (SketchCanvasHistory.HistoryItem historyItem: canvasHistory.getHistoryItems()) {
+            if (historyItem instanceof SketchCanvasHistory.FilledScreen) {
                 bottomTrimValue = bitmap.getHeight();
                 break;
-            } else if (historyItem instanceof Stroke) {
-                RectF bounds = ((Stroke) historyItem).getBounds();
+            } else if (historyItem instanceof SketchCanvasHistory.Stroke) {
+                RectF bounds = ((SketchCanvasHistory.Stroke) historyItem).getBounds();
                 if (isLandscape) {
                     bottomTrimValue = Math.max(bottomTrimValue, (int) bounds.bottom);
                 } else {
                     bottomTrimValue = Math.max(bottomTrimValue, (int) bounds.bottom);
                 }
-            } else if (historyItem instanceof Emoji) {
-                bottomTrimValue = (int) Math.max(bottomTrimValue, ((Emoji) historyItem).y);
+            } else if (historyItem instanceof SketchCanvasHistory.Emoji) {
+                bottomTrimValue = (int) Math.max(bottomTrimValue, ((SketchCanvasHistory.Emoji) historyItem).y);
             }
         }
         return Math.min(bottomTrimValue + trimBuffer, bitmap.getHeight());
@@ -376,17 +374,19 @@ public class DrawingCanvasView extends View {
     }
 
     public boolean undo() {
-        if (historyItems.size() == 0) {
+        if (canvasHistory.size() == 0) {
             return false;
         }
-        if (historyItems.size() == 1) {
+        if (canvasHistory.size() == 1) {
             paintedOn(false);
         }
-        HistoryItem last = historyItems.removeLast();
-        if (last instanceof Text) {
-            Text newLastText = getLastText();
+        SketchCanvasHistory.HistoryItem last = canvasHistory.undo();
+        if (last instanceof SketchCanvasHistory.Text) {
+            SketchCanvasHistory.Text newLastText = canvasHistory.getLastText();
             if (newLastText != null) {
                 drawingCanvasCallback.onTextChanged(newLastText.text, (int) newLastText.x, (int) newLastText.y, newLastText.scale);
+            } else {
+                drawingCanvasCallback.onTextChanged(null, 0, 0, 1.0f);
             }
         }
         redraw();
@@ -394,13 +394,7 @@ public class DrawingCanvasView extends View {
     }
 
     public void drawTextBitmap(Bitmap textBitmap, float x, float y, String text, float scale) {
-        Text newTextHistoryItem;
-        if (textBitmap == null) {
-            newTextHistoryItem = new ErasedText();
-        } else {
-            newTextHistoryItem = new Text(textBitmap, x, y, bitmapPaint, text, scale);
-        }
-        historyItems.add(newTextHistoryItem);
+        canvasHistory.addText(textBitmap, x, y, text, scale, bitmapPaint);
         redraw();
     }
 
@@ -466,7 +460,7 @@ public class DrawingCanvasView extends View {
     }
 
     public boolean isEmpty() {
-        return historyItems.size() == 0;
+        return canvasHistory.size() == 0;
     }
 
     public void clearBitmapSpace(int width, int height) {
@@ -477,33 +471,19 @@ public class DrawingCanvasView extends View {
         }
     }
 
-    private Text getLastText() {
-        Text lastText = null;
-        for (int i = historyItems.size() - 1; i >= 0; i--) {
-            if (historyItems.get(i) instanceof Text) {
-                lastText = (Text) historyItems.get(i);
-                break;
-            }
-        }
-        return lastText;
-    }
-
     public void hideText() {
-        historyItems.add(new HiddenText());
+        canvasHistory.hideText();
         redraw();
     }
 
     public void showText() {
-        Text lastText = getLastText();
-        if (lastText != null && lastText instanceof HiddenText) {
-            historyItems.remove(lastText);
-        }
+        canvasHistory.showText();
         redraw();
     }
 
     private void redraw() {
         canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), whitePaint);
-        paintedOn(historyItems.size() > 0);
+        paintedOn(canvasHistory.size() > 0);
         if (includeBackgroundImage) {
             drawBackgroundBitmap();
         }
@@ -512,128 +492,16 @@ public class DrawingCanvasView extends View {
     }
 
     private void drawHistory() {
-        Text lastText = getLastText();
-        for (HistoryItem item : historyItems) {
-            if (!(item instanceof Text) || item == lastText) {
-                item.draw(canvas);
-            }
-        }
-    }
-
-    private class Stroke implements HistoryItem {
-        private final Path path;
-        private final Paint paint;
-        private RectF bounds;
-
-        Stroke(Path path, Paint paint, RectF bounds) {
-            this.path = path;
-            this.paint = paint;
-            this.bounds = bounds;
-        }
-
-        public RectF getBounds() {
-            return bounds;
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            canvas.drawPath(path, paint);
-        }
-    }
-
-    private class Emoji implements HistoryItem {
-        private final float x;
-        private final float y;
-        private final String emoji;
-        private final Paint paint;
-
-        Emoji(String emoji, float currentX, float currentY, Paint paint) {
-            this.emoji = emoji;
-            this.x = currentX;
-            this.y = currentY;
-            this.paint = paint;
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            canvas.drawText(emoji, x, y, paint);
-        }
-    }
-
-    private class Text implements HistoryItem {
-        private final float x;
-        private final float y;
-        private final Bitmap bitmap;
-        private final Paint paint;
-        private final String text;
-        private final float scale;
-
-        Text(Bitmap bitmap, float currentX, float currentY, Paint paint, String text, float scale) {
-            this.bitmap = bitmap;
-            this.x = currentX;
-            this.y = currentY;
-            this.paint = paint;
-            this.text = text;
-            this.scale = scale;
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            canvas.drawBitmap(bitmap, x, y, paint);
-        }
-
-        public void recycle() {
-            bitmap.recycle();
-        }
-    }
-
-    private class HiddenText extends Text {
-        HiddenText() {
-            super(null, 0, 0, null, "", 1.0f);
-        }
-        @Override
-        public void draw(Canvas canvas) {
-        }
-    }
-
-    private class ErasedText extends Text {
-        ErasedText() {
-            super(null, 0, 0, null, "", 1.0f);
-        }
-        @Override
-        public void draw(Canvas canvas) {
-        }
-    }
-
-    private class FilledScreen implements HistoryItem {
-        private final float width;
-        private final float height;
-        private final Paint paint;
-
-        FilledScreen(float width, float height, Paint paint) {
-            this.width = width;
-            this.height = height;
-            this.paint = paint;
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            canvas.drawRect(0, 0, width, height, paint);
-        }
+        canvasHistory.draw(canvas);
     }
 
     public void onDestroy() {
         bitmap = null;
         backgroundBitmap = null;
         canvas = null;
-        if (historyItems != null) {
-            historyItems.clear();
-            historyItems = null;
+        if (canvasHistory != null) {
+            canvasHistory.clear();
+            canvasHistory = null;
         }
     }
-
-    private interface HistoryItem {
-        void draw(Canvas canvas);
-    }
-
 }

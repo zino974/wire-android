@@ -636,6 +636,12 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
 
     @Override
     public void onTextChanged(String text, int x, int y, float scale) {
+        if (text == null) {
+            sketchEditTextView.setText("");
+            sketchEditTextView.removeListener(sketchEditTextListener);
+            sketchEditTextView.setVisibility(View.INVISIBLE);
+            return;
+        }
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
         params.leftMargin = x;
         params.topMargin = y;
