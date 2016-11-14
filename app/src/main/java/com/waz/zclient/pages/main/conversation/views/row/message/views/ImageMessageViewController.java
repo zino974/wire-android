@@ -204,7 +204,6 @@ public class ImageMessageViewController extends MessageViewController implements
         layoutParams.height = finalHeight;
         gifImageView.setLayoutParams(layoutParams);
         polkadotView.setLayoutParams(layoutParams);
-        imageActionContainer.setLayoutParams(layoutParams);
         ViewUtils.setWidth(previewLoadingIndicator, finalWidth);
 
 

@@ -75,6 +75,7 @@
                 android:id="@+id/fl__row_conversation__image_actions"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/image_preview__sketch_menu__height"
+                android:layout_gravity="bottom"
                 android:gravity="center_horizontal|bottom"
                 android:orientation="horizontal"
                 android:background="@color/black_48"

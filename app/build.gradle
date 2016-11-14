@@ -108,7 +108,7 @@ android {
             buildConfigField 'boolean', 'IS_LOADTIME_LOGGER_ENABLED', 'true'
             buildConfigField 'boolean', 'SHOW_TEST_COUNTRY_CODE', 'true'
             buildConfigField 'boolean', 'SHOW_MENTIONING', 'true'
-            buildConfigField 'boolean', 'IS_TEST_GALLERY_ALLOWED', 'true'
+            buildConfigField 'boolean', 'IS_TEST_GALLERY_ALLOWED', 'false'
             buildConfigField 'boolean', 'SHOW_BACKEND_PICKER', 'true'
             buildConfigField 'int', 'LOG_LEVEL_UI', logLevelWarn()
             buildConfigField 'int', 'LOG_LEVEL_SE', logLevelSupress()
