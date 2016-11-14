@@ -49,7 +49,7 @@ public class ConversationChatheadDrawable extends Drawable {
         clearPaint.setAntiAlias(true);
         clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT));
 
-        accentColors = context.getResources().getIntArray(R.array.accents_color);
+        accentColors = context.getResources().getIntArray(R.array.selectable_accents_color);
 
         minSizeForLargeBorderWidth = (int) context.getResources().getDimension(R.dimen.chathead__min_size_large_border);
         smallBorderWidth = (int) context.getResources().getDimension(R.dimen.chathead__border_width);

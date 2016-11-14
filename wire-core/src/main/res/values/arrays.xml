@@ -19,7 +19,7 @@
 
 -->
 <resources>
-    <array name="accents_color">
+    <array name="selectable_accents_color">
         <item>@color/accent_blue</item>
         <item>@color/accent_green</item>
         <item>@color/accent_red</item>

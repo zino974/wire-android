@@ -32,17 +32,19 @@ public class AccentColorController implements IAccentColorController {
     public static final String TAG = AccentColorController.class.getName();
     private static final int NO_COLOR_FOUND = -1;
 
-    private final int[] accentColors;
+    private final int[] originalAccentColors;
+    private final int[] uiAccentColors;
 
     private Set<AccentColorObserver> accentColorObservers = new HashSet<>();
 
     private int color;
 
     public AccentColorController(Context context, IUserPreferencesController userPreferencesController) {
-        accentColors = context.getResources().getIntArray(R.array.original_accents_color);
+        originalAccentColors = context.getResources().getIntArray(R.array.original_accents_color);
+        uiAccentColors = context.getResources().getIntArray(R.array.selectable_accents_color);
         color = userPreferencesController.getLastAccentColor();
 
-        if (color == NO_COLOR_FOUND) {
+        if (color == NO_COLOR_FOUND || !isSelectableColor(color)) {
             color = ResourceUtils.getRandomAccentColor(context);
             userPreferencesController.setLastAccentColor(color);
         }
@@ -77,14 +79,10 @@ public class AccentColorController implements IAccentColorController {
 
     @Override
     public void setColor(AccentColorChangeRequester accentColorChangeRequester, int color) {
-        for (int accentColor : accentColors) {
-            if (accentColor == color) {
-                notifyAccentColorHasChanged(accentColorChangeRequester, color);
-                this.color = color;
-                return;
-            }
-        }
-        if (BuildConfig.DEBUG) {
+        if (isValidColor(color)) {
+            notifyAccentColorHasChanged(accentColorChangeRequester, color);
+            this.color = color;
+        } else if (BuildConfig.DEBUG) {
             throw new RuntimeException("Couldn't find predefined accent color: " + color);
         }
     }
@@ -98,5 +96,23 @@ public class AccentColorController implements IAccentColorController {
         for (AccentColorObserver accentColorObserver : accentColorObservers) {
             accentColorObserver.onAccentColorHasChanged(accentColorChangeRequester, color);
         }
+    }
+
+    private boolean isValidColor(int color) {
+        for (int accentColor : originalAccentColors) {
+            if (accentColor == color) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSelectableColor(int color) {
+        for (int accentColor : uiAccentColors) {
+            if (accentColor == color) {
+                return true;
+            }
+        }
+        return false;
     }
 }

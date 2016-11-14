@@ -110,7 +110,7 @@ public class GiphyGridViewAdapter extends RecyclerView.Adapter<GiphyGridViewAdap
             if (MathUtils.floatEqual(imageAssetHeight, 0)) {
                 aspectRatio = 1f;
             }
-            int[] colorArray = context.getResources().getIntArray(R.array.accents_color);
+            int[] colorArray = context.getResources().getIntArray(R.array.selectable_accents_color);
             gifPreview.setImageDrawable(new ColorDrawable(colorArray[position % (colorArray.length - 1)]));
             gifPreview.setAspectRatio(aspectRatio);
             if (bitmapLoadHandle != null) {
