@@ -20,6 +20,7 @@ package com.waz.zclient.controllers.accentcolor;
 import android.content.Context;
 import com.waz.api.AccentColor;
 import com.waz.api.impl.AccentColors;
+import com.waz.zclient.BuildConfig;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.userpreferences.IUserPreferencesController;
 import com.waz.zclient.ui.utils.ResourceUtils;
@@ -83,7 +84,9 @@ public class AccentColorController implements IAccentColorController {
                 return;
             }
         }
-        throw new RuntimeException("Couldn't find predefined accent color: " + color);
+        if (BuildConfig.DEBUG) {
+            throw new RuntimeException("Couldn't find predefined accent color: " + color);
+        }
     }
 
     @Override
