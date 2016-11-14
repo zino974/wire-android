@@ -44,7 +44,7 @@ public class ResourceUtils {
 
     public static int getRandomAccentColor(Context context) {
         int[] validAccentColors = context.getResources().getIntArray(R.array.selectable_accents_color);
-        int accentColorPos = randInt(0, validAccentColors.length);
+        int accentColorPos = randInt(0, validAccentColors.length - 1);
         return validAccentColors[accentColorPos];
     }
 
