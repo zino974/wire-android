@@ -49,8 +49,7 @@ public class ResourceUtils {
             case 1: return context.getResources().getColor(R.color.accent_orange);
             case 3: return context.getResources().getColor(R.color.accent_magenta);
             case 4: return context.getResources().getColor(R.color.accent_red);
-            case 5: return context.getResources().getColor(R.color.accent_yellow);
-            case 6: return context.getResources().getColor(R.color.accent_green);
+            case 5: return context.getResources().getColor(R.color.accent_green);
             default: return context.getResources().getColor(R.color.accent_blue);
         }
     }

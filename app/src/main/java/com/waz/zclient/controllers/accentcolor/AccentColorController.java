@@ -66,7 +66,7 @@ public class AccentColorController implements IAccentColorController {
                 return color;
             }
         }
-        return null;
+        return AccentColors.defaultColor();
     }
 
     @Override

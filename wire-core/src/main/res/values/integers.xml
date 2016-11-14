@@ -33,7 +33,7 @@
     <integer name="background_accent_color_transition_animation_duration">600</integer>
 
     <!-- Other-->
-    <integer name="framework__num_of_accent_colors">7</integer>
+    <integer name="framework__num_of_accent_colors">6</integer>
 
     <!-- Color picker-->
     <!-- a value in [1, 100] -->
