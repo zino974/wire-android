@@ -142,6 +142,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         @Override
         public void onClick(View v) {
             if (drawingCanvasView != null) {
+                KeyboardUtils.hideKeyboard(getActivity());
                 drawingCanvasView.undo();
             }
         }
