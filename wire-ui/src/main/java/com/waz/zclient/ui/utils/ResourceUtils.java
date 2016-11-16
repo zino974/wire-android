@@ -43,16 +43,9 @@ public class ResourceUtils {
     }
 
     public static int getRandomAccentColor(Context context) {
-        int accentColorPos = randInt(0, context.getResources().getInteger(R.integer.framework__num_of_accent_colors));
-        switch (accentColorPos) {
-            case 0: return context.getResources().getColor(R.color.accent_blue);
-            case 1: return context.getResources().getColor(R.color.accent_orange);
-            case 3: return context.getResources().getColor(R.color.accent_magenta);
-            case 4: return context.getResources().getColor(R.color.accent_red);
-            case 5: return context.getResources().getColor(R.color.accent_yellow);
-            case 6: return context.getResources().getColor(R.color.accent_green);
-            default: return context.getResources().getColor(R.color.accent_blue);
-        }
+        int[] validAccentColors = context.getResources().getIntArray(R.array.selectable_accents_color);
+        int accentColorPos = randInt(0, validAccentColors.length - 1);
+        return validAccentColors[accentColorPos];
     }
 
     public static int randInt(int min, int max) {

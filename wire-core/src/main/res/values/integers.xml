@@ -32,9 +32,6 @@
     <integer name="animation_duration_very_long">700</integer>
     <integer name="background_accent_color_transition_animation_duration">600</integer>
 
-    <!-- Other-->
-    <integer name="framework__num_of_accent_colors">7</integer>
-
     <!-- Color picker-->
     <!-- a value in [1, 100] -->
     <integer name="color_picker_circle_animation_tension">80</integer>

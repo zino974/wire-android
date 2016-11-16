@@ -55,7 +55,7 @@ public class ColorPickerLayout extends LinearLayout {
     }
 
     private void init() {
-        int[] colors = getResources().getIntArray(R.array.accents_color);
+        int[] colors = getResources().getIntArray(R.array.selectable_accents_color);
         setAccentColors(colors, colors[0]);
 
         invalidate();

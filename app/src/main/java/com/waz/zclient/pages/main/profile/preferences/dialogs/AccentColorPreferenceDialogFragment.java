@@ -85,7 +85,7 @@ public class AccentColorPreferenceDialogFragment extends BaseDialogFragment<Acce
         AccentColorAdapter(Context context, @ColorInt int selectedAccentColor) {
             this.context = context;
             this.selectedAccentColor = selectedAccentColor;
-            this.accentColors = context.getResources().getIntArray(R.array.accents_color);
+            this.accentColors = context.getResources().getIntArray(R.array.selectable_accents_color);
         }
 
         @Override
