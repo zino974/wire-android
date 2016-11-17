@@ -383,10 +383,10 @@ public class DrawingCanvasView extends View {
         SketchCanvasHistory.HistoryItem last = canvasHistory.undo();
         if (last instanceof SketchCanvasHistory.Text) {
             SketchCanvasHistory.Text newLastText = canvasHistory.getLastText();
-            if (newLastText != null) {
+            if (newLastText != null && newLastText.text != null) {
                 drawingCanvasCallback.onTextChanged(newLastText.text, (int) newLastText.x, (int) newLastText.y, newLastText.scale);
             } else {
-                drawingCanvasCallback.onTextChanged(null, 0, 0, 1.0f);
+                drawingCanvasCallback.onTextRemoved();
             }
         }
         redraw();

@@ -44,6 +44,9 @@ public class SketchEditText extends EditText {
     private int hintHorizontalPadding;
     private int regularVerticalPadding;
     private int hintVerticalPadding;
+    private float mediumRegularTextSize;
+    private float mediumHintTextSize;
+    private float mediumPaddingSize;
 
     public SketchEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -63,6 +66,9 @@ public class SketchEditText extends EditText {
             public void afterTextChanged(Editable editable) {
             }
         });
+        mediumRegularTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__regular);
+        mediumHintTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__small);
+        mediumPaddingSize = getResources().getDimensionPixelSize(R.dimen.wire__padding__regular);
     }
 
     @Override
@@ -161,13 +167,10 @@ public class SketchEditText extends EditText {
 
     public void setSketchScale(float scale) {
         sketchScale = scale;
-        float mediumRegularTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__regular);
         float newRegularSize = mediumRegularTextSize * scale;
         setRegularTextSize(newRegularSize);
-        float mediumHintTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__small);
         float newHintSize = mediumHintTextSize  * scale;
         setHintTextSize(newHintSize);
-        float mediumPaddingSize = getResources().getDimensionPixelSize(R.dimen.wire__padding__regular);
         int newPaddingSize = (int) (mediumPaddingSize  * scale);
         setRegularPaddingSize(newPaddingSize, newPaddingSize);
         float hintVerticalPadding = mediumPaddingSize + (mediumRegularTextSize - mediumHintTextSize) / 2;

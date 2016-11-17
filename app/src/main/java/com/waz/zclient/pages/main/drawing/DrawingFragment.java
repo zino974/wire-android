@@ -619,19 +619,18 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
 
     @Override
     public void onTextChanged(String text, int x, int y, float scale) {
-        if (text == null) {
-            sketchEditTextView.setText("");
-            sketchEditTextView.removeListener(sketchEditTextListener);
-            sketchEditTextView.setVisibility(View.INVISIBLE);
-            return;
-        }
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
-        params.leftMargin = x;
-        params.topMargin = y;
-        sketchEditTextView.setLayoutParams(params);
+        ViewUtils.setMarginLeft(sketchEditTextView, x);
+        ViewUtils.setMarginTop(sketchEditTextView, y);
         sketchEditTextView.setSketchScale(scale);
         sketchEditTextView.setText(text);
         sketchEditTextView.setSelection(text.length());
+    }
+
+    @Override
+    public void onTextRemoved() {
+        sketchEditTextView.setText("");
+        sketchEditTextView.removeListener(sketchEditTextListener);
+        sketchEditTextView.setVisibility(View.INVISIBLE);
     }
 
     @Override

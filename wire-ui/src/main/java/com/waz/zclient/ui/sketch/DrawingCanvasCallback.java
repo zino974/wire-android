@@ -31,4 +31,6 @@ public interface DrawingCanvasCallback {
     void onScaleEnd();
 
     void onTextChanged(String text, int x, int y, float scale);
+
+    void onTextRemoved();
 }
