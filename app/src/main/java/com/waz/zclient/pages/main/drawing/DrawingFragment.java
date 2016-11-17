@@ -54,6 +54,7 @@ import com.waz.zclient.ui.sketch.DrawingCanvasView;
 import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.ColorUtils;
 import com.waz.zclient.ui.utils.KeyboardUtils;
+import com.waz.zclient.ui.utils.MathUtils;
 import com.waz.zclient.ui.views.CursorIconButton;
 import com.waz.zclient.ui.views.SketchEditText;
 import com.waz.zclient.utils.LayoutSpec;
@@ -506,7 +507,9 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         drawingCanvasView.setStrokeSize(strokeSize);
         currentBackgroundColor = color;
         sketchEditTextView.setBackground(ColorUtils.getRoundedTextBoxBackground(getContext(), color, sketchEditTextView.getHeight()));
-        drawSketchEditText();
+        if (MathUtils.floatEqual(sketchEditTextView.getAlpha(), TEXT_ALPHA_INVISIBLE)) {
+            drawSketchEditText();
+        }
     }
 
     public void onEmojiClick() {
