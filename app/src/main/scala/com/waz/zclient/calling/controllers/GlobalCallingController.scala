@@ -85,6 +85,10 @@ class GlobalCallingController(cxt: WireContext)(implicit inj: Injector) extends 
     CallingActivity.start(cxt)
   }(EventContext.Global)
 
+  activeCall.onChanged.filter(_ == false).on(Threading.Ui){ _ =>
+    screenManager.releaseWakeLock()
+  }(EventContext.Global)
+
   videoCall.zip(callState) {
     case (true, _) => screenManager.setStayAwake()
     case (false, Some(st)) if st == OTHER_CALLING => screenManager.setStayAwake()
