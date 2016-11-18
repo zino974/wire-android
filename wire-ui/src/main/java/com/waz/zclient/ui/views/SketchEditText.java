@@ -24,6 +24,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.EditText;
 
+import com.waz.zclient.ui.R;
 import com.waz.zclient.ui.utils.TypefaceUtils;
 
 import java.util.Collections;
@@ -38,6 +39,14 @@ public class SketchEditText extends EditText {
     private int hintFontId;
     private float regularTextSize;
     private float hintTextSize;
+    private float sketchScale;
+    private int regularHorizontalPadding;
+    private int hintHorizontalPadding;
+    private int regularVerticalPadding;
+    private int hintVerticalPadding;
+    private float mediumRegularTextSize;
+    private float mediumHintTextSize;
+    private float mediumPaddingSize;
 
     public SketchEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -57,6 +66,9 @@ public class SketchEditText extends EditText {
             public void afterTextChanged(Editable editable) {
             }
         });
+        mediumRegularTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__regular);
+        mediumHintTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__small);
+        mediumPaddingSize = getResources().getDimensionPixelSize(R.dimen.wire__padding__regular);
     }
 
     @Override
@@ -85,10 +97,12 @@ public class SketchEditText extends EditText {
             setHint("");
             setTypeface(TypefaceUtils.getTypeface(getContext().getString(textFontId)));
             setTextSize(TypedValue.COMPLEX_UNIT_PX, regularTextSize);
+            setPadding(regularHorizontalPadding, regularVerticalPadding, regularHorizontalPadding, regularVerticalPadding);
         } else {
             setHint(customHint);
             setTypeface(TypefaceUtils.getTypeface(getContext().getString(hintFontId)));
             setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSize);
+            setPadding(hintHorizontalPadding, hintVerticalPadding, hintHorizontalPadding, hintVerticalPadding);
         }
     }
 
@@ -137,6 +151,35 @@ public class SketchEditText extends EditText {
     public void setHintTextSize(float hintSize) {
         this.hintTextSize = hintSize;
         updateField();
+    }
+
+    private void setRegularPaddingSize(int horizontal, int vertical) {
+        this.regularVerticalPadding = vertical;
+        this.regularHorizontalPadding = horizontal;
+        updateField();
+    }
+
+    private void setHintPaddingSize(int horizontal, int vertical) {
+        this.hintVerticalPadding = vertical;
+        this.hintHorizontalPadding = horizontal;
+        updateField();
+    }
+
+    public void setSketchScale(float scale) {
+        sketchScale = scale;
+        float newRegularSize = mediumRegularTextSize * scale;
+        setRegularTextSize(newRegularSize);
+        float newHintSize = mediumHintTextSize  * scale;
+        setHintTextSize(newHintSize);
+        int newPaddingSize = (int) (mediumPaddingSize  * scale);
+        setRegularPaddingSize(newPaddingSize, newPaddingSize);
+        float hintVerticalPadding = mediumPaddingSize + (mediumRegularTextSize - mediumHintTextSize) / 2;
+        int newHintVerticalPadding = (int) (hintVerticalPadding  * scale);
+        setHintPaddingSize(newPaddingSize, newHintVerticalPadding);
+    }
+
+    public float getSketchScale() {
+        return sketchScale;
     }
 
     public interface SketchEditTextListener {

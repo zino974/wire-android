@@ -56,10 +56,12 @@ import com.waz.zclient.pages.main.conversation.AssetIntentsManager;
 import com.waz.zclient.ui.colorpicker.ColorPickerLayout;
 import com.waz.zclient.ui.colorpicker.EmojiBottomSheetDialog;
 import com.waz.zclient.ui.colorpicker.EmojiSize;
+import com.waz.zclient.ui.sketch.DrawingCanvasCallback;
 import com.waz.zclient.ui.sketch.DrawingCanvasView;
 import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.ColorUtils;
 import com.waz.zclient.ui.utils.KeyboardUtils;
+import com.waz.zclient.ui.utils.MathUtils;
 import com.waz.zclient.ui.views.CursorIconButton;
 import com.waz.zclient.ui.views.SketchEditText;
 import com.waz.zclient.utils.LayoutSpec;
@@ -72,7 +74,7 @@ import java.util.Locale;
 
 public class DrawingFragment extends BaseFragment<DrawingFragment.Container> implements OnBackPressedListener,
                                                                                         ColorPickerLayout.OnColorSelectedListener,
-                                                                                        DrawingCanvasView.DrawingCanvasCallback,
+                                                                                        DrawingCanvasCallback,
                                                                                         ViewTreeObserver.OnScrollChangedListener,
                                                                                         AccentColorObserver,
                                                                                         AssetIntentsManager.Callback,
@@ -92,10 +94,9 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     private static final float TEXT_ALPHA_INVISIBLE = 0F;
     private static final float TEXT_ALPHA_MOVE = 0.2F;
     private static final float TEXT_ALPHA_VISIBLE = 1F;
-
     private static final int SEND_BUTTON_DISABLED_ALPHA = 102;
-
     private static final int DEFAULT_TEXT_COLOR = Color.WHITE;
+    private static final int EDIT_BOX_POS_MARGIN = 10;
 
     private ShakeEventListener shakeEventListener;
     private SensorManager sensorManager;
@@ -158,6 +159,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         @Override
         public void onClick(View v) {
             if (drawingCanvasView != null) {
+                KeyboardUtils.hideKeyboard(getActivity());
                 drawingCanvasView.undo();
             }
         }
@@ -179,6 +181,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
                     case MotionEvent.ACTION_MOVE:
                         params.leftMargin += (int) (event.getX() - initialX);
                         params.topMargin += (int) (event.getY() - initialY);
+                        clampSketchEditBoxPosition(params);
                         sketchEditTextView.setLayoutParams(params);
                         break;
                     case MotionEvent.ACTION_UP:
@@ -312,8 +315,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         sketchEditTextView.setBackground(ColorUtils.getTransparentDrawable());
         sketchEditTextView.setHintFontId(R.string.wire__typeface__medium);
         sketchEditTextView.setTextFontId(R.string.wire__typeface__regular);
-        setRegularTextSize(1.0f);
-        setHintTextSize(1.0f);
+        sketchEditTextView.setSketchScale(1.0f);
         sketchEditTextView.setOnTouchListener(sketchEditTextOnTouchListener);
 
         if (savedInstanceState != null) {
@@ -614,6 +616,9 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         drawingCanvasView.setStrokeSize(strokeSize);
         currentBackgroundColor = color;
         sketchEditTextView.setBackground(ColorUtils.getRoundedTextBoxBackground(getContext(), color, sketchEditTextView.getHeight()));
+        if (MathUtils.floatEqual(sketchEditTextView.getAlpha(), TEXT_ALPHA_INVISIBLE)) {
+            drawSketchEditText();
+        }
     }
 
     public void onEmojiClick() {
@@ -636,31 +641,12 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
     }
 
     private void closeKeyboard() {
-        if (sketchEditTextView.getVisibility() == View.VISIBLE) {
-            sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
-            sketchEditTextView.setCursorVisible(false);
-            //This has to be on a post otherwise the setAlpha and setCursor won't be noticeable in the drawing cache
-            getView().post(new Runnable() {
-                @Override
-                public void run() {
-                    sketchEditTextView.setDrawingCacheEnabled(true);
-                    Bitmap bitmapDrawingCache = sketchEditTextView.getDrawingCache();
-                    if (bitmapDrawingCache != null) {
-                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
-                        drawingCanvasView.drawTextBitmap(bitmapDrawingCache.copy(bitmapDrawingCache.getConfig(), true), params.leftMargin, params.topMargin);
-                    } else {
-                        drawingCanvasView.drawTextBitmap(null, 0, 0);
-                    }
-                    sketchEditTextView.setDrawingCacheEnabled(false);
-                    sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
-                }
-            });
-        }
+        drawSketchEditText();
         KeyboardUtils.hideKeyboard(getActivity());
     }
 
     private void showKeyboard() {
-        drawingCanvasView.drawTextBitmap(null, 0, 0);
+        drawingCanvasView.hideText();
         sketchEditTextView.setCursorVisible(true);
         sketchEditTextView.requestFocus();
         KeyboardUtils.showKeyboard(getActivity());
@@ -723,20 +709,37 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
 
     @Override
     public void onScaleChanged(float scale) {
-        setRegularTextSize(scale);
-        setHintTextSize(scale);
-        setTextPaddingSize(scale);
+        sketchEditTextView.setSketchScale(scale);
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
+        clampSketchEditBoxPosition(params);
+        sketchEditTextView.setLayoutParams(params);
     }
 
     @Override
     public void onScaleStart() {
-        drawingCanvasView.drawTextBitmap(null, 0, 0);
+        drawingCanvasView.hideText();
         sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
     }
 
     @Override
     public void onScaleEnd() {
         closeKeyboard();
+    }
+
+    @Override
+    public void onTextChanged(String text, int x, int y, float scale) {
+        ViewUtils.setMarginLeft(sketchEditTextView, x);
+        ViewUtils.setMarginTop(sketchEditTextView, y);
+        sketchEditTextView.setSketchScale(scale);
+        sketchEditTextView.setText(text);
+        sketchEditTextView.setSelection(text.length());
+    }
+
+    @Override
+    public void onTextRemoved() {
+        sketchEditTextView.setText("");
+        sketchEditTextView.removeListener(sketchEditTextListener);
+        sketchEditTextView.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -766,22 +769,45 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
 
     }
 
-    private void setRegularTextSize(float scale) {
-        float mediumRegularTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__regular);
-        float newRegularSize = mediumRegularTextSize * scale;
-        sketchEditTextView.setRegularTextSize(newRegularSize);
+    private void drawSketchEditText() {
+        if (sketchEditTextView.getVisibility() == View.VISIBLE) {
+            sketchEditTextView.setAlpha(TEXT_ALPHA_VISIBLE);
+            sketchEditTextView.setCursorVisible(false);
+            //This has to be on a post otherwise the setAlpha and setCursor won't be noticeable in the drawing cache
+            getView().post(new Runnable() {
+                @Override
+                public void run() {
+                    sketchEditTextView.setDrawingCacheEnabled(true);
+                    Bitmap bitmapDrawingCache = sketchEditTextView.getDrawingCache();
+                    if (bitmapDrawingCache != null) {
+                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) sketchEditTextView.getLayoutParams();
+                        drawingCanvasView.showText();
+                        drawingCanvasView.drawTextBitmap(
+                            bitmapDrawingCache.copy(bitmapDrawingCache.getConfig(), true),
+                            params.leftMargin,
+                            params.topMargin,
+                            sketchEditTextView.getText().toString(),
+                            sketchEditTextView.getSketchScale());
+                    } else {
+                        drawingCanvasView.drawTextBitmap(null, 0, 0, "", 1.0f);
+                    }
+                    sketchEditTextView.setDrawingCacheEnabled(false);
+                    sketchEditTextView.setAlpha(TEXT_ALPHA_INVISIBLE);
+                }
+            });
+        }
     }
 
-    private void setHintTextSize(float scale) {
-        float mediumHintTextSize = getResources().getDimensionPixelSize(com.waz.zclient.ui.R.dimen.wire__text_size__small);
-        float newHintSize = mediumHintTextSize  * scale;
-        sketchEditTextView.setHintTextSize(newHintSize);
-    }
+    private void clampSketchEditBoxPosition(FrameLayout.LayoutParams params) {
+        int sketchWidth = (((ViewGroup) sketchEditTextView.getParent()).getMeasuredWidth());
+        int sketchHeight = (((ViewGroup) sketchEditTextView.getParent()).getMeasuredHeight());
+        int textWidth = sketchEditTextView.getMeasuredWidth();
+        int textHeight = sketchEditTextView.getMeasuredHeight();
 
-    private void setTextPaddingSize(float scale) {
-        float mediumPaddingSize = getResources().getDimensionPixelSize(R.dimen.wire__padding__regular);
-        int newPaddingSize = (int) (mediumPaddingSize  * scale);
-        sketchEditTextView.setPadding(newPaddingSize, newPaddingSize, newPaddingSize, newPaddingSize);
+        params.leftMargin = Math.min(params.leftMargin, sketchWidth - textWidth / 2);
+        params.topMargin = Math.min(params.topMargin, sketchHeight - textHeight / 2);
+        params.leftMargin = Math.max(params.leftMargin, -textWidth / 2);
+        params.topMargin = Math.max(params.topMargin, -textHeight / 2);
     }
 
     public interface Container { }
