@@ -221,7 +221,7 @@ private class IncomingControlsView(val context: Context, val attrs: AttributeSet
         Signal.const[Option[BitmapResult]](None)
       } { assetId =>
         zms.assetsStorage.signal(assetId).flatMap {
-          case data@AssetData.IsImage(_, _) => BitmapSignal(data, Round(avatarRadius * 2, 0, Color.TRANSPARENT), zms.imageLoader, zms.imageCache).map(Option(_))
+          case data@AssetData.IsImage() => BitmapSignal(data, Round(avatarRadius * 2, 0, Color.TRANSPARENT), zms.imageLoader, zms.imageCache).map(Option(_))
           case _ => Signal.const[Option[BitmapResult]](None)
         }
       }
