@@ -633,11 +633,15 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
     }
 
     @Override
+    public void onIgnoredConnectRequest(IConversation conversation) {
+        getStoreFactory().getConversationStore().setCurrentConversationToNext(ConversationChangeRequester.CONNECT_REQUEST_IGNORED);
+    }
+
+    @Override
     public void onAcceptedPendingOutgoingConnectRequest(IConversation conversation) {
         getStoreFactory().getConversationStore().setCurrentConversation(conversation,
                                                                         ConversationChangeRequester.CONNECT_REQUEST_ACCEPTED);
     }
-
 
     //////////////////////////////////////////////////////////////////////////////////////////
     //

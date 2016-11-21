@@ -237,6 +237,11 @@ public class PendingConnectRequestManagerFragment extends BaseFragment<PendingCo
         getContainer().onAcceptedConnectRequest(conversation);
     }
 
+    @Override
+    public void onIgnoredConnectRequest(IConversation conversation) {
+        getContainer().onIgnoredConnectRequest(conversation);
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////
     //
     //  OnBackPressedListener
@@ -362,6 +367,9 @@ public class PendingConnectRequestManagerFragment extends BaseFragment<PendingCo
     public interface Container extends UserProfileContainer {
         void onAcceptedConnectRequest(IConversation conversation);
 
+        void onIgnoredConnectRequest(IConversation conversation);
+
         void onAcceptedPendingOutgoingConnectRequest(IConversation conversation);
+
     }
 }

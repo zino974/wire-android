@@ -41,5 +41,6 @@ public enum ConversationChangeRequester {
     INVITE,
     NOTIFICATION,
     SHARING,
-    CONNECT_REQUEST_ACCEPTED
+    CONNECT_REQUEST_ACCEPTED,
+    CONNECT_REQUEST_IGNORED
 }
