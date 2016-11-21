@@ -64,7 +64,7 @@ class ImageNotificationsController(cxt: WireContext)(implicit inj: Injector) ext
       }
     case _ => Signal.empty[BitmapResult]
   }.zip(savedImageUri).on(Threading.Ui) {
-    case (BitmapResult.BitmapLoaded(bitmap, _, _), uri) => showBitmap(bitmap, uri)
+    case (BitmapResult.BitmapLoaded(bitmap, _), uri) => showBitmap(bitmap, uri)
     case (_, uri) => showBitmap(null, uri)
   }
 

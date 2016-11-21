@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.zclient.R;
@@ -33,8 +34,7 @@ import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
 
 public class BackgroundFrameLayout extends FrameLayout implements BackgroundObserver,
-                                                                  AccentColorObserver,
-                                                                  ImageAsset.BitmapCallback {
+                                                                  AccentColorObserver {
 
     private final boolean isTablet;
     private boolean scaledToMax;
@@ -51,7 +51,12 @@ public class BackgroundFrameLayout extends FrameLayout implements BackgroundObse
             if (loadHandle != null) {
                 loadHandle.cancel();
             }
-            loadHandle = imageAsset.getBitmap(drawable.getWidth(), BackgroundFrameLayout.this);
+            loadHandle = imageAsset.getBitmap(drawable.getWidth(), new BitmapCallback() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap) {
+                    drawable.setBitmap(bitmap);
+                }
+            });
         }
     };
 
@@ -92,16 +97,6 @@ public class BackgroundFrameLayout extends FrameLayout implements BackgroundObse
     @Override
     public void onAccentColorHasChanged(Object sender, int color) {
         drawable.setAccentColor(color, true);
-    }
-
-    @Override
-    public void onBitmapLoaded(Bitmap b, boolean isPreview) {
-        drawable.setBitmap(b);
-    }
-
-    @Override
-    public void onBitmapLoadingFailed() {
-
     }
 
     @Override

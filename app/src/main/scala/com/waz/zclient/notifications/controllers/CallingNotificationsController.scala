@@ -79,7 +79,7 @@ class CallingNotificationsController(cxt: WireContext)(implicit inj: Injector) e
     }
     case _ => Signal.empty[BitmapResult]
   }.map {
-    case BitmapLoaded(bmp, _, _) => Option(BitmapUtils.cropRect(bmp, callImageSizePx))
+    case BitmapLoaded(bmp, _) => Option(BitmapUtils.cropRect(bmp, callImageSizePx))
     case _ => None
   }
 

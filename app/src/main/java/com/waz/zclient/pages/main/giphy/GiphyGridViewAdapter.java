@@ -27,6 +27,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.waz.api.BitmapCallback;
 import com.waz.api.GiphyResults;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
@@ -73,7 +74,7 @@ public class GiphyGridViewAdapter extends RecyclerView.Adapter<GiphyGridViewAdap
         notifyDataSetChanged();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements ImageAsset.BitmapCallback {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final Context context;
         private int animationDuration;
@@ -120,22 +121,20 @@ public class GiphyGridViewAdapter extends RecyclerView.Adapter<GiphyGridViewAdap
             if (width == 0) {
                 width = imageAsset.getWidth();
             }
-            bitmapLoadHandle = imageAsset.getSingleBitmap(width, this);
+            bitmapLoadHandle = imageAsset.getSingleBitmap(width, new BitmapCallback() {
+                @Override
+                public void onBitmapLoaded(final Bitmap bitmap) {
+                    final Drawable[] images = new Drawable[2];
+                    images[0] = gifPreview.getDrawable();
+                    images[1] = new BitmapDrawable(context.getResources(), bitmap);
+                    TransitionDrawable crossfader = new TransitionDrawable(images);
+                    gifPreview.setImageDrawable(crossfader);
+                    crossfader.startTransition(animationDuration);
+                    gifPreview.setImageBitmap(bitmap);
+                }
+            });
         }
 
-        @Override
-        public void onBitmapLoaded(final Bitmap bitmap, boolean b) {
-            final Drawable[] images = new Drawable[2];
-            images[0] = gifPreview.getDrawable();
-            images[1] = new BitmapDrawable(context.getResources(), bitmap);
-            TransitionDrawable crossfader = new TransitionDrawable(images);
-            gifPreview.setImageDrawable(crossfader);
-            crossfader.startTransition(animationDuration);
-            gifPreview.setImageBitmap(bitmap);
-        }
-
-        @Override
-        public void onBitmapLoadingFailed() {}
     }
 
     public interface ScrollGifCallback {

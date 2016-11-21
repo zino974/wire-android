@@ -36,6 +36,7 @@ import android.view.ViewPropertyAnimator;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.zclient.OnBackPressedListener;
@@ -200,14 +201,13 @@ public abstract class SingleImageFragment extends BaseFragment<SingleImageFragme
         if (imageAsset.getWidth() > 0) {
             fadeControls(true);
             bitmapLoadHandle = imageAsset.getBitmap(ViewUtils.getOrientationIndependentDisplayWidth(getActivity()),
-                                                    new ImageAsset.BitmapCallback() {
+                                                    new BitmapCallback() {
                                                         @Override
-                                                        public void onBitmapLoaded(Bitmap bitmap, boolean isPreview) {
+                                                        public void onBitmapLoaded(Bitmap bitmap) {
                                                             if (getActivity() == null || messageTouchImageView == null) {
                                                                 return;
                                                             }
-                                                            if (!isPreview &&
-                                                                messageTouchImageView.getDrawable() != null) {
+                                                            if (messageTouchImageView.getDrawable() != null) {
                                                                 // means we display the preview
                                                                 showBitmap(bitmap);
                                                                 return;
@@ -219,7 +219,7 @@ public abstract class SingleImageFragment extends BaseFragment<SingleImageFragme
                                                         }
 
                                                         @Override
-                                                        public void onBitmapLoadingFailed() {
+                                                        public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
                                                             // show error?
                                                             if (messageTouchImageView == null ||
                                                                 // means we display nothing

@@ -226,7 +226,7 @@ private class IncomingControlsView(val context: Context, val attrs: AttributeSet
         }
       }
   }.map {
-    case Some(BitmapLoaded(bitmap, preview, etag)) if !preview && bitmap != null => Some(bitmap)
+    case Some(BitmapLoaded(bitmap, etag)) if bitmap != null => Some(bitmap)
     case _ => None
   }
 

@@ -304,7 +304,7 @@ protected class ChatheadController(val setSelectable: Boolean = false,
   }
 
   val bitmap = bitmapResult.flatMap {
-    case BitmapLoaded(bitmap, preview, etag) if !preview && bitmap != null => Signal(bitmap)
+    case BitmapLoaded(bitmap, etag) if bitmap != null => Signal(bitmap)
     case _ => Signal.empty[Bitmap]
   }
 

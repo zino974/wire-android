@@ -24,6 +24,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.api.UpdateListener;
@@ -36,26 +37,21 @@ public class ImageAssetView extends ImageView implements UpdateListener {
     private LoadHandle bitmapLoadHandle;
     private boolean shouldScaleForPortraitMode;
     private ImageAsset imageAsset;
-    private boolean showPreview;
     private boolean animateFirstTimeBitmapAppearance;
 
     private ObjectAnimator alphaAnimator;
 
-    private final ImageAsset.BitmapCallback loadCallback = new ImageAsset.BitmapCallback() {
+    private final BitmapCallback loadCallback = new BitmapCallback() {
         @Override
-        public void onBitmapLoaded(Bitmap bitmap, boolean isPreview) {
-            Timber.i("ImageAssetView %s :: onBitmapLoaded(), id=%s preview=%b, w=%d, h=%d",
+        public void onBitmapLoaded(Bitmap bitmap) {
+            Timber.i("ImageAssetView %s :: onBitmapLoaded(), id=%s, w=%d, h=%d",
                      ImageAssetView.this,
                      imageAsset.getId(),
-                     isPreview,
                      bitmap.getWidth(),
                      bitmap.getHeight());
-            if (isPreview && !showPreview) {
-                return;
-            }
             setScalePolicy(bitmap);
             setImageBitmap(bitmap);
-            if (bitmapLoadedCallback != null && !isPreview) {
+            if (bitmapLoadedCallback != null) {
                 bitmapLoadedCallback.onBitmapLoadFinished(true);
             }
 
@@ -69,7 +65,7 @@ public class ImageAssetView extends ImageView implements UpdateListener {
         }
 
         @Override
-        public void onBitmapLoadingFailed() {
+        public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
             logBitmapLoadError();
             clearImage();
             if (bitmapLoadedCallback != null) {
@@ -98,10 +94,6 @@ public class ImageAssetView extends ImageView implements UpdateListener {
 
     public void setShouldScaleForPortraitMode(boolean shouldScaleForPortraitMode) {
         this.shouldScaleForPortraitMode = shouldScaleForPortraitMode;
-    }
-
-    public void setShowPreview(boolean showPreview) {
-        this.showPreview = showPreview;
     }
 
     public void clearImage() {

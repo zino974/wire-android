@@ -40,6 +40,7 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.ImageAssetFactory;
 import com.waz.api.LoadHandle;
@@ -70,6 +71,7 @@ import com.waz.zclient.utils.TrackingUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.debug.ShakeEventListener;
 import net.hockeyapp.android.ExceptionHandler;
+
 import java.util.Locale;
 
 public class DrawingFragment extends BaseFragment<DrawingFragment.Container> implements OnBackPressedListener,
@@ -363,10 +365,10 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
         }
         drawingViewTip.setTextColor(getResources().getColor(R.color.drawing__tip__font__color_image));
         cancelLoadHandle();
-        bitmapLoadHandle = backgroundImage.getSingleBitmap(ViewUtils.getOrientationDependentDisplayWidth(getActivity()), new ImageAsset.BitmapCallback() {
+        bitmapLoadHandle = backgroundImage.getSingleBitmap(ViewUtils.getOrientationDependentDisplayWidth(getActivity()), new BitmapCallback() {
             @Override
-            public void onBitmapLoaded(Bitmap bitmap, boolean isPreview) {
-                if (getActivity() == null || drawingCanvasView == null || isPreview) {
+            public void onBitmapLoaded(Bitmap bitmap) {
+                if (getActivity() == null || drawingCanvasView == null) {
                     return;
                 }
                 includeBackgroundImage = true;
@@ -381,7 +383,7 @@ public class DrawingFragment extends BaseFragment<DrawingFragment.Container> imp
             }
 
             @Override
-            public void onBitmapLoadingFailed() {
+            public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
                 cancelLoadHandle();
             }
         });

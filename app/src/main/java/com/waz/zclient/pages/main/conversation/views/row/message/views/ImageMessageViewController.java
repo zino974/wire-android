@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.api.Message;
@@ -43,10 +44,9 @@ import com.waz.zclient.ui.theme.ThemeUtils;
 import com.waz.zclient.ui.utils.ColorUtils;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.ui.views.EphemeralDotAnimationView;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.views.LoadingIndicatorView;
-import com.waz.zclient.ui.views.OnDoubleClickListener;
 import timber.log.Timber;
 
 public class ImageMessageViewController extends MessageViewController implements AccentColorObserver,
@@ -57,7 +57,7 @@ public class ImageMessageViewController extends MessageViewController implements
     private View view;
     private FrameLayout imageContainer;
     private ImageView gifImageView;
-    private ImageView polkadotView;
+    private ProgressDotsView progressDotsView;
     private ImageAsset imageAsset;
     private TextView textViewChangeSetting;
     private View imageActionContainer;
@@ -68,10 +68,8 @@ public class ImageMessageViewController extends MessageViewController implements
     private View wifiContainer;
     private EphemeralDotAnimationView ephemeralDotAnimationView;
     private View ephemeralTypeView;
-    private LoadingIndicatorView previewLoadingIndicator;
     private UpdateListener imageAssetUpdateListener;
     private LoadHandle bitmapLoadHandle;
-    private boolean previewLoaded;
     private boolean tapButtonsVisible;
     private int paddingLeft;
     private int paddingRight;
@@ -127,8 +125,7 @@ public class ImageMessageViewController extends MessageViewController implements
         imageContainer.setOnClickListener(containerOnDoubleClickListener);
         imageContainer.setOnLongClickListener(this);
         gifImageView = ViewUtils.getView(view, R.id.iv__row_conversation__message_image);
-        polkadotView = ViewUtils.getView(view, R.id.iv__row_conversation__message_polkadots);
-        previewLoadingIndicator = ViewUtils.getView(view, R.id.lbv__row_conversation__message_polkadots);
+        progressDotsView = ViewUtils.getView(view, R.id.pdv__row_conversation__image_placeholder_dots);
         textViewChangeSetting = ViewUtils.getView(view, R.id.ttv__conversation_row__image__change_settings);
         wifiContainer = ViewUtils.getView(view, R.id.ll__conversation_row__image__wifi_warning);
         wifiContainer.setVisibility(View.GONE);
@@ -148,10 +145,6 @@ public class ImageMessageViewController extends MessageViewController implements
         ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
         ephemeralTypeView = ViewUtils.getView(view, R.id.gtv__row_conversation__image__ephemeral_type);
         ephemeralTypeView.setVisibility(View.GONE);
-
-        previewLoadingIndicator.setColor(messageViewContainer.getControllerFactory().getAccentColorController().getColor());
-        previewLoadingIndicator.setType(LoadingIndicatorView.INFINITE_LOADING_BAR);
-        previewLoadingIndicator.setVisibility(View.GONE);
 
         paddingLeft = (int) context.getResources().getDimension(R.dimen.content__padding_left);
         paddingRight = (int) context.getResources().getDimension(R.dimen.content__padding_right);
@@ -203,9 +196,7 @@ public class ImageMessageViewController extends MessageViewController implements
         layoutParams.width = finalWidth;
         layoutParams.height = finalHeight;
         gifImageView.setLayoutParams(layoutParams);
-        polkadotView.setLayoutParams(layoutParams);
-        ViewUtils.setWidth(previewLoadingIndicator, finalWidth);
-
+        progressDotsView.setLayoutParams(layoutParams);
 
         if (imageAsset == null) {
             Timber.e("No imageAsset for message with id='%s' available.", message.getId());
@@ -226,8 +217,6 @@ public class ImageMessageViewController extends MessageViewController implements
     }
 
     private void loadBitmap(int finalViewWidth) {
-        previewLoaded = false;
-
         if (bitmapLoadHandle != null) {
             bitmapLoadHandle.cancel();
         }
@@ -235,13 +224,10 @@ public class ImageMessageViewController extends MessageViewController implements
             return;
         }
 
-        bitmapLoadHandle = imageAsset.getBitmap(finalViewWidth, new ImageAsset.BitmapCallback() {
+        showProgressDots();
+        bitmapLoadHandle = imageAsset.getBitmap(finalViewWidth, new BitmapCallback() {
             @Override
-            public void onBitmapLoaded(Bitmap bitmap, boolean isPreview) {
-                if ((previewLoaded || gifImageView.getDrawable() != null) && isPreview) {
-                    return;
-                }
-
+            public void onBitmapLoaded(Bitmap bitmap) {
                 if (gifImageView == null ||
                     message == null ||
                     !gifImageView.getTag().equals(message.getId()) ||
@@ -249,48 +235,45 @@ public class ImageMessageViewController extends MessageViewController implements
                     return;
                 }
 
-                if (isPreview) {
-                    showPreview(bitmap);
-
-                    boolean hasWifi = messageViewsContainer.getStoreFactory().getNetworkStore().hasWifiConnection();
-                    boolean downloadPolicyWifiOnly = messageViewsContainer.getControllerFactory().getUserPreferencesController().isImageDownloadPolicyWifiOnly();
-
-                    if (!hasWifi && downloadPolicyWifiOnly) {
-                        wifiContainer.setVisibility(View.VISIBLE);
-                        textViewChangeSetting.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (!messageViewsContainer.isTornDown()) {
-                                    messageViewsContainer.openSettings();
-                                }
-                            }
-                        });
-
-                        previewLoadingIndicator.setVisibility(View.GONE);
-                        previewLoadingIndicator.hide();
-                    }
+                view.setTag(FULL_IMAGE_LOADED);
+                if (gifImageView.getDrawable() != null) {
+                    gifImageView.setImageBitmap(bitmap);
                 } else {
-                    view.setTag(FULL_IMAGE_LOADED);
-                    if (gifImageView.getDrawable() != null) {
-                        gifImageView.setImageBitmap(bitmap);
-                    } else {
-                        showFinalImage(bitmap);
-                    }
+                    showFinalImage(bitmap);
                 }
             }
 
-            @Override public void onBitmapLoadingFailed() { }
+            @Override public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
+                if (reason == BitmapLoadingFailed.DOWNLOAD_ON_WIFI_ONLY) {
+                    setWifiContainerVisible(true);
+                }
+            }
         });
     }
 
-    private void showPreview(final Bitmap bitmap) {
-        previewLoaded = true;
-        polkadotView.setAlpha(1f);
-        polkadotView.setVisibility(View.VISIBLE);
-        polkadotView.setImageBitmap(bitmap);
+    private void showProgressDots() {
+        progressDotsView.setAlpha(1f);
+        progressDotsView.setVisibility(View.VISIBLE);
         gifImageView.setVisibility(View.GONE);
-        previewLoadingIndicator.setVisibility(View.VISIBLE);
-        previewLoadingIndicator.show();
+    }
+
+    private void setWifiContainerVisible(boolean show) {
+        boolean hasWifi = messageViewsContainer.getStoreFactory().getNetworkStore().hasWifiConnection();
+        boolean downloadPolicyWifiOnly = messageViewsContainer.getControllerFactory().getUserPreferencesController().isImageDownloadPolicyWifiOnly();
+
+        if (!hasWifi && downloadPolicyWifiOnly && show) {
+            wifiContainer.setVisibility(View.VISIBLE);
+            textViewChangeSetting.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!messageViewsContainer.isTornDown()) {
+                        messageViewsContainer.openSettings();
+                    }
+                }
+            });
+        } else {
+            wifiContainer.setVisibility(View.GONE);
+        }
     }
 
     private void showFinalImage(final Bitmap bitmap) {
@@ -300,14 +283,11 @@ public class ImageMessageViewController extends MessageViewController implements
         gifImageView.setImageBitmap(bitmap);
         gifImageView.setAlpha(0f);
         gifImageView.setVisibility(View.VISIBLE);
-        previewLoadingIndicator.hide();
-        previewLoadingIndicator.setVisibility(View.GONE);
 
-        int crossFadeDuration = context.getResources().getInteger(R.integer.content__image__polka_crossfade_duration);
-        int showFinalDirectlyDuration = context.getResources().getInteger(R.integer.content__image__directly_final_duration);
-        int fadingDuration = previewLoaded ? crossFadeDuration : showFinalDirectlyDuration;
-        int polkaShowDuration = context.getResources().getInteger(R.integer.content__image__polka_show_duration);
-        int startDelay = previewLoaded ? polkaShowDuration : 0;
+        int fadingDuration = context.getResources().getInteger(R.integer.content__image__directly_final_duration);
+        int startDelay = 0;
+
+        setWifiContainerVisible(false);
 
         gifImageView.animate()
                     .alpha(1f)
@@ -315,17 +295,17 @@ public class ImageMessageViewController extends MessageViewController implements
                     .setStartDelay(startDelay)
                     .start();
 
-        polkadotView.animate()
-                    .alpha(0f)
-                    .setDuration(fadingDuration)
-                    .setStartDelay(startDelay)
-                    .withEndAction(new Runnable() {
+        progressDotsView.animate()
+                        .alpha(0f)
+                        .setDuration(fadingDuration)
+                        .setStartDelay(startDelay)
+                        .withEndAction(new Runnable() {
                         @Override
                         public void run() {
-                            polkadotView.setVisibility(View.GONE);
+                            progressDotsView.setVisibility(View.GONE);
                         }
                     })
-                    .start();
+                        .start();
 
     }
 
@@ -361,17 +341,14 @@ public class ImageMessageViewController extends MessageViewController implements
         ephemeralDotAnimationView.setMessage(null);
         containerOnDoubleClickListener.reset();
         gifImageView.animate().cancel();
-        polkadotView.animate().cancel();
         imageActionContainer.setVisibility(View.GONE);
         gifImageView.setVisibility(View.INVISIBLE);
         gifImageView.setImageDrawable(null);
         tapButtonsVisible = false;
-        previewLoadingIndicator.hide();
-        previewLoadingIndicator.setVisibility(View.GONE);
         textViewChangeSetting.setOnClickListener(null);
         wifiContainer.setVisibility(View.GONE);
-        previewLoaded = false;
         view.setTag(null);
+        progressDotsView.setExpired(false);
         if (imageAsset != null) {
             imageAsset.removeUpdateListener(imageAssetUpdateListener);
         }
@@ -380,15 +357,11 @@ public class ImageMessageViewController extends MessageViewController implements
             bitmapLoadHandle.cancel();
             bitmapLoadHandle = null;
         }
-        polkadotView.setImageBitmap(null);
         super.recycle();
     }
 
     @Override
     public void onAccentColorHasChanged(Object sender, int color) {
-        if (previewLoadingIndicator != null) {
-            previewLoadingIndicator.setColor(color);
-        }
         if (message != null &&
             message.isEphemeral() &&
             message.isExpired()) {
@@ -398,6 +371,7 @@ public class ImageMessageViewController extends MessageViewController implements
         ephemeralDotAnimationView.setPrimaryColor(color);
         ephemeralDotAnimationView.setSecondaryColor(ColorUtils.injectAlpha(ResourceUtils.getResourceFloat(context.getResources(), R.dimen.ephemeral__accent__timer_alpha),
                                                                            color));
+        progressDotsView.setAccentColor(ColorUtils.injectAlpha(ThemeUtils.getEphemeralBackgroundAlpha(context), color));
     }
 
     @Override
@@ -437,21 +411,20 @@ public class ImageMessageViewController extends MessageViewController implements
                                                                      messageViewsContainer.getControllerFactory().getAccentColorController().getColor()));
             gifImageView.setVisibility(View.INVISIBLE);
             gifImageView.setImageBitmap(null);
-            polkadotView.setVisibility(View.INVISIBLE);
-            polkadotView.setImageBitmap(null);
+            progressDotsView.setVisibility(View.INVISIBLE);
             if (bitmapLoadHandle != null) {
                 bitmapLoadHandle.cancel();
             }
-            previewLoadingIndicator.hide();
-            previewLoadingIndicator.setVisibility(View.GONE);
             imageActionContainer.setVisibility(View.GONE);
             tapButtonsVisible = false;
             ephemeralTypeView.setVisibility(View.VISIBLE);
+            progressDotsView.setExpired(true);
         } else {
             imageContainer.setBackground(null);
             gifImageView.setVisibility(View.VISIBLE);
-            polkadotView.setVisibility(View.VISIBLE);
+            progressDotsView.setVisibility(View.VISIBLE);
             ephemeralTypeView.setVisibility(View.GONE);
+            progressDotsView.setExpired(false);
         }
     }
 

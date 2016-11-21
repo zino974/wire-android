@@ -29,6 +29,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.KindOfMedia;
 import com.waz.api.LoadHandle;
@@ -109,18 +110,17 @@ public abstract class MediaPlayerViewController extends MessageViewController im
             final int bitmapWidth = view.getMeasuredWidth() > 0 ?
                                     view.getMeasuredWidth() :
                                     ViewUtils.getOrientationIndependentDisplayWidth(context);
-            loadHandle = imageAsset.getBitmap(bitmapWidth, new ImageAsset.BitmapCallback() {
+            loadHandle = imageAsset.getBitmap(bitmapWidth, new BitmapCallback() {
                 @Override
-                public void onBitmapLoaded(Bitmap bitmap, boolean isPreview) {
-                    if (isPreview ||
-                        message == null) {
+                public void onBitmapLoaded(Bitmap bitmap) {
+                    if (message == null) {
                         return;
                     }
                     updateMediaPlayerView(bitmap);
                 }
 
                 @Override
-                public void onBitmapLoadingFailed() {
+                public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
                     if (message == null) {
                         return;
                     }

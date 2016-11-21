@@ -51,24 +51,16 @@
                 android:visibility="gone"
                 />
 
-            <com.waz.zclient.pages.main.conversation.views.row.message.views.BlockingImageView
-                android:id="@+id/iv__row_conversation__message_polkadots"
+            <com.waz.zclient.pages.main.conversation.views.row.message.views.ProgressDotsView
+                android:id="@+id/pdv__row_conversation__image_placeholder_dots"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_gravity="left"
                 android:layout_marginBottom="@dimen/content__image__polka__loading_bar__total_height"
                 android:adjustViewBounds="false"
-                android:background="@null"
+                android:background="@drawable/shape_audio_message_background"
                 android:scaleType="fitXY"
-                />
-
-            <!-- Polka dot image preview loading indicator -->
-            <com.waz.zclient.views.LoadingIndicatorView
-                android:id="@+id/lbv__row_conversation__message_polkadots"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/loading_bar__stroke_width"
-                android:layout_gravity="bottom"
-                android:layout_marginTop="@dimen/content__image__polka__loading_bar__margin_top"
+                android:visibility="gone"
                 />
 
             <LinearLayout

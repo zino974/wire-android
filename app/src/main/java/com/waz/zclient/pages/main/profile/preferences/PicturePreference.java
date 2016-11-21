@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.Self;
 import com.waz.zclient.R;
@@ -41,14 +42,14 @@ public class PicturePreference extends Preference {
     private final ModelObserver<ImageAsset> imageAssetModelObserver = new ModelObserver<ImageAsset>() {
         @Override
         public void updated(ImageAsset model) {
-            model.getRoundBitmap(diameter, new ImageAsset.BitmapCallback() {
+            model.getRoundBitmap(diameter, new BitmapCallback() {
                 @Override
-                public void onBitmapLoaded(Bitmap b, boolean isPreview) {
+                public void onBitmapLoaded(Bitmap b) {
                     setIcon(new BitmapDrawable(getContext().getResources(), b));
                 }
 
                 @Override
-                public void onBitmapLoadingFailed() {
+                public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
                     FilledCircularBackgroundDrawable icon = new FilledCircularBackgroundDrawable(Color.BLACK, diameter);
                     setIcon(DrawableUtils.drawableToBitmapDrawable(getContext().getResources(), icon, diameter));
                 }

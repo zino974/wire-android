@@ -27,6 +27,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.api.UpdateListener;
@@ -34,10 +35,8 @@ import com.waz.zclient.R;
 import com.waz.zclient.ui.animation.interpolators.penner.Expo;
 import com.waz.zclient.ui.animation.interpolators.penner.Quart;
 import com.waz.zclient.utils.ViewUtils;
-import hugo.weaving.DebugLog;
 
-public class ImageAssetImageView extends FrameLayout implements UpdateListener,
-                                                                ImageAsset.BitmapCallback {
+public class ImageAssetImageView extends FrameLayout implements UpdateListener {
     public static final String TAG = ImageAssetImageView.class.getName();
 
 
@@ -81,11 +80,6 @@ public class ImageAssetImageView extends FrameLayout implements UpdateListener,
     private DisplayType displayType;
 
     /**
-     * Listener to bitmap loading events.
-     */
-    private Callback callback;
-
-    /**
      * The handle to bitmap loading processes.
      * A started request can be canceled via the handle.
      */
@@ -115,8 +109,6 @@ public class ImageAssetImageView extends FrameLayout implements UpdateListener,
      * This is the saturation value animatable.
      */
     private float saturation;
-
-    private boolean useBitmapPreview = true;
 
     // border of round bitmap
     private int borderColor;
@@ -228,16 +220,6 @@ public class ImageAssetImageView extends FrameLayout implements UpdateListener,
      */
     public float getSaturation() {
         return saturation;
-    }
-
-    /**
-     * Sets the callback in case the parent wants to be informed
-     * of bitmap loading state.
-     *
-     * @param callback the listener to bitmap loading processes
-     */
-    public void setCallback(Callback callback) {
-        this.callback = callback;
     }
 
     /**
@@ -414,13 +396,11 @@ public class ImageAssetImageView extends FrameLayout implements UpdateListener,
 
         // check if image asset is null
         if (imageAsset == null) {
-            notifyBitmapError(BitmapError.IMAGE_ASSET_IS_NULL);
             return;
         }
 
         // check if image asset is empty
         if (imageAsset.isEmpty()) {
-            notifyBitmapError(BitmapError.IMAGE_ASSET_IS_EMPTY);
             return;
         }
 
@@ -435,60 +415,28 @@ public class ImageAssetImageView extends FrameLayout implements UpdateListener,
 
         switch (displayType) {
             case REGULAR:
-                loadHandle = imageAsset.getBitmap(measuredWidth, this);
+                loadHandle = imageAsset.getBitmap(measuredWidth, callback);
                 break;
             case CIRCLE:
-                loadHandle = imageAsset.getRoundBitmap(measuredWidth, borderWidth, borderColor, this);
+                loadHandle = imageAsset.getRoundBitmap(measuredWidth, borderWidth, borderColor, callback);
                 break;
         }
     }
+
+    private BitmapCallback callback = new BitmapCallback() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap) {
+            setBitmapWithTransition(bitmap);
+            // once the bitmap loaded any further updates on this image assets
+            // comes with no animation.
+            transitionType = TransitionType.NONE;
+        }
+    };
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         updated();
-    }
-
-    /**
-     * Successful Callback from ImageAsset.BitmapCallback.
-     *
-     * @param bitmap    the delivered bitmap
-     * @param isPreview is this bitmap only a down sampled preview
-     */
-    @Override
-    @DebugLog
-    public void onBitmapLoaded(Bitmap bitmap, boolean isPreview) {
-        if (isPreview && !useBitmapPreview) {
-            // no preview desired
-            return;
-        }
-
-        setBitmapWithTransition(bitmap);
-        // once the bitmap loaded any further updates on this image assets
-        // comes with no animation.
-        transitionType = TransitionType.NONE;
-        if (callback != null) {
-            callback.onBitmapLoaded(imageAsset, bitmap, isPreview);
-        }
-    }
-
-    /**
-     * Failed Callback from ImageAsset.BitmapCallback.
-     */
-    @Override
-    public void onBitmapLoadingFailed() {
-        notifyBitmapError(BitmapError.BITMAP_LOADING_FAILED);
-    }
-
-    /**
-     * Notifies the parent of an error while loading a bitmap.
-     *
-     * @param bitmapError the type of error that occured
-     */
-    private void notifyBitmapError(BitmapError bitmapError) {
-        if (callback != null) {
-            callback.onBitmapLoadingFailed(imageAsset, bitmapError);
-        }
     }
 
     /**
@@ -532,15 +480,5 @@ public class ImageAssetImageView extends FrameLayout implements UpdateListener,
         }
         swapImageView1.setImageDrawable(null);
         swapImageView2.setImageDrawable(null);
-    }
-
-    /**
-     * Callback for the parent. As an additional parameter to SE image asset callback
-     * it passes the image asset.
-     */
-    public interface Callback {
-        void onBitmapLoaded(ImageAsset imageAsset, Bitmap bitmap, boolean isPreview);
-
-        void onBitmapLoadingFailed(ImageAsset imageAsset, BitmapError bitmapError);
     }
 }
