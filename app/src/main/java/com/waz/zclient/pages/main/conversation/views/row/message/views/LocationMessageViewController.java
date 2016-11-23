@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.api.Message;
@@ -46,11 +47,11 @@ import com.waz.zclient.ui.utils.ColorUtils;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.ui.utils.TypefaceUtils;
 import com.waz.zclient.ui.views.EphemeralDotAnimationView;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import com.waz.zclient.utils.IntentUtils;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.ui.views.OnDoubleClickListener;
 import timber.log.Timber;
 
 public class LocationMessageViewController extends MessageViewController implements AccentColorObserver {
@@ -195,11 +196,10 @@ public class LocationMessageViewController extends MessageViewController impleme
             bitmapLoadHandle.cancel();
         }
 
-        bitmapLoadHandle = imageAsset.getBitmap(finalViewWidth, new ImageAsset.BitmapCallback() {
+        bitmapLoadHandle = imageAsset.getBitmap(finalViewWidth, new BitmapCallback() {
             @Override
-            public void onBitmapLoaded(Bitmap bitmap, boolean isPreview) {
-                if (isPreview ||
-                    mapImageView == null ||
+            public void onBitmapLoaded(Bitmap bitmap) {
+                if (mapImageView == null ||
                     message == null ||
                     !mapImageView.getTag().equals(message.getId()) ||
                     messageViewsContainer.isTornDown()) {
@@ -216,8 +216,6 @@ public class LocationMessageViewController extends MessageViewController impleme
                     showFinalImage(bitmap);
                 }
             }
-
-            @Override public void onBitmapLoadingFailed() { }
         });
     }
 

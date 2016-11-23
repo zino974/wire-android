@@ -30,12 +30,12 @@ import com.facebook.rebound._
 import com.waz.ZLog
 import com.waz.api.VideoSendState._
 import com.waz.api.impl.AccentColor
-import com.waz.model.ImageAssetData
-import com.waz.service.assets.AssetService.BitmapRequest.Round
+import com.waz.model.AssetData
 import com.waz.service.assets.AssetService.BitmapResult
 import com.waz.service.assets.AssetService.BitmapResult.BitmapLoaded
 import com.waz.service.images.BitmapSignal
 import com.waz.threading.Threading
+import com.waz.ui.MemoryImageCache.BitmapRequest.Round
 import com.waz.utils.NameParts
 import com.waz.utils.events.{EventStream, Signal}
 import com.waz.zclient.calling.controllers.{CallPermissionsController, CurrentCallController}
@@ -221,12 +221,12 @@ private class IncomingControlsView(val context: Context, val attrs: AttributeSet
         Signal.const[Option[BitmapResult]](None)
       } { assetId =>
         zms.assetsStorage.signal(assetId).flatMap {
-          case data: ImageAssetData => BitmapSignal(data, Round(avatarRadius * 2, 0, Color.TRANSPARENT), zms.imageLoader, zms.imageCache).map(Option(_))
+          case data@AssetData.IsImage() => BitmapSignal(data, Round(avatarRadius * 2, 0, Color.TRANSPARENT), zms.imageLoader, zms.imageCache).map(Option(_))
           case _ => Signal.const[Option[BitmapResult]](None)
         }
       }
   }.map {
-    case Some(BitmapLoaded(bitmap, preview, etag)) if !preview && bitmap != null => Some(bitmap)
+    case Some(BitmapLoaded(bitmap, etag)) if bitmap != null => Some(bitmap)
     case _ => None
   }
 

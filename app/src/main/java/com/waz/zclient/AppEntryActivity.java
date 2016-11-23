@@ -27,6 +27,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.Toast;
 import com.localytics.android.Localytics;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.ImageAssetFactory;
 import com.waz.api.LoadHandle;
@@ -154,14 +155,9 @@ public class AppEntryActivity extends BaseActivity implements VerifyPhoneFragmen
             // This is just to force that SE will download the image so that it is probably ready when we are at the
             // set picture screen
             unsplashInitLoadHandle = unsplashInitImageAsset.getSingleBitmap(PREFETCH_IMAGE_WIDTH,
-                                                                            new ImageAsset.BitmapCallback() {
+                                                                            new BitmapCallback() {
                                                                                 @Override
-                                                                                public void onBitmapLoaded(
-                                                                                    Bitmap b,
-                                                                                    boolean isPreview) {}
-
-                                                                                @Override
-                                                                                public void onBitmapLoadingFailed() {}
+                                                                                public void onBitmapLoaded(Bitmap b) {}
                                                                             });
         }
     }

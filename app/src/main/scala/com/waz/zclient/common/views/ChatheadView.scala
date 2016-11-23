@@ -30,13 +30,13 @@ import com.waz.api.User.ConnectionStatus
 import com.waz.api.User.ConnectionStatus._
 import com.waz.api.impl.AccentColor
 import com.waz.api.{ContactDetails, User}
-import com.waz.model.{ImageAssetData, UserData, UserId}
+import com.waz.model.{AssetData, UserData, UserId}
 import com.waz.service.ZMessaging
-import com.waz.service.assets.AssetService.BitmapRequest.Round
 import com.waz.service.assets.AssetService.BitmapResult
 import com.waz.service.assets.AssetService.BitmapResult.BitmapLoaded
 import com.waz.service.images.BitmapSignal
 import com.waz.threading.Threading
+import com.waz.ui.MemoryImageCache.BitmapRequest.Round
 import com.waz.utils.NameParts
 import com.waz.utils.events.{EventContext, Signal}
 import com.waz.zclient.ui.utils.TypefaceUtils
@@ -178,7 +178,7 @@ class ChatheadView(val context: Context, val attrs: AttributeSet, val defStyleAt
         canvas.drawText(initials, radius, getVerticalTextCenter(initialsTextPaint, radius), initialsTextPaint)
       }
     } { bitmap =>
-      canvas.drawBitmap(bitmap, (size - bitmap.getWidth) / 2, 0, backgroundPaint)
+      canvas.drawBitmap(bitmap, null, new RectF(0, 0, size, size), backgroundPaint)
     }
 
     // Cut out
@@ -297,14 +297,14 @@ protected class ChatheadController(val setSelectable: Boolean = false,
 
   val bitmapResult = Signal(zMessaging, assetId, viewWidth, borderWidth, accentColor).flatMap[BitmapResult] {
     case (zms, Some(id), width, bWidth, bColor) if width > 0 => zms.assetsStorage.signal(id).flatMap {
-      case data: ImageAssetData => BitmapSignal(data, Round(width, bWidth, bColor.value), zms.imageLoader, zms.imageCache)
+      case data@AssetData.IsImage() => BitmapSignal(data, Round(width, bWidth, bColor.value), zms.imageLoader, zms.imageCache)
       case _ => Signal.empty[BitmapResult]
     }
     case _ => Signal.empty[BitmapResult]
   }
 
   val bitmap = bitmapResult.flatMap {
-    case BitmapLoaded(bitmap, preview, etag) if !preview && bitmap != null => Signal(bitmap)
+    case BitmapLoaded(bitmap, etag) if bitmap != null => Signal(bitmap)
     case _ => Signal.empty[Bitmap]
   }
 

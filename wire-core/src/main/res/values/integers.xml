@@ -81,9 +81,7 @@
     <integer name="content__message__progress_duration">1500</integer>
     <integer name="typing_indicator__pause_random_time">1400</integer>
     <integer name="typing_indicator__pulse_duration">280</integer>
-    <integer name="content__image__polka_crossfade_duration">550</integer>
     <integer name="content__image__directly_final_duration">200</integer>
-    <integer name="content__image__polka_show_duration">500</integer>
     <integer name="content__image__progress_pending_stop">270</integer>
     <integer name="content__image__progress_duration">1500</integer>
 

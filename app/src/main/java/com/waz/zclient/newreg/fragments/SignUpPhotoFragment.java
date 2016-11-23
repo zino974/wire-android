@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.zclient.OnBackPressedListener;
@@ -58,7 +59,6 @@ import com.waz.zclient.views.ProgressView;
 public class SignUpPhotoFragment extends BaseFragment<SignUpPhotoFragment.Container> implements CameraFragment.Container,
                                                                                                 CameraActionObserver,
                                                                                                 AccentColorObserver,
-                                                                                                ImageAsset.BitmapCallback,
                                                                                                 OnBackPressedListener {
     public static final String TAG = SignUpPhotoFragment.class.getName();
 
@@ -152,7 +152,54 @@ public class SignUpPhotoFragment extends BaseFragment<SignUpPhotoFragment.Contai
             unsplashImageLoadHandle.cancel();
             unsplashImageLoadHandle = null;
         }
-        unsplashImageLoadHandle = getContainer().getUnsplashImageAsset().getSingleBitmap(displayWidth, this);
+        unsplashImageLoadHandle = getContainer().getUnsplashImageAsset().getSingleBitmap(displayWidth, new BitmapCallback() {
+            @Override
+            public void onBitmapLoaded(final Bitmap bitmap) {
+                if (keepButton == null ||
+                    progressContainer == null ||
+                    initImage == null) {
+                    return;
+                }
+                keepButton.setEnabled(true);
+                initImage.setImageBitmap(bitmap);
+                if (!isImageLoaded) {
+                    ViewUtils.fadeInView(initImage);
+
+                    progressContainer.animate()
+                                     .alpha(0)
+                                     .withEndAction(new Runnable() {
+                                         @Override
+                                         public void run() {
+                                             progressContainer.setVisibility(View.GONE);
+                                             progressView.stopAnimation();
+                                         }
+                                     })
+                                     .start();
+                } else {
+                    initContainer.setVisibility(View.VISIBLE);
+                    progressContainer.setVisibility(View.GONE);
+                    progressView.stopAnimation();
+                }
+                isImageLoaded = true;
+            }
+
+            @Override
+            public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
+                if (progressContainer == null) {
+                    return;
+                }
+                progressContainer.animate()
+                                 .alpha(0)
+                                 .withEndAction(new Runnable() {
+                                     @Override
+                                     public void run() {
+                                         progressContainer.setVisibility(View.GONE);
+                                         progressView.stopAnimation();
+                                     }
+                                 })
+                                 .start();
+            }
+        });
 
         return view;
     }
@@ -323,54 +370,6 @@ public class SignUpPhotoFragment extends BaseFragment<SignUpPhotoFragment.Contai
     @Override
     public void onOpenCamera(CameraContext cameraContext) {
 
-    }
-
-    @Override
-    public void onBitmapLoaded(final Bitmap bitmap, boolean isPreview) {
-        if (keepButton == null ||
-            progressContainer == null ||
-            initImage == null ||
-            isPreview) {
-            return;
-        }
-        keepButton.setEnabled(true);
-        initImage.setImageBitmap(bitmap);
-        if (!isImageLoaded) {
-            ViewUtils.fadeInView(initImage);
-
-            progressContainer.animate()
-                             .alpha(0)
-                             .withEndAction(new Runnable() {
-                                 @Override
-                                 public void run() {
-                                     progressContainer.setVisibility(View.GONE);
-                                     progressView.stopAnimation();
-                                 }
-                             })
-                             .start();
-        } else {
-            initContainer.setVisibility(View.VISIBLE);
-            progressContainer.setVisibility(View.GONE);
-            progressView.stopAnimation();
-        }
-        isImageLoaded = true;
-    }
-
-    @Override
-    public void onBitmapLoadingFailed() {
-        if (progressContainer == null) {
-            return;
-        }
-        progressContainer.animate()
-                         .alpha(0)
-                         .withEndAction(new Runnable() {
-                             @Override
-                             public void run() {
-                                 progressContainer.setVisibility(View.GONE);
-                                 progressView.stopAnimation();
-                             }
-                         })
-                         .start();
     }
 
     @Override

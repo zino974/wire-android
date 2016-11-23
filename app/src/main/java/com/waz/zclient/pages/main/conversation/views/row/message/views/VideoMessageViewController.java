@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.waz.api.Asset;
 import com.waz.api.AssetStatus;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.api.Message;
@@ -60,8 +61,7 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-public class VideoMessageViewController extends MessageViewController implements ImageAsset.BitmapCallback,
-                                                                                 AccentColorObserver {
+public class VideoMessageViewController extends MessageViewController implements AccentColorObserver {
 
     private static final String INFO_DIVIDER = " · ";
     private static final int DEFAULT_ASPECT_RATIO_WIDTH = 4;
@@ -135,7 +135,23 @@ public class VideoMessageViewController extends MessageViewController implements
     private final ModelObserver<ImageAsset> imageAssetModelObserver = new ModelObserver<ImageAsset>() {
         @Override
         public void updated(ImageAsset imageAsset) {
-            previewImageLoadHandle = imageAsset.getBitmap(getThumbnailWidth(), VideoMessageViewController.this);
+            previewImageLoadHandle = imageAsset.getBitmap(getThumbnailWidth(), new BitmapCallback() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap) {
+                    if (bitmap == null) {
+                        return;
+                    }
+                    int displayWidth = getThumbnailWidth();
+                    if (bitmap.getHeight() > bitmap.getWidth()) {
+                        displayWidth -= (2 * context.getResources().getDimensionPixelSize(R.dimen.content__padding_left));
+                    }
+                    updatePreviewImageSize(displayWidth, bitmap.getWidth(), bitmap.getHeight());
+                    previewImage.setImageBitmap(bitmap);
+                    ViewUtils.fadeInView(previewImage);
+                    videoInfoText.setBackgroundResource(R.drawable.gradient_video_mesasge_info_background);
+                    videoInfoText.setTextColor(context.getResources().getColor(R.color.white));
+                }
+            });
         }
     };
 
@@ -292,8 +308,6 @@ public class VideoMessageViewController extends MessageViewController implements
                 updateViews(action, errorButtonBackground, null);
                 break;
             case UPLOAD_NOT_STARTED:
-            case META_DATA_SENT:
-            case PREVIEW_SENT:
             case UPLOAD_IN_PROGRESS:
                 if (message.getMessageStatus() == Message.Status.FAILED) {
                     updateViews(context.getString(R.string.glyph__redo), errorButtonBackground, null);
@@ -354,8 +368,6 @@ public class VideoMessageViewController extends MessageViewController implements
                 }
                 break;
             case UPLOAD_NOT_STARTED:
-            case META_DATA_SENT:
-            case PREVIEW_SENT:
             case UPLOAD_IN_PROGRESS:
                 if (message.getMessageStatus() == Message.Status.FAILED ||
                     message.getMessageStatus() == Message.Status.FAILED_READ) {
@@ -444,27 +456,6 @@ public class VideoMessageViewController extends MessageViewController implements
         layoutParams.width = displayWidth;
         layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
         videoPreviewContainer.setLayoutParams(layoutParams);
-    }
-
-    @Override
-    public void onBitmapLoaded(Bitmap bitmap, boolean isPreview) {
-        if (bitmap == null) {
-            return;
-        }
-        int displayWidth = getThumbnailWidth();
-        if (bitmap.getHeight() > bitmap.getWidth()) {
-            displayWidth -= (2 * context.getResources().getDimensionPixelSize(R.dimen.content__padding_left));
-        }
-        updatePreviewImageSize(displayWidth, bitmap.getWidth(), bitmap.getHeight());
-        previewImage.setImageBitmap(bitmap);
-        ViewUtils.fadeInView(previewImage);
-        videoInfoText.setBackgroundResource(R.drawable.gradient_video_mesasge_info_background);
-        videoInfoText.setTextColor(context.getResources().getColor(R.color.white));
-    }
-
-    @Override
-    public void onBitmapLoadingFailed() {
-        // noop
     }
 
     private void messageExpired() {

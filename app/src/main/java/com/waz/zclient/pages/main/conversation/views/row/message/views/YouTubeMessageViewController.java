@@ -28,6 +28,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.api.MediaAsset;
@@ -48,14 +49,13 @@ import com.waz.zclient.ui.theme.ThemeUtils;
 import com.waz.zclient.ui.utils.ColorUtils;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.ui.views.EphemeralDotAnimationView;
+import com.waz.zclient.ui.views.OnDoubleClickListener;
 import com.waz.zclient.utils.MessageUtils;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.ui.views.OnDoubleClickListener;
 
 import java.util.List;
 
 public class YouTubeMessageViewController extends MessageViewController implements View.OnClickListener,
-                                                                                   ImageAsset.BitmapCallback,
                                                                                    AccentColorObserver,
                                                                                    TextMessageLinkTextView.Callback {
 
@@ -110,7 +110,24 @@ public class YouTubeMessageViewController extends MessageViewController implemen
             if (loadHandle != null) {
                 loadHandle.cancel();
             }
-            loadHandle = imageAsset.getBitmap(getThumbnailWidth(), YouTubeMessageViewController.this);
+            loadHandle = imageAsset.getBitmap(getThumbnailWidth(), new BitmapCallback() {
+                @Override
+                public void onBitmapLoaded(final Bitmap bitmap) {
+                    if (bitmap == null ||
+                        imageView.getDrawable() != null) {
+                        return;
+                    }
+                    errorTextView.setVisibility(View.GONE);
+                    imageView.setImageBitmap(bitmap);
+                    imageView.setColorFilter(ColorUtils.injectAlpha(alphaOverlay, Color.BLACK), PorterDuff.Mode.DARKEN);
+                    ViewUtils.fadeInView(imageView);
+                }
+
+                @Override
+                public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
+                    showError();
+                }
+            });
         }
     };
 
@@ -263,24 +280,6 @@ public class YouTubeMessageViewController extends MessageViewController implemen
         }
         glyphTextView.setText(context.getString(R.string.glyph__movie));
         glyphTextView.setTextColor(context.getResources().getColor(R.color.content__youtube__error_indicator__color));
-    }
-
-    @Override
-    public void onBitmapLoaded(final Bitmap bitmap, boolean isPreview) {
-        if (bitmap == null ||
-            imageView.getDrawable() != null ||
-            isPreview) {
-            return;
-        }
-        errorTextView.setVisibility(View.GONE);
-        imageView.setImageBitmap(bitmap);
-        imageView.setColorFilter(ColorUtils.injectAlpha(alphaOverlay, Color.BLACK), PorterDuff.Mode.DARKEN);
-        ViewUtils.fadeInView(imageView);
-    }
-
-    @Override
-    public void onBitmapLoadingFailed() {
-        showError();
     }
 
     private int getThumbnailWidth() {

@@ -29,14 +29,15 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import com.waz.api.BitmapCallback;
 import com.waz.api.ImageAsset;
 import com.waz.api.LoadHandle;
 import com.waz.api.UpdateListener;
 import com.waz.api.User;
 import com.waz.zclient.R;
+import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.ui.utils.TypefaceUtils;
-import com.waz.zclient.ui.text.TypefaceTextView;
 import timber.log.Timber;
 
 public class ChatheadImageView extends FrameLayout implements UpdateListener {
@@ -207,16 +208,16 @@ public class ChatheadImageView extends FrameLayout implements UpdateListener {
             handle.cancel();
         }
 
-        handle = imageAsset.getRoundBitmap(imageView.getMeasuredWidth(), 0, DEFAULT_COLOR, new ImageAsset.BitmapCallback() {
+        handle = imageAsset.getRoundBitmap(imageView.getMeasuredWidth(), 0, DEFAULT_COLOR, new BitmapCallback() {
             @Override
-            public void onBitmapLoaded(Bitmap bitmap, boolean b) {
+            public void onBitmapLoaded(Bitmap bitmap) {
                 setState(ChatHeadState.BITMAP_LOADED);
                 imageView.setImageBitmap(bitmap);
             }
 
             @Override
-            public void onBitmapLoadingFailed() {
-                Timber.e("Loading of bitmap in failed");
+            public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
+                Timber.e("Loading of bitmap in failed: %s", reason);
             }
         });
     }

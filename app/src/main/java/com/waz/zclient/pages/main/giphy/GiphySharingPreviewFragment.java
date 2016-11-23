@@ -155,8 +155,6 @@ public class GiphySharingPreviewFragment extends BaseFragment<GiphySharingPrevie
         giphySearchEditText.addTextChangedListener(this);
         giphySearchEditText.setText(searchTerm);
 
-        previewImageAssetView.setShowPreview(true);
-
         giphyGridViewAdapter = new GiphyGridViewAdapter(getActivity());
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(giphyGridViewAdapter);
