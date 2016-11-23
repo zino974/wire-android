@@ -59,7 +59,7 @@
         android:layout_marginStart="@dimen/content__padding_left"
         android:layout_marginEnd="@dimen/content__padding_right"
         android:orientation="horizontal"
-        android:background="@drawable/shape_audio_message_background"
+        android:background="@drawable/shape_asset_message_background"
         >
 
         <com.waz.zclient.views.AssetActionButton

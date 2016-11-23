@@ -217,7 +217,7 @@ public class ChatheadImageView extends FrameLayout implements UpdateListener {
 
             @Override
             public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
-                Timber.e("Loading of bitmap in failed");
+                Timber.e("Loading of bitmap in failed: %s", reason);
             }
         });
     }

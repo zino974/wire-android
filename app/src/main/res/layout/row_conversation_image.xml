@@ -44,7 +44,6 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_gravity="left"
-                android:layout_marginBottom="@dimen/content__image__polka__loading_bar__total_height"
                 android:adjustViewBounds="false"
                 android:background="@null"
                 android:scaleType="fitXY"
@@ -56,9 +55,8 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_gravity="left"
-                android:layout_marginBottom="@dimen/content__image__polka__loading_bar__total_height"
                 android:adjustViewBounds="false"
-                android:background="@drawable/shape_audio_message_background"
+                android:background="@drawable/shape_asset_message_background"
                 android:scaleType="fitXY"
                 android:visibility="gone"
                 />

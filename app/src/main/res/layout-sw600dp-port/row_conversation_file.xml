@@ -59,7 +59,7 @@
         android:layout_height="@dimen/content__audio_message__view_height"
         android:layout_gravity="center"
         android:orientation="horizontal"
-        android:background="@drawable/shape_audio_message_background"
+        android:background="@drawable/shape_asset_message_background"
         android:baselineAligned="false"
         >
 

@@ -66,7 +66,7 @@ public class ImageAssetView extends ImageView implements UpdateListener {
 
         @Override
         public void onBitmapLoadingFailed(BitmapLoadingFailed reason) {
-            logBitmapLoadError();
+            logBitmapLoadError(reason);
             clearImage();
             if (bitmapLoadedCallback != null) {
                 bitmapLoadedCallback.onBitmapLoadFinished(false);
@@ -181,11 +181,12 @@ public class ImageAssetView extends ImageView implements UpdateListener {
         }
     }
 
-    private void logBitmapLoadError() {
-        Timber.e("ImageAssetView %s :: failed loading bitmap for %s id=%s",
+    private void logBitmapLoadError(BitmapCallback.BitmapLoadingFailed reason) {
+        Timber.e("ImageAssetView %s :: failed loading bitmap for %s id=%s, reason: %s",
                  this,
                  imageAsset,
-                 imageAsset != null ? imageAsset.getId() : null);
+                 imageAsset != null ? imageAsset.getId() : null,
+                 reason);
     }
 
     private void cancelPreviousBitmapLoad() {
