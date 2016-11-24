@@ -1066,6 +1066,11 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
     }
 
     @Override
+    public void onIgnoredConnectRequest(IConversation conversation) {
+
+    }
+
+    @Override
     public void onAcceptedPendingOutgoingConnectRequest(IConversation conversation) {
 
     }

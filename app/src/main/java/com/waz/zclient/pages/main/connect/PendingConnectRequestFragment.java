@@ -375,6 +375,7 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
                     user.ignoreConnection();
                     getContainer().dismissUserProfile();
                 }
+                getContainer().onIgnoredConnectRequest(conversation);
             }
         });
 
@@ -543,6 +544,8 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
 
     public interface Container extends UserProfileContainer {
         void onAcceptedConnectRequest(IConversation conversation);
+
+        void onIgnoredConnectRequest(IConversation conversation);
 
         void showOptionsMenu(User user);
 
