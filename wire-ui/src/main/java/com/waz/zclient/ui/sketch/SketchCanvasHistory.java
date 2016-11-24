@@ -27,7 +27,7 @@ import java.util.List;
 
 class SketchCanvasHistory {
 
-    private LinkedList<HistoryItem> historyItems; //NOPMD
+    private final LinkedList<HistoryItem> historyItems; //NOPMD
 
     SketchCanvasHistory() {
         historyItems = new LinkedList<>();
