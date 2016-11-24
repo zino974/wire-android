@@ -146,7 +146,7 @@ public class AudioMessageViewController extends MessageViewController implements
     private final View.OnClickListener actionButtonOnClickListener = new OnDoubleClickListener()  {
         @Override
         public void onDoubleClick() {
-            if (message.isEphemeral()) {
+            if (message == null || message.isEphemeral()) {
                 return;
             } else if (message.isLikedByThisUser()) {
                 message.unlike();
@@ -221,8 +221,8 @@ public class AudioMessageViewController extends MessageViewController implements
         if (!messageViewsContainer.isTornDown()) {
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
-        ephemeralDotAnimationView.setMessage(null);
         containerOnClickListener.reset();
+        ephemeralDotAnimationView.setMessage(null);
         messageModelObserver.clear();
         playbackControlsModelObserver.clear();
         assetModelObserver.clear();

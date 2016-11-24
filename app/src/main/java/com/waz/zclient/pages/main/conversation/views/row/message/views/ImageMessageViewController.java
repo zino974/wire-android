@@ -78,7 +78,7 @@ public class ImageMessageViewController extends MessageViewController implements
     private final OnDoubleClickListener containerOnDoubleClickListener = new OnDoubleClickListener() {
         @Override
         public void onDoubleClick() {
-            if (message.isEphemeral()) {
+            if (message == null || message.isEphemeral()) {
                 return;
             } else if (message.isLikedByThisUser()) {
                 message.unlike();
@@ -96,6 +96,9 @@ public class ImageMessageViewController extends MessageViewController implements
 
         @Override
         public void onSingleClick() {
+            if (message == null) {
+                return;
+            }
             boolean shouldOpenTapButtons = false;
             if (footerActionCallback != null) {
                 boolean footerVisible = footerActionCallback.toggleVisibility();
@@ -338,8 +341,8 @@ public class ImageMessageViewController extends MessageViewController implements
             messageViewsContainer.getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
         }
         messageModelObserver.clear();
-        ephemeralDotAnimationView.setMessage(null);
         containerOnDoubleClickListener.reset();
+        ephemeralDotAnimationView.setMessage(null);
         gifImageView.animate().cancel();
         imageActionContainer.setVisibility(View.GONE);
         gifImageView.setVisibility(View.INVISIBLE);
