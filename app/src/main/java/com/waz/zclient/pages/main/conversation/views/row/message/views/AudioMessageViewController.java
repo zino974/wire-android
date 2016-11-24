@@ -281,7 +281,8 @@ public class AudioMessageViewController extends MessageViewController implements
 
     public void onActionClick() {
         if (messageViewsContainer == null ||
-            messageViewsContainer.isTornDown()) {
+            messageViewsContainer.isTornDown() ||
+            asset == null) {
             return;
         }
         switch (asset.getStatus()) {
