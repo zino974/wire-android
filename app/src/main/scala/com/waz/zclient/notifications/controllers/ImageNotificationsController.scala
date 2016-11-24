@@ -21,12 +21,15 @@ import android.app.NotificationManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.support.v4.app.NotificationCompat
+import com.waz.ZLog._
+import com.waz.bitmap.BitmapUtils
 import com.waz.model.{AssetData, AssetId}
 import com.waz.service.ZMessaging
 import com.waz.service.assets.AssetService.BitmapResult
 import com.waz.service.images.BitmapSignal
 import com.waz.threading.Threading
 import com.waz.ui.MemoryImageCache.BitmapRequest.Single
+import com.waz.utils.LoggedTry
 import com.waz.utils.events.Signal
 import com.waz.zclient.{Injectable, Injector, R, WireContext}
 import com.waz.zclient.utils.ContextUtils._
@@ -76,20 +79,29 @@ class ImageNotificationsController(cxt: WireContext)(implicit inj: Injector) ext
       .bigPicture(bitmap)
       .setSummaryText(summaryText)
 
-    val notification = new NotificationCompat.Builder(cxt)
+    val builder = new NotificationCompat.Builder(cxt)
       .setContentTitle(notificationTitle)
       .setContentText(summaryText)
       .setSmallIcon(R.drawable.ic_menu_save_image_gallery)
-      .setLargeIcon(bitmap)
+      .setLargeIcon(BitmapUtils.cropRect(bitmap, toPx(largeIconSizeDp)))
       .setStyle(notificationStyle)
       .setContentIntent(getGalleryIntent(cxt, uri))
       .addAction(R.drawable.ic_menu_share, getString(R.string.notification__image_saving__action__share), getPendingShareIntent(cxt, uri)).setLocalOnly(true).setAutoCancel(true)
-      .build
 
-    notManager.notify(ZETA_SAVE_IMAGE_NOTIFICATION_ID, notification)
+    def showNotification() = notManager.notify(ZETA_SAVE_IMAGE_NOTIFICATION_ID, builder.build())
+
+    LoggedTry(showNotification()).recover { case e =>
+      error(s"Notify failed: try without bitmap. Error: $e")
+      builder.setLargeIcon(null)
+      try showNotification()
+      catch {
+        case e: Throwable => error("second display attempt failed, aborting")
+      }
+    }
   }
 }
 
 object ImageNotificationsController {
+  val largeIconSizeDp = 64
   val ZETA_SAVE_IMAGE_NOTIFICATION_ID: Int = 1339274
 }

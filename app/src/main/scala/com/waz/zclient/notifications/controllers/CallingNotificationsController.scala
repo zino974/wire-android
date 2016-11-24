@@ -20,6 +20,8 @@ package com.waz.zclient.notifications.controllers
 import android.app.{Notification, NotificationManager, PendingIntent}
 import android.content.Intent
 import android.support.v4.app.NotificationCompat
+import com.waz.ZLog.ImplicitTag._
+import com.waz.ZLog.error
 import com.waz.api.VoiceChannelState._
 import com.waz.api.{KindOfCall, VoiceChannelState}
 import com.waz.bitmap.BitmapUtils
@@ -30,6 +32,7 @@ import com.waz.service.assets.AssetService.BitmapResult.BitmapLoaded
 import com.waz.service.images.BitmapSignal
 import com.waz.threading.Threading
 import com.waz.ui.MemoryImageCache.BitmapRequest.Regular
+import com.waz.utils.LoggedTry
 import com.waz.utils.events.Signal
 import com.waz.zclient.calling.controllers.GlobalCallingController
 import com.waz.zclient.utils.ContextUtils._
@@ -118,11 +121,24 @@ class CallingNotificationsController(cxt: WireContext)(implicit inj: Injector) e
         case _ => //no available action
       }
 
+      def buildNotification = {
+        val notification = builder.build
+        notification.priority = Notification.PRIORITY_MAX
+        if (data.ongoing) notification.flags |= Notification.FLAG_NO_CLEAR
+        notification
+      }
 
-      val notification = builder.build
-      notification.priority = Notification.PRIORITY_MAX
-      if (data.ongoing) notification.flags |= Notification.FLAG_NO_CLEAR
-      notificationManager.notify(if (data.ongoing) ZETA_CALL_ONGOING_NOTIFICATION_ID else ZETA_CALL_INCOMING_NOTIFICATION_ID, notification)
+      def showNotification() =
+        notificationManager.notify(if (data.ongoing) ZETA_CALL_ONGOING_NOTIFICATION_ID else ZETA_CALL_INCOMING_NOTIFICATION_ID, buildNotification)
+
+      LoggedTry(showNotification()).recover { case e =>
+        error(s"Notify failed: try without bitmap. Error: $e")
+        builder.setLargeIcon(null)
+        try showNotification()
+        catch {
+          case e: Throwable => error("second display attempt failed, aborting")
+        }
+      }
   }
 
   private def getCallStateMessage(state: VoiceChannelState, isVideoCall: Boolean): String = state match {
