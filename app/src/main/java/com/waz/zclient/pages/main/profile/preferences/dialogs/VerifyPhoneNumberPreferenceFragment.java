@@ -186,7 +186,6 @@ public class VerifyPhoneNumberPreferenceFragment extends BaseDialogFragment<Veri
             textBox.addTextChangedListener(new OnTextChangedListener() {
                 @Override
                 public void afterTextChanged(Editable s) {
-                    verificationCodeInputLayout.setError(null);
                     final String val = textBox.getText().toString().trim();
                     final char c;
                     if (TextUtils.isEmpty(val)) {

@@ -61,7 +61,7 @@ public class DrawingCanvasView extends View {
     private String emoji;
     private boolean drawEmoji;
 
-    SketchCanvasHistory canvasHistory;
+    private final SketchCanvasHistory canvasHistory;
 
     public enum Mode {
         SKETCH,
@@ -80,6 +80,7 @@ public class DrawingCanvasView extends View {
 
     public DrawingCanvasView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        canvasHistory = new SketchCanvasHistory();
         init();
     }
 
@@ -99,7 +100,6 @@ public class DrawingCanvasView extends View {
         emojiPaint.setStrokeWidth(1);
         emoji = null;
         currentMode = Mode.SKETCH;
-        canvasHistory = new SketchCanvasHistory();
 
         trimBuffer = getResources().getDimensionPixelSize(R.dimen.draw_image_trim_buffer);
     }
@@ -501,7 +501,6 @@ public class DrawingCanvasView extends View {
         canvas = null;
         if (canvasHistory != null) {
             canvasHistory.clear();
-            canvasHistory = null;
         }
     }
 }

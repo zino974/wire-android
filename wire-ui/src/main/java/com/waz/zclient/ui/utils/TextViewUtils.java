@@ -73,7 +73,14 @@ public class TextViewUtils {
             return string;
         }
 
-        SpannableString colorSpannable = new SpannableString(string.replaceAll("_", ""));
+        StringBuilder stringBuilder = new StringBuilder(string.substring(0, highlightStart));
+        stringBuilder.append(string.substring(highlightStart + 1, highlightEnd));
+        if (highlightEnd < string.length() - 1) {
+            stringBuilder.append(string.substring(highlightEnd + 1, string.length()));
+        }
+
+
+        SpannableString colorSpannable = new SpannableString(stringBuilder.toString());
         colorSpannable.setSpan(new ForegroundColorSpan(highlightColor),
                                highlightStart,
                                highlightEnd,
@@ -222,9 +229,9 @@ public class TextViewUtils {
         str.setSpan(linkSpan, highlightStart, highlightEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         if (bold) {
             str.setSpan(new CustomTypefaceSpan("", textView.getResources().getString(R.string.wire__typeface__medium)),
-                                    highlightStart,
-                                    highlightEnd,
-                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        highlightStart,
+                        highlightEnd,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         textView.setText(str);
     }
