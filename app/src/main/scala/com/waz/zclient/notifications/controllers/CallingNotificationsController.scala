@@ -20,8 +20,7 @@ package com.waz.zclient.notifications.controllers
 import android.app.{Notification, NotificationManager, PendingIntent}
 import android.content.Intent
 import android.support.v4.app.NotificationCompat
-import com.waz.ZLog.ImplicitTag._
-import com.waz.ZLog.error
+import com.waz.ZLog._
 import com.waz.api.VoiceChannelState._
 import com.waz.api.{KindOfCall, VoiceChannelState}
 import com.waz.bitmap.BitmapUtils
@@ -167,4 +166,5 @@ object CallingNotificationsController {
   val JoinRequestCode = 8912
   val LeaveRequestCode = 8913
   val SilenceRequestCode = 8914
+  private implicit val tag: LogTag = logTagFor[CallingNotificationsController]
 }

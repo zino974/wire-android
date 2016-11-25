@@ -104,4 +104,5 @@ class ImageNotificationsController(cxt: WireContext)(implicit inj: Injector) ext
 object ImageNotificationsController {
   val largeIconSizeDp = 64
   val ZETA_SAVE_IMAGE_NOTIFICATION_ID: Int = 1339274
+  private implicit val tag: LogTag = logTagFor[ImageNotificationsController]
 }
