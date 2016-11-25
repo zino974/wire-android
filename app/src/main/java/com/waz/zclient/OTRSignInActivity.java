@@ -33,8 +33,6 @@ public class OTRSignInActivity  extends BaseActivity implements OTREmailSignInFr
     private static final String HTTP_PREFIX = "http://";
 
     private LoadingIndicatorView progressView;
-    private boolean isOverlayEnabled;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,8 +66,6 @@ public class OTRSignInActivity  extends BaseActivity implements OTREmailSignInFr
 
     @Override
     public void enableProgress(boolean enabled) {
-        isOverlayEnabled = enabled;
-
         if (enabled) {
             progressView.show(LoadingIndicatorView.SPINNER_WITH_DIMMED_BACKGROUND, true);
         } else {

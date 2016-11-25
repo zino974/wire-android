@@ -17,6 +17,7 @@
  */
 package com.waz.zclient;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -35,6 +36,7 @@ import com.waz.api.Self;
 import com.waz.zclient.controllers.navigation.NavigationControllerObserver;
 import com.waz.zclient.controllers.navigation.Page;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
+import com.waz.zclient.controllers.userpreferences.UserPreferencesController;
 import com.waz.zclient.core.api.scala.AppEntryStore;
 import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
 import com.waz.zclient.core.controllers.tracking.attributes.RegistrationEventContext;
@@ -63,9 +65,11 @@ import com.waz.zclient.newreg.fragments.WelcomeEmailFragment;
 import com.waz.zclient.newreg.fragments.country.CountryController;
 import com.waz.zclient.newreg.fragments.country.CountryDialogFragment;
 import com.waz.zclient.ui.utils.KeyboardUtils;
+import com.waz.zclient.utils.HockeyCrashReporting;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.utils.ZTimeFormatter;
 import com.waz.zclient.views.LoadingIndicatorView;
+import net.hockeyapp.android.NativeCrashManager;
 import timber.log.Timber;
 
 import static com.waz.zclient.newreg.fragments.SignUpPhotoFragment.UNSPLASH_API_URL;
@@ -176,6 +180,24 @@ public class AppEntryActivity extends BaseActivity implements VerifyPhoneFragmen
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        final boolean trackingEnabled = getSharedPreferences(UserPreferencesController.USER_PREFS_TAG, Context.MODE_PRIVATE)
+            .getBoolean(getString(R.string.pref_advanced_analytics_enabled_key), true);
+
+        if (trackingEnabled) {
+            HockeyCrashReporting.checkForCrashes(getApplicationContext(),
+                                                 getControllerFactory().getUserPreferencesController().getDeviceId(),
+                                                 getControllerFactory().getTrackingController());
+        } else {
+            HockeyCrashReporting.deleteCrashReports(getApplicationContext());
+            NativeCrashManager.deleteDumpFiles(getApplicationContext());
+        }
+        getControllerFactory().getTrackingController().appResumed();
+
+    }
+
+    @Override
     protected void onPostResume() {
         super.onPostResume();
         if (isPaused) {
@@ -186,6 +208,7 @@ public class AppEntryActivity extends BaseActivity implements VerifyPhoneFragmen
 
     @Override
     protected void onPause() {
+        getControllerFactory().getTrackingController().appPaused();
         isPaused = true;
         super.onPause();
     }
