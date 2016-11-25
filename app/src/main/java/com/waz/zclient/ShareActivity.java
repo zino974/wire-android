@@ -32,11 +32,15 @@ import com.waz.zclient.controllers.confirmation.TwoButtonConfirmationCallback;
 import com.waz.zclient.controllers.sharing.SharedContentType;
 import com.waz.zclient.core.stores.api.ZMessagingApiStoreObserver;
 import com.waz.zclient.pages.main.sharing.SharingConversationListManagerFragment;
+import com.waz.zclient.utils.AssetUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.menus.ConfirmationMenu;
+import timber.log.Timber;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ShareActivity extends BaseActivity implements SharingConversationListManagerFragment.Container,
@@ -185,7 +189,18 @@ public class ShareActivity extends BaseActivity implements SharingConversationLi
                 contentType = SharedContentType.FILE;
             }
             getControllerFactory().getSharingController().setSharedContentType(contentType);
-            getControllerFactory().getSharingController().setSharedUris(new ArrayList<>(sharedFileUris));
+            List<Uri> sanitisedUris = new ArrayList<>();
+            for (Uri uri : sharedFileUris) {
+                String path = AssetUtils.getPath(getApplicationContext(), uri);
+                if (path == null) {
+                    Timber.e("Something went wrong, unable to retrieve path");
+                    sanitisedUris.add(uri);
+                } else {
+                    sanitisedUris.add(Uri.fromFile(new File(path)));
+                }
+            }
+            getControllerFactory().getSharingController().setSharedUris(sanitisedUris);
+
         }
     }
 

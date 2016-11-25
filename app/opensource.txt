@@ -19,3 +19,4 @@ Retrofit - https://github.com/square/retrofit - Apache License, Version 2.0
 OkHttp - https://github.com/square/okhttp - Apache License, Version 2.0
 Spotify Web API for Android - https://github.com/kaaes/spotify-web-api-android - MIT
 Material Preference - https://github.com/consp1racy/android-support-preference - Apache 2.0
+https://github.com/iPaulPro/aFileChooser - Apache License, Version 2.0
