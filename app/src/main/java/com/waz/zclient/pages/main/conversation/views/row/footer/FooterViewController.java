@@ -229,7 +229,7 @@ public class FooterViewController implements ConversationItemViewController,
         likeButton.setTag(likedByThisUser);
         if (message.isLiked() && likeButton.getVisibility() == View.GONE && shouldShowLikeButton()) {
             likeButton.setVisibility(View.VISIBLE);
-        } else if (message.isEphemeral()) {
+        } else if (message.isEphemeral() || message.getMessageType() == Message.Type.MISSED_CALL) {
             likeButton.setVisibility(View.GONE);
         }
         if (showLikeAnimation) {
@@ -259,7 +259,7 @@ public class FooterViewController implements ConversationItemViewController,
             }
             linkHighlightColor = container.getControllerFactory().getAccentColorController().getColor();
             linkUnderlined = false;
-        } else if (message.getUser().isMe()) {
+        } else if (message.getUser().isMe() && message.getMessageType() != Message.Type.MISSED_CALL) {
             switch (message.getMessageStatus()) {
                 case PENDING:
                     status = context.getString(R.string.message_footer__status__sending);
@@ -550,6 +550,7 @@ public class FooterViewController implements ConversationItemViewController,
         return !message.isEphemeral() &&
                !(message.getMessageStatus() == Message.Status.FAILED ||
                  message.getMessageStatus() == Message.Status.FAILED_READ ||
-                 message.getMessageStatus() == Message.Status.PENDING);
+                 message.getMessageStatus() == Message.Status.PENDING) &&
+               (message.getMessageType() != Message.Type.MISSED_CALL);
     }
 }

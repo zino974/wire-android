@@ -40,6 +40,7 @@ public class FooterViewControllerFactory {
             case AUDIO_ASSET:
             case ANY_ASSET:
             case ASSET:
+            case MISSED_CALL:
                 return true;
             default:
                 return false;

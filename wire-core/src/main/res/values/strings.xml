@@ -924,6 +924,7 @@
     <string name="conversation_list__label_action__contacts">CONTACTS</string>
     <string name="conversation_list__hint_header">Conversations start here</string>
     <string name="conversation_list__hint_text">Start a conversation or invite more people to join. Call, message and share in private or with groups.</string>
+    <string name="conversation_list__action_join_call">JOIN</string>
 
     <!-- Conversation Toolbar -->
     <string name="conversation_toolbar__call_video">Video call</string>

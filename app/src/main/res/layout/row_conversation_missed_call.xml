@@ -20,7 +20,6 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="horizontal"
@@ -32,36 +31,15 @@
         android:layout_height="wrap_content"
         >
 
-        <FrameLayout
-            android:layout_width="@dimen/wire__call_indicator__large__width"
-            android:layout_height="@dimen/wire__call_indicator__large__width"
-            android:layout_marginEnd="@dimen/row_conversation__missed_call__margin"
+        <com.waz.zclient.ui.text.GlyphTextView
+            android:id="@+id/gtv__row_conversation__missed_call__icon"
+            android:layout_width="@dimen/row_conversation__missed_call__icon_size"
+            android:layout_height="@dimen/row_conversation__missed_call__icon_size"
             android:layout_gravity="end"
-            tools:ignore="UselessParent"
-            >
-
-            <com.waz.zclient.views.calling.StaticCallingIndicator
-                android:id="@+id/sci__conversation__missed_call__image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-
-                app:innerOpacity="@integer/wire__call_indicator__inner_opacity"
-                app:innerRadius="@dimen/wire__call_indicator__large__inner_radius"
-                app:middleOpacity="@integer/wire__call_indicator__missed_or_ongoing__middle_opacity"
-                app:middleRadius="@dimen/wire__call_indicator__large__middle_radius"
-                app:outerOpacity="@integer/wire__call_indicator__missed_or_ongoing__outer_opacity"
-                app:outerRadius="@dimen/wire__call_indicator__large__outer_radius"
-                />
-
-            <com.waz.zclient.views.chathead.ChatheadImageView
-                android:id="@+id/civ__row_conversation__missed_call_chathead"
-                android:layout_width="@dimen/content__separator__chathead__size"
-                android:layout_height="@dimen/content__separator__chathead__size"
-                android:layout_gravity="center"
-                />
-
-        </FrameLayout>
-
+            android:layout_marginEnd="@dimen/chathead__margin"
+            android:gravity="center"
+            android:textSize="@dimen/row_conversation__missed_call__icon_text_size"
+            />
 
     </FrameLayout>
 

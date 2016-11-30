@@ -32,14 +32,15 @@ import com.waz.api.ConversationsList;
 import com.waz.api.CoreList;
 import com.waz.api.IConversation;
 import com.waz.zclient.R;
-import com.waz.zclient.core.stores.network.INetworkStore;
 import com.waz.zclient.controllers.streammediaplayer.IStreamMediaPlayerController;
 import com.waz.zclient.core.stores.connect.InboxLinkConversation;
+import com.waz.zclient.core.stores.network.INetworkStore;
 import com.waz.zclient.pages.main.conversation.ConversationUtils;
 import com.waz.zclient.pages.main.conversationlist.views.ConversationCallback;
 import com.waz.zclient.pages.main.conversationlist.views.listview.SwipeListView;
 import com.waz.zclient.pages.main.conversationlist.views.row.ConversationListArchivedBorderRow;
 import com.waz.zclient.pages.main.conversationlist.views.row.ConversationListRow;
+import com.waz.zclient.pages.main.conversationlist.views.row.RightIndicatorView;
 import com.waz.zclient.ui.animation.interpolators.penner.Expo;
 import com.waz.zclient.ui.animation.interpolators.penner.Quart;
 import com.waz.zclient.utils.ViewUtils;
@@ -78,6 +79,7 @@ public class ConversationListAdapter extends BaseAdapter {
 
     private IStreamMediaPlayerController streamMediaPlayerController;
     private INetworkStore networkStore;
+    private RightIndicatorView.ConversationActionCallback conversationActionCallback;
 
     private ConversationCallback conversationCallback;
 
@@ -218,6 +220,10 @@ public class ConversationListAdapter extends BaseAdapter {
         this.streamMediaPlayerController = streamMediaPlayerController;
     }
 
+    public void setConversationActionCallback(RightIndicatorView.ConversationActionCallback conversationActionCallback) {
+        this.conversationActionCallback = conversationActionCallback;
+    }
+
     public void setNetworkStore(INetworkStore networkStore) {
         this.networkStore = networkStore;
     }
@@ -338,6 +344,7 @@ public class ConversationListAdapter extends BaseAdapter {
         if (convertView == null || !(convertView instanceof ConversationListRow)) {
             conversationListRowItem = new ConversationListRow(parent.getContext());
             conversationListRowItem.setStreamMediaPlayerController(streamMediaPlayerController);
+            conversationListRowItem.setConversationActionCallback(conversationActionCallback);
             conversationListRowItem.setNetworkStore(networkStore);
         } else {
             conversationListRowItem = (ConversationListRow) convertView;
@@ -346,6 +353,7 @@ public class ConversationListAdapter extends BaseAdapter {
             if (conversationListRowItem.needsRedraw()) {
                 conversationListRowItem = new ConversationListRow(parent.getContext());
                 conversationListRowItem.setStreamMediaPlayerController(streamMediaPlayerController);
+                conversationListRowItem.setConversationActionCallback(conversationActionCallback);
                 conversationListRowItem.setNetworkStore(networkStore);
             }
         }

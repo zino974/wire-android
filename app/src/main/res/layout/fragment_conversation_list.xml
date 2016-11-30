@@ -57,12 +57,6 @@
             app:font="@string/wire__typeface__light" />
     </LinearLayout>
 
-    <com.waz.zclient.views.PebbleView
-        android:id="@+id/pv__conv_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
