@@ -517,16 +517,6 @@ public class CircularSeekBar extends RoundedImageView {
         this.onArtLongClickListener = onArtLongClickListener;
     }
 
-    public boolean isShowPointer() {
-        return showPointer;
-    }
-
-    public void setShowPointer(boolean showPointer) {
-        this.showPointer = showPointer;
-        requestLayout();
-        invalidate();
-    }
-
     /**
      * Initializes the {@code Paint} objects with the appropriate styles.
      */
@@ -756,14 +746,6 @@ public class CircularSeekBar extends RoundedImageView {
         }
 
         recalculateAll();
-    }
-
-    public boolean isLockEnabled() {
-        return lockEnabled;
-    }
-
-    public void setLockEnabled(boolean lockEnabled) {
-        this.lockEnabled = lockEnabled;
     }
 
     @Override
@@ -1028,15 +1010,6 @@ public class CircularSeekBar extends RoundedImageView {
     }
 
     /**
-     * Gets the circle color.
-     *
-     * @return An integer color value for the circle
-     */
-    public int getCircleColor() {
-        return circleColor;
-    }
-
-    /**
      * Sets the circle color.
      *
      * @param color the color of the circle
@@ -1048,15 +1021,6 @@ public class CircularSeekBar extends RoundedImageView {
     }
 
     /**
-     * Gets the circle progress color.
-     *
-     * @return An integer color value for the circle progress
-     */
-    public int getCircleProgressColor() {
-        return circleProgressColor;
-    }
-
-    /**
      * Sets the circle progress color.
      *
      * @param color the color of the circle progress
@@ -1064,108 +1028,6 @@ public class CircularSeekBar extends RoundedImageView {
     public void setCircleProgressColor(int color) {
         circleProgressColor = color;
         circleProgressPaint.setColor(circleProgressColor);
-        invalidate();
-    }
-
-    /**
-     * Gets the pointer color.
-     *
-     * @return An integer color value for the pointer
-     */
-    public int getPointerColor() {
-        return pointerColor;
-    }
-
-    /**
-     * Sets the pointer color.
-     *
-     * @param color the color of the pointer
-     */
-    public void setPointerColor(int color) {
-        pointerColor = color;
-        pointerPaint.setColor(pointerColor);
-        invalidate();
-    }
-
-    /**
-     * Gets the pointer halo color.
-     *
-     * @return An integer color value for the pointer halo
-     */
-    public int getPointerHaloColor() {
-        return pointerHaloColor;
-    }
-
-    /**
-     * Sets the pointer halo color.
-     *
-     * @param color the color of the pointer halo
-     */
-    public void setPointerHaloColor(int color) {
-        pointerHaloColor = color;
-        pointerHaloPaint.setColor(pointerHaloColor);
-        invalidate();
-    }
-
-    /**
-     * Gets the pointer alpha value.
-     *
-     * @return An integer alpha value for the pointer (0..255)
-     */
-    public int getPointerAlpha() {
-        return pointerAlpha;
-    }
-
-    /**
-     * Sets the pointer alpha.
-     *
-     * @param alpha the alpha of the pointer
-     */
-    public void setPointerAlpha(int alpha) {
-        if (alpha >= 0 && alpha <= 255) {
-            pointerAlpha = alpha;
-            pointerHaloPaint.setAlpha(pointerAlpha);
-            invalidate();
-        }
-    }
-
-    /**
-     * Gets the pointer alpha value when touched.
-     *
-     * @return An integer alpha value for the pointer (0..255) when touched
-     */
-    public int getPointerAlphaOnTouch() {
-        return pointerAlphaOnTouch;
-    }
-
-    /**
-     * Sets the pointer alpha when touched.
-     *
-     * @param alpha the alpha of the pointer (0..255) when touched
-     */
-    public void setPointerAlphaOnTouch(int alpha) {
-        if (alpha >= 0 && alpha <= 255) {
-            pointerAlphaOnTouch = alpha;
-        }
-    }
-
-    /**
-     * Gets the circle fill color.
-     *
-     * @return An integer color value for the circle fill
-     */
-    public int getCircleFillColor() {
-        return circleFillColor;
-    }
-
-    /**
-     * Sets the circle fill color.
-     *
-     * @param color the color of the circle fill
-     */
-    public void setCircleFillColor(int color) {
-        circleFillColor = color;
-        circleFillPaint.setColor(circleFillColor);
         invalidate();
     }
 
