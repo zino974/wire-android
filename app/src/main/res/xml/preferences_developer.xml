@@ -55,6 +55,13 @@
 
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="@string/pref_dev_gcm_enabled_key"
+        android:summary="@string/pref_dev_gcm_enabled_summary"
+        android:title="@string/pref_dev_gcm_enabled_title"
+        />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
         android:key="@string/pref_dev_assets_v3_key"
         android:title="@string/pref_dev_assets_v3_title"
         />
