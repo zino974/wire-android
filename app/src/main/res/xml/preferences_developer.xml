@@ -55,15 +55,32 @@
 
     <CheckBoxPreference
         android:defaultValue="false"
-        android:key="@string/pref_dev_gcm_enabled_key"
-        android:summary="@string/pref_dev_gcm_enabled_summary"
-        android:title="@string/pref_dev_gcm_enabled_title"
-        />
-
-    <CheckBoxPreference
-        android:defaultValue="false"
         android:key="@string/pref_dev_assets_v3_key"
         android:title="@string/pref_dev_assets_v3_title"
         />
+
+    <PreferenceCategory
+        android:key="@string/pref_dev_category_notifications_key"
+        android:title="@string/pref_dev_category_notifications_title"
+        >
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_dev_gcm_enabled_key"
+            android:summary="@string/pref_dev_gcm_enabled_summary"
+            android:title="@string/pref_dev_gcm_enabled_title"
+            />
+
+        <!--Default of 15 minutes (900000 millis)-->
+        <!--TODO - make a proper time picker preference-->
+        <EditTextPreference
+            android:defaultValue="900000"
+            android:inputType="number"
+            android:key="@string/pref_dev_websocket_ping_interval_key"
+            android:summary="@string/pref_dev_websocket_ping_interval_summary"
+            android:title="@string/pref_dev_websocket_ping_interval_title"
+            />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>
