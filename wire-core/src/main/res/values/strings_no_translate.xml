@@ -162,5 +162,16 @@
     <string translatable="false" name="pref_dev_assets_v3_key">@string/zms_assets_v3</string>
     <string translatable="false" name="pref_dev_assets_v3_title">Send assets using API v3</string>
 
+
+    <!--Notifications preferences-->
+    <string translatable="false" name="pref_dev_category_notifications_key">PREF_NOTIFICATIONS_CATEGORY</string>
+    <string translatable="false" name="pref_dev_category_notifications_title">Notifications</string>
+    <string translatable="false" name="pref_dev_gcm_enabled_key">@string/zms_gcm_enabled</string>
+    <string translatable="false" name="pref_dev_gcm_enabled_summary">Enable to receive notifications through GCM. Disable to rely on WebSockets only.</string>
+    <string translatable="false" name="pref_dev_gcm_enabled_title">GCM Enabled</string>
+    <string translatable="false" name="pref_dev_websocket_ping_interval_key">@string/zms_websocket_ping_interval</string>
+    <string translatable="false" name="pref_dev_websocket_ping_interval_summary">Change the frequency of checking the connection to the server. Note that increasing the frequency may have a negative impact on battery life.</string>
+    <string translatable="false" name="pref_dev_websocket_ping_interval_title">WebSocket Ping Frequency (ms)</string>
+
 </resources>
 
