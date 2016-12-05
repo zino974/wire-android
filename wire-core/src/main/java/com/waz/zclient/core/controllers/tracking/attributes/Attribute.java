@@ -97,7 +97,19 @@ public enum Attribute {
     // AN-4011: Temporary attributes
     REFERRAL_TOKEN("REFERRAL_TOKEN"),
     USER_TOKEN("USER_TOKEN"),
-    SKETCH_SOURCE("sketch_source")
+    SKETCH_SOURCE("sketch_source"),
+
+    DAY("day"),
+    MONTH("month"),
+    YEAR("year"),
+
+    GCM_SUCCESS("successful_gcm_notifications"),
+    GCM_FAILED("failed_gcm_notifications"),
+    GCM_RE_REGISTER("registration_retries"),
+    TOTAL_PINGS("total_pings"),
+    RECEIVED_PONGS("received_pongs"),
+    PING_INTERVAL("ping_interval")
+
     ;
 
 

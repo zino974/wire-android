@@ -25,6 +25,7 @@ import com.waz.api.KindOfTrackingEvent;
 import com.waz.api.TrackingEvent;
 import com.waz.api.TrackingEventsHandler;
 import com.waz.service.call.AvsMetrics;
+import com.waz.service.push.PushTrackingService;
 import com.waz.zclient.controllers.tracking.ITrackingController;
 import com.waz.zclient.controllers.tracking.events.calling.EndedCallAVSMetricsEvent;
 import com.waz.zclient.core.controllers.tracking.attributes.CompletedMediaType;
@@ -37,6 +38,7 @@ import com.waz.zclient.core.controllers.tracking.events.filetransfer.Successfull
 import com.waz.zclient.core.controllers.tracking.events.filetransfer.SuccessfullyUploadedFileEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.CompletedMediaActionEvent;
 import com.waz.zclient.core.controllers.tracking.events.media.SentPictureEvent;
+import com.waz.zclient.core.controllers.tracking.events.notifications.NotificationInformationEvent;
 import org.threeten.bp.Duration;
 import timber.log.Timber;
 
@@ -51,6 +53,11 @@ public class AppTrackingEventsHandler implements TrackingEventsHandler {
 
     public AppTrackingEventsHandler(ITrackingController trackingController) {
         this.trackingController = trackingController;
+    }
+
+    @Override
+    public void onNotificationsEvent(PushTrackingService.NotificationsEvent ev) {
+        trackingController.tagEvent(new NotificationInformationEvent(ev));
     }
 
     @Override
