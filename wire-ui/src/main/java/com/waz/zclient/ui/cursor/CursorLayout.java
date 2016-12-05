@@ -55,6 +55,7 @@ import com.waz.zclient.ui.views.OnDoubleClickListener;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -419,7 +420,7 @@ public class CursorLayout extends FrameLayout implements
     @Override
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_SEND ||
-            (actionId != EditorInfo.IME_ACTION_UNSPECIFIED &&
+            (newCursorEditText.getImeOptions() == EditorInfo.IME_ACTION_SEND &&
              event != null &&
              event.getKeyCode() == KeyEvent.KEYCODE_ENTER &&
              event.getAction() == KeyEvent.ACTION_DOWN)) {
