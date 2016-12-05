@@ -73,7 +73,7 @@ ext {
 
     audioVersion = System.getenv("AUDIO_VERSION") ?: '1.205.0@aar'
 
-    zMessagingDevVersionBase = '86.1305'
+    zMessagingDevVersionBase = '87.1308'
 
     zMessagingDevVersion = "${zMessagingDevVersionBase}@aar"
     // Release version number must be like this X.0(.Y)
