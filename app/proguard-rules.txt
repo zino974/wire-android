@@ -128,3 +128,8 @@
 -dontwarn com.coremedia.iso.boxes.**
 -dontwarn com.googlecode.mp4parser.authoring.tracks.mjpeg.**
 -dontwarn com.googlecode.mp4parser.authoring.tracks.ttml.**
+
+# Optimizations - careful here... ;)
+
+-assumenosideeffects public class net.hockeyapp.android.tasks.SendFeedbackTask { *; }
+-assumenosideeffects public class net.hockeyapp.android.FeedbackActivity { *; }
