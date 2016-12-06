@@ -31,8 +31,8 @@
 
         <com.waz.zclient.ui.text.GlyphTextView
             android:id="@+id/gtv__footer__like__button"
-            android:layout_width="@dimen/content__footer__like_icon__size"
-            android:layout_height="@dimen/content__footer__like_icon__size"
+            android:layout_width="@dimen/content__footer__like_icon__width"
+            android:layout_height="@dimen/content__footer__like_icon__height"
             android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="@dimen/chathead__margin"
             android:gravity="center"
@@ -42,8 +42,8 @@
 
         <com.waz.zclient.ui.text.GlyphTextView
             android:id="@+id/gtv__footer__like__button_animation"
-            android:layout_width="@dimen/content__footer__like_icon__size"
-            android:layout_height="@dimen/content__footer__like_icon__size"
+            android:layout_width="@dimen/content__footer__like_icon__width"
+            android:layout_height="@dimen/content__footer__like_icon__height"
             android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="@dimen/chathead__margin"
             android:gravity="center"

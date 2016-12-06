@@ -171,20 +171,6 @@
         <attr name="pendingDuration" format="integer"/>
     </declare-styleable>
 
-    <declare-styleable name="CallingIndicator">
-        <attr name="outerOpacity" format="integer"/>
-        <attr name="outerRadius" format="dimension"/>
-        <attr name="middleOpacity" format="integer"/>
-        <attr name="middleRadius" format="dimension"/>
-        <attr name="innerOpacity" format="integer"/>
-        <attr name="innerRadius" format="dimension"/>
-    </declare-styleable>
-    <declare-styleable name="CallingButtonCircleView">
-        <attr name="cbcvRadius1" format="dimension" />
-        <attr name="cbcvRadius2" format="dimension" />
-        <attr name="cbcvRadius3" format="dimension" />
-    </declare-styleable>
-
     <declare-styleable name="CursorLayout">
         <attr name="anchor1" format="dimension" />
         <attr name="anchor2" format="dimension" />

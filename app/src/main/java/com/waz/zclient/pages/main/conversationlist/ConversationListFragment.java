@@ -67,6 +67,7 @@ import com.waz.zclient.pages.main.conversationlist.views.ConversationCallback;
 import com.waz.zclient.pages.main.conversationlist.views.ListActionsView;
 import com.waz.zclient.pages.main.conversationlist.views.listview.SwipeListView;
 import com.waz.zclient.pages.main.conversationlist.views.row.ConversationListRow;
+import com.waz.zclient.pages.main.conversationlist.views.row.RightIndicatorView;
 import com.waz.zclient.pages.main.pickuser.controller.IPickUserController;
 import com.waz.zclient.pages.main.profile.ZetaPreferencesActivity;
 import com.waz.zclient.ui.pullforaction.PullForActionContainer;
@@ -75,7 +76,6 @@ import com.waz.zclient.ui.pullforaction.PullForActionMode;
 import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.ResourceUtils;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.views.PebbleView;
 import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.ExceptionHandler;
 
@@ -119,7 +119,6 @@ public class ConversationListFragment extends BaseFragment<ConversationListFragm
     private SwipeListView swipeListView;
     private int pebbleViewX;
 
-    private PebbleView pebbleView;
     private View hintContainer;
     private TypefaceTextView hintHeader;
     private ListActionsView listActionsView;
@@ -131,14 +130,6 @@ public class ConversationListFragment extends BaseFragment<ConversationListFragm
     private View layoutNoConversations;
 
     private final ConversationCallback conversationCallback = new ConversationCallback() {
-
-        @Override
-        public void startPinging(KnockingEvent knockingEvent, int y) {
-            if (pebbleView != null) {
-                pebbleView.setAccentColor(knockingEvent.getColor());
-                pebbleView.startShot(pebbleViewX, y);
-            }
-        }
 
         @Override
         public void onConversationListRowSwiped(IConversation conversation, View conversationListRowView) {
@@ -302,9 +293,6 @@ public class ConversationListFragment extends BaseFragment<ConversationListFragm
 
         conversationsListAdapter.setListView(swipeListView);
 
-        pebbleView = ViewUtils.getView(view, R.id.pv__conv_list);
-        pebbleView.setDirection(PebbleView.Direction.LEFT);
-
         archiveBox = ViewUtils.getView(view, R.id.ll__archiving_container);
         archiveBox.setVisibility(View.INVISIBLE);
 
@@ -376,6 +364,16 @@ public class ConversationListFragment extends BaseFragment<ConversationListFragm
         activeVoiceChannels = getStoreFactory().getZMessagingApiStore().getApi().getActiveVoiceChannels();
         activeVoiceChannels.addUpdateListener(callUpdateListener);
         conversationsListAdapter.setStreamMediaPlayerController(getControllerFactory().getStreamMediaPlayerController());
+        conversationsListAdapter.setConversationActionCallback(new RightIndicatorView.ConversationActionCallback() {
+            @Override
+            public void startCall(IConversation conversation) {
+                if (getStoreFactory() != null && !getStoreFactory().isTornDown()) {
+                    getStoreFactory().getConversationStore().setCurrentConversation(conversation,
+                                                                                    ConversationChangeRequester.CONVERSATION_LIST);
+                    getControllerFactory().getCallingController().startCall(false);
+                }
+            }
+        });
         conversationsListAdapter.setNetworkStore(getStoreFactory().getNetworkStore());
         getControllerFactory().getAccentColorController().addAccentColorObserver(this);
         if (mode == Mode.NORMAL) {

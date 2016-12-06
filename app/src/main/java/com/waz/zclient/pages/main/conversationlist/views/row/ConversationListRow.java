@@ -35,7 +35,6 @@ import com.waz.zclient.core.stores.inappnotification.KnockingEvent;
 import com.waz.zclient.core.stores.network.INetworkStore;
 import com.waz.zclient.pages.main.conversationlist.views.ConversationCallback;
 import com.waz.zclient.pages.main.conversationlist.views.listview.SwipeListView;
-import com.waz.zclient.ui.animation.LeftPaddingReverseAnimation;
 import com.waz.zclient.ui.animation.interpolators.penner.Expo;
 import com.waz.zclient.ui.text.TypefaceFactory;
 import com.waz.zclient.ui.views.properties.MoveToAnimateable;
@@ -48,7 +47,6 @@ public class ConversationListRow extends FrameLayout implements SwipeListView.Sw
 
     // current menuOpenSpring animation
     private boolean isArchiveTarget;
-    private LeftPaddingReverseAnimation knockingAnimation;
     private int normalTextColor;
     private float maxAlpha;
     private boolean open;
@@ -116,7 +114,6 @@ public class ConversationListRow extends FrameLayout implements SwipeListView.Sw
     @Override
     public void setMaxOffset(float maxOffset) {
         this.maxOffset = maxOffset;
-        leftIndicatorView.setMaxOffset(maxOffset);
     }
 
     /**
@@ -159,6 +156,7 @@ public class ConversationListRow extends FrameLayout implements SwipeListView.Sw
 
         rightIndicatorView = new RightIndicatorView(getContext());
 
+
         addView(menuIndicatorView);
         addView(leftIndicatorView);
         addView(textView);
@@ -194,7 +192,6 @@ public class ConversationListRow extends FrameLayout implements SwipeListView.Sw
                 moveToAnimator.cancel();
             }
 
-            stopKnock();
             closeImmediate();
             if (this.conversation instanceof InboxLinkConversation) {
                 this.conversation.clear();
@@ -278,27 +275,7 @@ public class ConversationListRow extends FrameLayout implements SwipeListView.Sw
         if (moveTo > 0) {
             return;
         }
-
-        // the row might just be created we need get measure data
-        this.post(new Runnable() {
-            @Override
-            public void run() {
-                // save left padding
-                final int leftPadding = textView.getPaddingLeft();
-                knockingAnimation = new LeftPaddingReverseAnimation(leftPadding,
-                                                                    getResources().getDimensionPixelSize(R.dimen.list__ping_label_distance),
-                                                                    textView,
-                                                                    getResources().getInteger(R.integer.framework_animation_duration_ages));
-                knockingAnimation.setInterpolator(new Expo.EaseOut());
-
-                textView.setAnimation(knockingAnimation);
-                knockingAnimation.start();
-                leftIndicatorView.knock();
-                conversationCallback.startPinging(knockingEvent, ConversationListRow.this.getTop() +
-                                                                 ConversationListRow.this.getMeasuredHeight() / 2);
-
-            }
-        });
+        leftIndicatorView.knock(knockingEvent);
     }
 
     public void open() {
@@ -420,18 +397,16 @@ public class ConversationListRow extends FrameLayout implements SwipeListView.Sw
         rightIndicatorView.setStreamMediaPlayerController(streamMediaPlayerController);
     }
 
+    public void setConversationActionCallback(RightIndicatorView.ConversationActionCallback callback) {
+        rightIndicatorView.setCallback(callback);
+    }
+
     public void setNetworkStore(INetworkStore networkStore) {
         rightIndicatorView.setNetworkStore(networkStore);
     }
 
     public void tearDown() {
         disconnectCurrentConversation();
-    }
-
-    public void stopKnock() {
-        if (knockingAnimation != null) {
-            knockingAnimation.cancel();
-        }
     }
 
     public void showIndicatorView(boolean show) {

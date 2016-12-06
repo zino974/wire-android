@@ -19,11 +19,8 @@ package com.waz.zclient.pages.main.conversationlist.views;
 
 import android.view.View;
 import com.waz.api.IConversation;
-import com.waz.zclient.core.stores.inappnotification.KnockingEvent;
 
 public interface ConversationCallback {
-
-    void startPinging(KnockingEvent knockingEvent, int y);
 
     void onConversationListRowSwiped(IConversation conversation, View conversationListRowView);
 

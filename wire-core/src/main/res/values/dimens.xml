@@ -187,13 +187,6 @@
     <dimen name="wire__stroke">0.5dp</dimen>
     <dimen name="wire__button__height_small">28dp</dimen>
     <dimen name="wire__call_indicator_small__width">18dp</dimen>
-    <dimen name="wire__call_indicator__small__outer_radius">9dp</dimen>
-    <dimen name="wire__call_indicator__small__middle_radius">6dp</dimen>
-    <dimen name="wire__call_indicator__small__inner_radius">3dp</dimen>
-    <dimen name="wire__call_indicator__large__width">56dp</dimen>
-    <dimen name="wire__call_indicator__large__outer_radius">23dp</dimen>
-    <dimen name="wire__call_indicator__large__middle_radius">20dp</dimen>
-    <dimen name="wire__call_indicator__large__inner_radius">17dp</dimen>
     <dimen name="wire__otr__shield__small_width">16dp</dimen>
     <dimen name="wire__otr__shield__small_height">16dp</dimen>
     <dimen name="wire__otr__shield__padding__top">6dp</dimen>
@@ -325,7 +318,8 @@
 
     <dimen name="content__footer__height">24dp</dimen>
     <dimen name="content__footer__hint_arrow_padding">50dp</dimen>
-    <dimen name="content__footer__like_icon__size">24dp</dimen>
+    <dimen name="content__footer__like_icon__height">24dp</dimen>
+    <dimen name="content__footer__like_icon__width">28dp</dimen>
     <dimen name="content__footer__chathead__size">20dp</dimen>
 
     <dimen name="conversation__header__media__button_size">60dp</dimen>
@@ -342,6 +336,8 @@
     <dimen name="list_tile_left_padding">64dp</dimen>
     <dimen name="list_right_indicator_right_padding">22dp</dimen>
     <dimen name="list_indicator_between_padding">16dp</dimen>
+    <dimen name="list_indicator_join_call_height">32dp</dimen>
+    <dimen name="list_indicator_join_call_width">56dp</dimen>
     <dimen name="conversation__unread_dot__radius">4dp</dimen>
     <dimen name="list_menu_unread_width">18dp</dimen>
     <dimen name="list__menu_indicator__max_swipe_offset">98dp</dimen>
@@ -367,6 +363,7 @@
     <dimen name="list__archived_box__icon_text_size">20dp</dimen>
     <dimen name="list_menu_distance_threshold">154dp</dimen>
     <dimen name="list__ping_label_distance">8dp</dimen>
+    <dimen name="list__left_icon__dimension">18dp</dimen>
     <dimen name="conversation_list__sticky_view__top_margin">88dp</dimen>
     <dimen name="framework__dialog__marker__radius">28dp</dimen>
     <dimen name="conversation_list__action_icon__size">28dp</dimen>
@@ -731,6 +728,8 @@
 
     <dimen name="open_new_conversation__thread_list__max_top_distance">88dp</dimen>
     <dimen name="row_conversation__missed_call__margin">11dp</dimen>
+    <dimen name="row_conversation__missed_call__icon_size">28dp</dimen>
+    <dimen name="row_conversation__missed_call__icon_text_size">16dp</dimen>
     <dimen name="quick_reply__text_size">14dp</dimen>
     <dimen name="quick_reply__icon_size">@dimen/wire__text_size__huge</dimen>
     <dimen name="quick_reply__content_height">70dp</dimen>

@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import com.waz.api.IConversation;
 import com.waz.api.NetworkMode;
 import com.waz.zclient.R;
@@ -37,19 +38,16 @@ public class RightIndicatorView extends LinearLayout {
     private final int initialPadding;
     // Media player control indicator
     private CircleIconButton mediaControlView;
-    // muteButton and microphone indicator
-    public CircleIconButton muteButton;
+    private TextView joinCallView;
+
     private IConversation conversation;
     private IStreamMediaPlayerController streamMediaPlayerController;
     private INetworkStore networkStore;
 
     private boolean isMediaControlVisible;
-    private boolean isMuteVisible;
+    private boolean isJoinCallVisible;
 
-    public void setConversation(final IConversation conversation) {
-        this.conversation = conversation;
-        updated();
-    }
+    private ConversationActionCallback callback;
 
     /**
      * Creates the view.
@@ -67,11 +65,15 @@ public class RightIndicatorView extends LinearLayout {
 
         initialPadding = getResources().getDimensionPixelSize(R.dimen.framework__general__right_padding);
 
-        muteButton = ViewUtils.getView(this, R.id.tv_conv_list_voice_muted);
-        muteButton.setText(R.string.glyph__silence);
-        muteButton.setSelectedTextColor(getResources().getColor(R.color.calling__ongoing__background__color));
-        muteButton.setShowCircleBorder(false);
-
+        joinCallView = ViewUtils.getView(this, R.id.ttv__conv_list__join_call);
+        joinCallView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (conversation != null && conversation.hasUnjoinedCall() && callback != null) {
+                    callback.startCall(conversation);
+                }
+            }
+        });
         mediaControlView = ViewUtils.getView(this, R.id.tv_conv_list_media_player);
         mediaControlView.setText(R.string.glyph__pause);
         mediaControlView.setSelectedTextColor(getResources().getColor(R.color.calling__ongoing__background__color));
@@ -102,8 +104,17 @@ public class RightIndicatorView extends LinearLayout {
         });
     }
 
+    public void setCallback(ConversationActionCallback callback) {
+        this.callback = callback;
+    }
+
+    public void setConversation(final IConversation conversation) {
+        this.conversation = conversation;
+        updated();
+    }
+
     public void updated() {
-        isMuteVisible = updateMuteIndicator();
+        isJoinCallVisible = updateJoinCallIndicator();
         isMediaControlVisible = updateMediaPlayerIndicator();
     }
 
@@ -133,28 +144,14 @@ public class RightIndicatorView extends LinearLayout {
         }
     }
 
-    private boolean updateMuteIndicator() {
-        if (conversation.hasVoiceChannel()) {
-            if (conversation.getVoiceChannel().isSilenced() || conversation.hasUnjoinedCall()) {
-                muteButton.setVisibility(View.GONE);
-                return false;
-            } else {
-                muteButton.setVisibility(View.VISIBLE);
-                muteButton.setText(R.string.glyph__microphone_off);
-                muteButton.setSelected(conversation.isVoiceChannelMuted());
-                return true;
-            }
-        }
-
-        muteButton.setSelected(false);
-        if (conversation.isMuted()) {
-            muteButton.setText(R.string.glyph__silence);
-            muteButton.setVisibility(View.VISIBLE);
-            return true;
+    private boolean updateJoinCallIndicator() {
+        boolean shouldShowJoinCall = conversation.hasUnjoinedCall();
+        if (shouldShowJoinCall) {
+            joinCallView.setVisibility(VISIBLE);
         } else {
-            muteButton.setVisibility(View.GONE);
-            return false;
+            joinCallView.setVisibility(GONE);
         }
+        return shouldShowJoinCall;
     }
 
     public void setStreamMediaPlayerController(IStreamMediaPlayerController streamMediaPlayer) {
@@ -172,10 +169,14 @@ public class RightIndicatorView extends LinearLayout {
             totalPadding += getResources().getDimensionPixelSize(R.dimen.conversation_list__right_icon_width);
         }
 
-        if (isMuteVisible) {
+        if (isJoinCallVisible) {
             totalPadding += getResources().getDimensionPixelSize(R.dimen.conversation_list__right_icon_width);
         }
 
         return totalPadding;
+    }
+
+    public interface ConversationActionCallback {
+        void startCall(IConversation conversation);
     }
 }

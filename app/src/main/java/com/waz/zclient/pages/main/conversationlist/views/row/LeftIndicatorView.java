@@ -18,7 +18,7 @@
 package com.waz.zclient.pages.main.conversationlist.views.row;
 
 import android.content.Context;
-import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,30 +27,19 @@ import android.widget.LinearLayout;
 import com.waz.api.IConversation;
 import com.waz.zclient.R;
 import com.waz.zclient.core.stores.connect.InboxLinkConversation;
+import com.waz.zclient.core.stores.inappnotification.KnockingEvent;
 import com.waz.zclient.pages.main.conversation.ConversationUtils;
 import com.waz.zclient.ui.animation.interpolators.penner.Quart;
+import com.waz.zclient.ui.text.GlyphTextView;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.views.calling.OngoingCallingProgressSmallView;
-import com.waz.zclient.views.calling.StaticCallingIndicator;
 
 public class LeftIndicatorView extends FrameLayout {
 
-    // if the voice channel is open this is pulsing
-    private OngoingCallingProgressSmallView ongoingCallingProgressSmallView;
+    private GlyphTextView callIndicator;
+    private GlyphTextView pingIndicator;
+    private ConversationIndicatorView conversationIndicatorView;
 
-    // if there is a missed call
-    private StaticCallingIndicator missedCallIndicator;
-
-    // if there is a call that the user hasn't joined
-    private StaticCallingIndicator unjoinedCallIndicator;
-
-    ConversationIndicatorView conversationIndicatorView;
-
-    // the current offset of the drawer
-    private int offset;
-
-    // the max offset of the drawer
-    private float maxOffset;
+    private View currentVisibleIndicator = null;
 
     public LeftIndicatorView(Context context, int accentColor) {
         super(context);
@@ -60,77 +49,40 @@ public class LeftIndicatorView extends FrameLayout {
         setLayoutParams(layoutParams);
         LayoutInflater.from(getContext()).inflate(R.layout.conv_list_item_unread, this, true);
 
-        ongoingCallingProgressSmallView = ViewUtils.getView(this, R.id.ocpvs__left_indicator);
         conversationIndicatorView = ViewUtils.getView(this, R.id.civ__list_row);
-        missedCallIndicator = ViewUtils.getView(this, R.id.sci__list__missed_call);
-        missedCallIndicator.setFillRings(true);
-        unjoinedCallIndicator = ViewUtils.getView(this, R.id.sci__list__unjoined_call);
-        unjoinedCallIndicator.setFillRings(false);
+        callIndicator = ViewUtils.getView(this, R.id.gtv__list__call_indicator);
+        pingIndicator = ViewUtils.getView(this, R.id.gtv__list__ping);
 
         ViewUtils.setPaddingTop(this, getResources().getDimensionPixelSize(R.dimen.calling__conversation_list__margin_top));
         setAccentColor(accentColor);
-    }
-
-    /* Getters/Setters */
-
-    /**
-     * the max offset is set by the SwipeListView. It needs to calculate its own width first.
-     */
-    public void setMaxOffset(float maxOffset) {
-        this.maxOffset = maxOffset;
     }
 
     /**
      * The color of the circles.
      */
     public void setAccentColor(int accentColor) {
-        ongoingCallingProgressSmallView.setAccentColor(accentColor);
         conversationIndicatorView.setAccentColor(accentColor);
-        unjoinedCallIndicator.setColor(accentColor);
-    }
-
-    /**
-     * Needed for the object animator.
-     */
-    public int getOffset() {
-        return offset;
-    }
-
-    public void setOffset(int offset) {
-        this.offset = offset;
-
-        float alpha = 1;
-        if (maxOffset > 0) {
-            alpha = 1 - 4 * this.offset / maxOffset;
-        }
-
-        conversationIndicatorView.setAlpha(alpha);
-        ongoingCallingProgressSmallView.setAlpha(alpha);
-        missedCallIndicator.setAlpha(alpha);
-        invalidate();
     }
 
     /**
      * Binds the conversation to this view.
      */
     public void setConversation(final IConversation conversation) {
-        ongoingCallingProgressSmallView.setVisibility(View.GONE);
         conversationIndicatorView.setVisibility(View.GONE);
-        missedCallIndicator.setVisibility(GONE);
-        unjoinedCallIndicator.setVisibility(GONE);
+        callIndicator.setVisibility(GONE);
+        pingIndicator.setVisibility(GONE);
 
         if (conversation.hasUnjoinedCall()) {
-            return;
-        }
-
-        // conversation is in call
-        if (conversation.hasVoiceChannel()) {
-            ongoingCallingProgressSmallView.setVisibility(View.VISIBLE);
+            callIndicator.setVisibility(VISIBLE);
+            callIndicator.setText(getContext().getString(R.string.glyph__call));
+            callIndicator.setTextColor(ContextCompat.getColor(getContext(), R.color.accent_green));
             return;
         }
 
         if (conversation.hasMissedCall()) {
-            missedCallIndicator.setVisibility(VISIBLE);
+            callIndicator.setVisibility(VISIBLE);
+            callIndicator.setText(getContext().getString(R.string.glyph__end_call));
+            callIndicator.setTextColor(ContextCompat.getColor(getContext(), R.color.accent_red));
             return;
         }
 
@@ -161,20 +113,58 @@ public class LeftIndicatorView extends FrameLayout {
      * knocking event occured. Fade out unread and pulser and start knocking animation.
      * Afterwards bring the view back into its original state.
      */
-    public void knock() {
-        animate().alpha(0).setInterpolator(new Quart.EaseOut()).setDuration(getResources().getInteger(R.integer.list_hello_indicator_fade_in_out_animation_duration));
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                resetAfterKnocking();
-            }
-        }, getResources().getInteger(R.integer.list_hello_indicator_fade_in_out_animation_duration));
+    public void knock(KnockingEvent knockingEvent) {
+        if (callIndicator.getVisibility() == VISIBLE) {
+            currentVisibleIndicator = callIndicator;
+        } else {
+            currentVisibleIndicator = conversationIndicatorView;
+        }
+        currentVisibleIndicator.animate()
+                               .alpha(0)
+                               .setInterpolator(new Quart.EaseOut())
+                               .setDuration(getResources().getInteger(R.integer.list_hello_indicator_fade_in_out_animation_duration))
+                               .withEndAction(new Runnable() {
+                                   @Override
+                                   public void run() {
+                                       showPing();
+                                   }
+                               });
+        pingIndicator.setTextColor(knockingEvent.getColor());
+    }
+
+    private void showPing() {
+        pingIndicator.setAlpha(0);
+        pingIndicator.setVisibility(VISIBLE);
+        pingIndicator.animate().alpha(1)
+                     .setInterpolator(new Quart.EaseOut())
+                     .setDuration(getResources().getInteger(R.integer.list_hello_indicator_fade_in_out_animation_duration))
+                     .withEndAction(
+                         new Runnable() {
+                             @Override
+                             public void run() {
+                                 hidePing();
+                             }
+                         });
+    }
+
+    private void hidePing() {
+        pingIndicator.animate().alpha(0)
+                     .setInterpolator(new Quart.EaseIn())
+                     .setDuration(getResources().getInteger(R.integer.list_hello_indicator_fade_in_out_animation_duration))
+                     .withEndAction(
+                         new Runnable() {
+                             @Override
+                             public void run() {
+                                 resetAfterKnocking();
+                             }
+                         });
     }
 
     /**
      * After knocking event has occured, bring the view back to its original state.
      */
     private void resetAfterKnocking() {
-        animate().alpha(1).setInterpolator(new Quart.EaseOut()).setDuration(getResources().getInteger(R.integer.list_hello_indicator_fade_in_out_animation_duration));
+        currentVisibleIndicator.animate().alpha(1).setInterpolator(new Quart.EaseOut()).setDuration(getResources().getInteger(R.integer.list_hello_indicator_fade_in_out_animation_duration));
+        pingIndicator.setVisibility(GONE);
     }
 }

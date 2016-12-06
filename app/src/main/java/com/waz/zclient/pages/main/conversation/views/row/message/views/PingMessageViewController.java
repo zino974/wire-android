@@ -22,7 +22,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
 import com.waz.api.UpdateListener;
 import com.waz.api.User;
 import com.waz.zclient.R;
@@ -31,8 +30,6 @@ import com.waz.zclient.pages.main.conversation.views.MessageViewsContainer;
 import com.waz.zclient.pages.main.conversation.views.row.message.MessageViewController;
 import com.waz.zclient.pages.main.conversation.views.row.separator.Separator;
 import com.waz.zclient.pages.main.participants.dialog.DialogLaunchMode;
-import com.waz.zclient.ui.animation.LeftPaddingReverseAnimation;
-import com.waz.zclient.ui.animation.interpolators.penner.Expo;
 import com.waz.zclient.ui.text.GlyphTextView;
 import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.ColorUtils;
@@ -41,8 +38,6 @@ import com.waz.zclient.ui.utils.TextViewUtils;
 import com.waz.zclient.ui.utils.TypefaceUtils;
 import com.waz.zclient.ui.views.EphemeralDotAnimationView;
 import com.waz.zclient.utils.ViewUtils;
-import com.waz.zclient.views.chathead.ChatheadImageView;
-import org.threeten.bp.DateTimeUtils;
 
 import java.util.Locale;
 
@@ -51,19 +46,15 @@ public class PingMessageViewController extends MessageViewController implements 
                                                                                 AccentColorObserver,
                                                                                 View.OnClickListener {
     public static final String TAG = PingMessageViewController.class.getName();
-    private static final long APPROXIMATE_MESSAGE_EVALUATION_DURATION = 1000L;
 
     private TypefaceTextView textViewMessage;
     private GlyphTextView glyphTextView;
-    private ChatheadImageView userChatheadImageView;
     private EphemeralDotAnimationView ephemeralDotAnimationView;
     private Locale locale;
 
     private View view;
     private User user;
 
-    private LeftPaddingReverseAnimation knockingAnimation;
-    int originalLeftPadding;
     private final Typeface originalTypeface;
 
     @SuppressLint("InflateParams")
@@ -76,13 +67,10 @@ public class PingMessageViewController extends MessageViewController implements 
         textViewMessage.setOnLongClickListener(this);
         glyphTextView = ViewUtils.getView(view, R.id.gtv__knock_icon);
         glyphTextView.setOnLongClickListener(this);
-        userChatheadImageView = ViewUtils.getView(view, R.id.civ__row_conversation__ping_chathead);
         ephemeralDotAnimationView = ViewUtils.getView(view, R.id.edav__ephemeral_view);
 
         locale = context.getResources().getConfiguration().locale;
         originalTypeface = textViewMessage.getTypeface();
-
-        originalLeftPadding = context.getResources().getDimensionPixelSize(R.dimen.content__padding_left);
     }
 
     @Override
@@ -91,8 +79,6 @@ public class PingMessageViewController extends MessageViewController implements 
         user = message.getUser();
         user.addUpdateListener(this);
         message.addUpdateListener(this);
-        userChatheadImageView.setUser(user);
-        userChatheadImageView.setOnClickListener(this);
         ephemeralDotAnimationView.setMessage(message);
 
         updated();
@@ -112,62 +98,13 @@ public class PingMessageViewController extends MessageViewController implements 
             glyphTextView.setTypeface(redactedTypeface);
             int accent = messageViewsContainer.getControllerFactory().getAccentColorController().getColor();
             glyphTextView.setTextColor(accent);
-            textViewMessage.setTextColor(accent);
         } else {
             final int textColor = user.getAccent().getColor();
             textViewMessage.setTypeface(originalTypeface);
             glyphTextView.setTypeface(TypefaceUtils.getTypeface(TypefaceUtils.getGlyphsTypefaceName()));
             glyphTextView.setTextColor(textColor);
-            textViewMessage.setTextColor(textColor);
             TextViewUtils.boldText(textViewMessage);
         }
-
-        if (DateTimeUtils.toDate(message.getLocalTime()).getTime() + APPROXIMATE_MESSAGE_EVALUATION_DURATION > System.currentTimeMillis() &&
-            (!message.isEphemeral() || !message.isExpired())) {
-            startKnockAnimation();
-        }
-    }
-
-    private void startKnockAnimation() {
-        if (message == null || messageViewsContainer == null) {
-            return;
-        }
-
-        // ping if not already shown
-        boolean successfulPing = messageViewsContainer.ping(message.isHotKnock(),
-                                                            message.getId(),
-                                                            textViewMessage.getText().toString(),
-                                                            message.getUser().getAccent().getColor());
-        if (!successfulPing) {
-            return;
-        }
-
-        showPingMessage(false);
-        // save left padding
-        final int leftPadding = view.getPaddingLeft();
-        knockingAnimation = new LeftPaddingReverseAnimation(leftPadding,
-                                                            context.getResources().getDimensionPixelSize(R.dimen.list__ping_label_distance),
-                                                            view,
-                                                            context.getResources().getInteger(R.integer.framework_animation_duration_ages));
-        knockingAnimation.setInterpolator(new Expo.EaseOut());
-        knockingAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                stopKnockAnimation();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        knockingAnimation.setFillAfter(false);
-        view.setAnimation(knockingAnimation);
-        knockingAnimation.start();
     }
 
     private String getPingMessage() {
@@ -186,23 +123,6 @@ public class PingMessageViewController extends MessageViewController implements 
         return pingMessage;
     }
 
-    private void stopKnockAnimation() {
-        showPingMessage(true);
-    }
-
-    private void showPingMessage(boolean show) {
-        if (glyphTextView == null) {
-            return;
-        }
-
-        if (show) {
-            ViewUtils.setPaddingLeft(view, originalLeftPadding);
-            glyphTextView.animate().alpha(1);
-        } else {
-            glyphTextView.animate().alpha(0).setDuration(0);
-        }
-    }
-
     @Override
     public void recycle() {
         if (!messageViewsContainer.isTornDown()) {
@@ -215,7 +135,6 @@ public class PingMessageViewController extends MessageViewController implements 
             message.removeUpdateListener(this);
         }
         ephemeralDotAnimationView.setMessage(null);
-        userChatheadImageView.setOnClickListener(null);
         user = null;
         super.recycle();
     }
@@ -231,7 +150,7 @@ public class PingMessageViewController extends MessageViewController implements 
         if (!messageViewsContainer.isPhone()) {
             messageViewsContainer.getControllerFactory()
                                  .getPickUserController()
-                                 .showUserProfile(user, userChatheadImageView);
+                                 .showUserProfile(user, glyphTextView);
         } else {
             messageViewsContainer.getControllerFactory()
                                  .getConversationScreenController()
@@ -249,7 +168,6 @@ public class PingMessageViewController extends MessageViewController implements 
             message.isEphemeral() &&
             message.isExpired()) {
             glyphTextView.setTextColor(color);
-            textViewMessage.setTextColor(color);
         }
     }
 }

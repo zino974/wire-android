@@ -106,7 +106,7 @@
                 android:layout_marginLeft="@dimen/wire__padding__regular"
                 android:layout_marginRight="@dimen/wire__padding__regular"
                 android:orientation="horizontal"
-                android:background="@drawable/rounded_corner_background_location_bubble"
+                android:background="@drawable/rounded_corner_background_bubble"
                 android:gravity="center"
                 >
 

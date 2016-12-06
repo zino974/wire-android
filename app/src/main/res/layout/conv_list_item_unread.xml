@@ -18,10 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<merge
-    android:id="@+id/row_conversation_behind_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:custom="http://schemas.android.com/apk/res-auto"
+<merge android:id="@+id/row_conversation_behind_layout"
+       xmlns:android="http://schemas.android.com/apk/res/android"
     >
 
     <com.waz.zclient.pages.main.conversationlist.views.row.ConversationIndicatorView
@@ -30,46 +28,21 @@
         android:layout_height="match_parent"
         />
 
-    <com.waz.zclient.views.calling.OngoingCallingProgressSmallView
-        android:id="@+id/ocpvs__left_indicator"
-        android:layout_width="@dimen/calling__conversation_list__width"
-        android:layout_height="@dimen/calling__conversation_list__height"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="@dimen/calling__conversation_list__margin_left"
-
-        custom:innerOpacity="@integer/wire__call_indicator__inner_opacity"
-        custom:middleOpacity="@integer/wire__call_indicator__missed_or_ongoing__middle_opacity"
-        custom:outerOpacity="@integer/wire__call_indicator__missed_or_ongoing__outer_opacity"
-        />
-
-    <com.waz.zclient.views.calling.StaticCallingIndicator
-        android:id="@+id/sci__list__missed_call"
-        android:layout_width="@dimen/wire__call_indicator_small__width"
-        android:layout_height="@dimen/wire__call_indicator_small__width"
+    <com.waz.zclient.ui.text.GlyphTextView
+        android:id="@+id/gtv__list__call_indicator"
+        android:layout_width="@dimen/list__left_icon__dimension"
+        android:layout_height="@dimen/list__left_icon__dimension"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/conversation_list__call_indicator__margin_left"
-
-        custom:innerOpacity="@integer/wire__call_indicator__inner_opacity"
-        custom:innerRadius="@dimen/wire__call_indicator__small__inner_radius"
-        custom:middleOpacity="@integer/wire__call_indicator__missed_or_ongoing__middle_opacity"
-        custom:middleRadius="@dimen/wire__call_indicator__small__middle_radius"
-        custom:outerOpacity="@integer/wire__call_indicator__missed_or_ongoing__outer_opacity"
-        custom:outerRadius="@dimen/wire__call_indicator__small__outer_radius"
         />
 
-    <com.waz.zclient.views.calling.StaticCallingIndicator
-            android:id="@+id/sci__list__unjoined_call"
-            android:layout_width="@dimen/wire__call_indicator_small__width"
-            android:layout_height="@dimen/wire__call_indicator_small__width"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/conversation_list__call_indicator__margin_left"
-
-            custom:innerOpacity="@integer/wire__call_indicator__inner_opacity"
-            custom:innerRadius="@dimen/wire__call_indicator__small__inner_radius"
-            custom:middleOpacity="@integer/wire__call_indicator__unjoined__middle_opacity"
-            custom:middleRadius="@dimen/wire__call_indicator__small__middle_radius"
-            custom:outerOpacity="@integer/wire__call_indicator__unjoined__outer_opacity"
-            custom:outerRadius="@dimen/wire__call_indicator__small__outer_radius"
-            />
+    <com.waz.zclient.ui.text.GlyphTextView
+        android:id="@+id/gtv__list__ping"
+        android:layout_width="@dimen/list__left_icon__dimension"
+        android:layout_height="@dimen/list__left_icon__dimension"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="@dimen/conversation_list__call_indicator__margin_left"
+        android:text="@string/glyph__ping"
+        />
 
 </merge>
