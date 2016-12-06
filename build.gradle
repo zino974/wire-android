@@ -10,8 +10,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.android.tools.build:gradle:1.5.0'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.mutualmobile.gradle.plugins:dexinfo:0.1.2'
         classpath 'com.wire:gradle-android-scala-plugin:1.5.0'
@@ -56,10 +57,10 @@ licenseFormat.dependsOn licenseFormatAndroid
 ext {
     majorVersion = "2.23."
 
-    compileSdkVersion = 24
+    compileSdkVersion = 23
     minSdkVersion = 17
     targetSdkVersion = 23
-    buildToolsVersion = '24.0.3'
+    buildToolsVersion = '23.0.3'
     scalaMajorVersion = '2.11'
     scalaVersion = scalaMajorVersion + '.8'
     sourceCompatibilityVersion = JavaVersion.VERSION_1_7
@@ -68,8 +69,8 @@ ext {
 
     checkstyleVersion = '6.18'
     pmdVersion = '5.4.1'
-    supportLibVersion = '24.0.0'
-    playServicesVersion = '10.0.1'
+    supportLibVersion = '23.4.0'
+    playServicesVersion = '7.8.+'
 
     audioVersion = System.getenv("AUDIO_VERSION") ?: '1.205.0@aar'
 
@@ -91,6 +92,12 @@ ext {
 
     deps = [
             scala               : "org.scala-lang:scala-library:$scalaVersion",
+
+            // Annotations processing
+            autoService         : 'com.google.auto.service:auto-service:1.0-rc2',
+            commonsLang3        : 'org.apache.commons:commons-lang3:3.4',
+            javaPoet            : 'com.squareup:javapoet:1.5.1',
+            javaWriter          : 'com.squareup:javawriter:2.5.1',
 
             // Lint dependencies
             lintapi              : 'com.android.tools.lint:lint-api:24.5.0',
@@ -123,6 +130,7 @@ ext {
             hockey               : 'net.hockeyapp.android:HockeySDK:3.7.2',
             threetenabp          : 'com.jakewharton.threetenabp:threetenabp:1.0.3',
             localytics           : 'com.localytics.android:library:3.8.2',
+            nineoldandroids      : 'com.nineoldandroids:library:2.4.0',
             rebound              : 'com.facebook.rebound:rebound:0.3.8',
             supportpreferences   : 'net.xpece.android:support-preference:0.8.1',
 
@@ -136,6 +144,7 @@ ext {
             junit               : 'junit:junit:4.12',
             testutils           : "com.wire:testutils:$zMessagingDevVersionBase",
             scalatest           : "org.scalatest:scalatest_$scalaMajorVersion:2.2.6",
+            easymock            : 'org.easymock:easymock:3.3',
             testRunner          : 'com.android.support.test:runner:0.4.1',
             testRules           : 'com.android.support.test:rules:0.4.1',
             espresso            : 'com.android.support.test.espresso:espresso-core:2.2',
@@ -152,6 +161,9 @@ ext {
 
             // Translations
             translations        : 'com.wire:wiretranslations:1.+',
+
+            // MP4 parser for video message preview
+            mp4parser           : 'com.googlecode.mp4parser:isoparser:1.1.7',
 
             //Json parser
             gson                : 'com.google.code.gson:gson:2.2.4'

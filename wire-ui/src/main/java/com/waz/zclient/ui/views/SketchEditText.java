@@ -106,6 +106,10 @@ public class SketchEditText extends EditText {
         }
     }
 
+    public String getCustomHint() {
+        return customHint;
+    }
+
     public void setCustomHint(String customHint) {
         this.customHint = customHint;
         if (getText().length() == 0) {
@@ -113,14 +117,26 @@ public class SketchEditText extends EditText {
         }
     }
 
+    public int getTextFontId() {
+        return textFontId;
+    }
+
     public void setTextFontId(int textFontId) {
         this.textFontId = textFontId;
         updateField();
     }
 
+    public int getHintFontId() {
+        return hintFontId;
+    }
+
     public void setHintFontId(int hintFontId) {
         this.hintFontId = hintFontId;
         updateField();
+    }
+
+    public float getRegularTextSize() {
+        return regularTextSize;
     }
 
     public void setRegularTextSize(float textSize) {

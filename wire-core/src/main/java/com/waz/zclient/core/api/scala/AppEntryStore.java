@@ -233,7 +233,7 @@ public class AppEntryStore implements IAppEntryStore, ErrorsList.ErrorListener {
                .remove(PREF_ITEM_NAME)
                .remove(PREF_ITEM_EMAIL)
                .remove(PREF_ITEM_PHONE_VERIFICATION_CODE)
-               .apply();
+               .commit();
     }
 
     // Here we handle email verification click on a different device
@@ -464,7 +464,7 @@ public class AppEntryStore implements IAppEntryStore, ErrorsList.ErrorListener {
                 break;
             case LOGGED_IN:
                 entryPoint = null;
-                context.getSharedPreferences(PREF_REGISTRATION, Context.MODE_PRIVATE).edit().clear().apply();
+                context.getSharedPreferences(PREF_REGISTRATION, Context.MODE_PRIVATE).edit().clear().commit();
                 self.removeUpdateListener(selfUpdateListener);
                 appEntryStateCallback.onEnterApplication();
                 break;

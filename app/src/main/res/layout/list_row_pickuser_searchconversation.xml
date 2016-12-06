@@ -41,7 +41,7 @@
         android:layout_height="match_parent"
         android:ellipsize="end"
         android:gravity="start|center_vertical"
-        android:maxLines="1"
+        android:singleLine="true"
         android:textSize="@dimen/wire__text_size__regular"
         android:textColor="@color/text__primary_dark"
         android:includeFontPadding="false"

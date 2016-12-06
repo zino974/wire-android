@@ -17,7 +17,6 @@
  */
 package com.waz.zclient.pages.main.profile.preferences;
 
-import android.annotation.SuppressLint;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -53,7 +52,6 @@ public abstract class PreferenceScreenStrategy {
             return callbacks.onBuildPreferenceFragment(preferenceScreen);
         }
 
-        @SuppressLint("CommitTransaction") // lint not seeing commit
         public void onPreferenceStartScreen(final FragmentManager fragmentManager,
                                             final PreferenceFragmentCompat preferenceFragmentCompat,
                                             final PreferenceScreen preferenceScreen) {
