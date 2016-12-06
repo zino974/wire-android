@@ -17,7 +17,6 @@
  */
 package com.waz.zclient.pages.main;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -73,7 +72,6 @@ public class MainTabletFragment extends BaseFragment<MainTabletFragment.Containe
 
 
     @Override
-    @SuppressLint("MissingSuperCall")
     public void onConfigurationChanged(Configuration newConfig) {
         confirmationMenu.adjustLayout();
     }
