@@ -61,24 +61,6 @@ public class ZTimeFormatter {
         return DateTimeFormatter.ofPattern(pattern).format(then.atZone(timeZone));
     }
 
-    public static String getSingleMessageTimeAndDate(@Nullable Resources resources, LocalDateTime date, boolean is24HourFormat, ZoneId timeZone) {
-        if (resources == null) {
-            return "";
-        }
-        String time = getTimeFormatString(resources, is24HourFormat);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(resources.getString(R.string.timestamp_pattern__single_message, time));
-        return formatter.format(date.atZone(timeZone));
-    }
-
-    public static String getSingleMessageTimeAndDate(Context context, Date date) {
-        boolean is24HourFormat = DateFormat.is24HourFormat(context);
-        return ZTimeFormatter.getSingleMessageTimeAndDate(context.getResources(),
-                                                          DateConvertUtils.asLocalDateTime(date),
-                                                          is24HourFormat,
-                                                          ZoneId.systemDefault());
-    }
-
     public static String getSingleMessageTime(Context context, Date date) {
         boolean is24HourFormat = DateFormat.is24HourFormat(context);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(getTimeFormatString(context.getResources(), is24HourFormat));
