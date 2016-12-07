@@ -84,7 +84,7 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     if (nots.isEmpty) notManager.cancel(notifId)
     else {
       val notification =
-        if (notifId == ZETA_EPHEMERAL_NOTIFICATION_ID) getEphemeralNotification(nots.size, silent)
+        if (notifId == ZETA_EPHEMERAL_NOTIFICATION_ID) getEphemeralNotification(nots.size, silent, nots.maxBy(_.time).time)
         else if (nots.size == 1) getSingleMessageNotification(nots.head, silent)
         else getMultipleMessagesNotification(nots, silent)
 
@@ -154,7 +154,7 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     else RingtoneUtils.getUriForRawId(context, returnDefault)
   }
 
-  private def getEphemeralNotification(size: Int, silent: Boolean): Notification = {
+  private def getEphemeralNotification(size: Int, silent: Boolean, displayTime: Instant): Notification = {
     val details = getString(R.string.notification__message__ephemeral_details)
     val title = getQuantityString(R.plurals.notification__message__ephemeral, size, Integer.valueOf(size))
 
@@ -165,6 +165,8 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     bigTextStyle.bigText(details)
 
     builder
+      .setShowWhen(true)
+      .setWhen(displayTime.toEpochMilli)
       .setSmallIcon(R.drawable.ic_menu_logo)
       .setLargeIcon(getAppIcon)
       .setContentTitle(title)
@@ -196,6 +198,8 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     builder
       .setSmallIcon(R.drawable.ic_menu_logo)
       .setLargeIcon(getAppIcon)
+      .setShowWhen(true)
+      .setWhen(n.time.toEpochMilli)
       .setContentTitle(title)
       .setContentText(spannableString)
       .setContentIntent(getNotificationAppLaunchIntent(cxt, n.convId.str, requestBase))
@@ -236,6 +240,8 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
       .setBigContentTitle(title)
 
     val builder = new NotificationCompat.Builder(cxt)
+      .setShowWhen(true)
+      .setWhen(ns.maxBy(_.time).time.toEpochMilli)
       .setSmallIcon(R.drawable.ic_menu_logo)
       .setLargeIcon(getAppIcon).setNumber(ns.size)
       .setContentTitle(title)
