@@ -83,6 +83,7 @@ import timber.log.Timber;
 import java.util.List;
 import java.util.Locale;
 
+@SuppressLint("All")
 public class LocationFragment extends BaseFragment<LocationFragment.Container> implements com.google.android.gms.location.LocationListener,
                                                                                           LocationListener,
                                                                                           TouchRegisteringFrameLayout.TouchCallback,
@@ -534,7 +535,11 @@ public class LocationFragment extends BaseFragment<LocationFragment.Container> i
         Timber.i("onMapReady");
         map = googleMap;
         map.getUiSettings().setMyLocationButtonEnabled(false);
-        map.setMyLocationEnabled(false);
+        try {
+            map.setMyLocationEnabled(false);
+        } catch (SecurityException se) {
+            // ignore
+        }
         if (currentLocation != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_MAP_ZOOM_LEVEL));
             animateTocurrentLocation = false;
