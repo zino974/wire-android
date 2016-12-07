@@ -29,6 +29,7 @@
 -keep class com.waz.call.CaptureDevice { *; }
 -keep class com.waz.media.manager.** { *; }
 -keep class com.waz.service.call.** { *; }
+-keep class com.waz.zclient.controllers.loadtimelogger.LoadTimeLoggerController { *; }
 
 -keepclassmembers class **.R$* {public static <fields>;}
 -keep class **.R$*
@@ -124,7 +125,5 @@
 -keep class com.waz.soundlink.SoundLinkAPI { *; }
 
 # Video parsing tools for video message preview
--keep class * implements com.coremedia.iso.boxes.Box { *; }
--dontwarn com.coremedia.iso.boxes.**
--dontwarn com.googlecode.mp4parser.authoring.tracks.mjpeg.**
--dontwarn com.googlecode.mp4parser.authoring.tracks.ttml.**
+-keep class com.coremedia.iso.** { *; }
+-keep class com.googlecode.mp4parser.** { *; }

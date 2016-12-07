@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
             android:layout_marginEnd="@dimen/wire__padding__regular"
-            android:maxLines="1"
+            android:singleLine="true"
             android:ellipsize="end"
             style="?startUiToolbar"
             />

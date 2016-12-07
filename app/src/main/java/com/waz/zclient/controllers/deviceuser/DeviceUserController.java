@@ -17,7 +17,6 @@
  */
 package com.waz.zclient.controllers.deviceuser;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 import net.hockeyapp.android.CrashManagerListener;
@@ -79,7 +78,6 @@ public class DeviceUserController implements IDeviceUserController {
         primaryPhoneNumber = builder.toString();
     }
 
-    @SuppressLint("HardwareIds")
     private void fetchSIMPhoneNumber() {
         if (primaryPhoneNumber == null) {
             try {

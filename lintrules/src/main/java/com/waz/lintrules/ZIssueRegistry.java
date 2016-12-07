@@ -30,6 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ZIssueRegistry extends IssueRegistry {
+    public ZIssueRegistry() {
+    }
 
     @Override
     public List<Issue> getIssues() {

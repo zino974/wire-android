@@ -31,6 +31,7 @@ import com.waz.zclient.utils.ViewUtils;
 
 public class ZetaButton extends TypefaceTextView {
     // Optional callback for state changes
+    private StateChangeCallback callback;
 
     private int accentColor;
     private boolean isFilled = true;
@@ -49,8 +50,21 @@ public class ZetaButton extends TypefaceTextView {
     }
 
     @Override
+    public void setPressed(boolean pressed) {
+        super.setPressed(pressed);
+
+        if (callback != null) {
+            callback.onSetPressed(pressed);
+        }
+    }
+
+    @Override
     public void setEnabled(boolean isEnabled) {
         super.setEnabled(isEnabled);
+
+        if (callback != null) {
+            callback.onSetEnabled(isEnabled);
+        }
 
         if (isEnabled) {
             setAlpha(1);
@@ -68,6 +82,10 @@ public class ZetaButton extends TypefaceTextView {
         int pressedTextColor = getPressedColor(color);
         int[] textColors = {pressedTextColor, pressedTextColor, color, pressedTextColor};
         super.setTextColor(ColorUtils.createButtonTextColorStateList(textColors));
+    }
+
+    public void setStateChangeCallback(StateChangeCallback callback) {
+        this.callback = callback;
     }
 
     public void setIsFilled(boolean isFilled) {
@@ -138,4 +156,9 @@ public class ZetaButton extends TypefaceTextView {
         return states;
     }
 
+    public interface StateChangeCallback {
+        void onSetEnabled(boolean isEnabled);
+
+        void onSetPressed(boolean pressed);
+    }
 }
