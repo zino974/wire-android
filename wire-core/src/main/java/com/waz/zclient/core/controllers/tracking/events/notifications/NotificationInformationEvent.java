@@ -21,14 +21,17 @@ import android.support.annotation.NonNull;
 import com.waz.service.push.PushTrackingService;
 import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
-import org.threeten.bp.temporal.ChronoField;
+
+import java.util.Calendar;
 
 public class NotificationInformationEvent extends Event {
 
     public NotificationInformationEvent(PushTrackingService.NotificationsEvent ev) {
-        attributes.put(Attribute.DAY, Integer.toString(ev.time().get(ChronoField.DAY_OF_MONTH)));
-        attributes.put(Attribute.MONTH, Integer.toString(ev.time().get(ChronoField.MONTH_OF_YEAR)));
-        attributes.put(Attribute.YEAR, Integer.toString(ev.time().get(ChronoField.YEAR)));
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(ev.time().toEpochMilli());
+        attributes.put(Attribute.DAY, Integer.toString(cal.get(Calendar.DAY_OF_MONTH)));
+        attributes.put(Attribute.MONTH, Integer.toString(cal.get(Calendar.MONTH)));
+        attributes.put(Attribute.YEAR, Integer.toString(cal.get(Calendar.YEAR)));
 
         attributes.put(Attribute.GCM_SUCCESS, Integer.toString(ev.successfulGcmNotifs()));
         attributes.put(Attribute.GCM_FAILED, Integer.toString(ev.failedGcmNotifs()));
