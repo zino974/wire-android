@@ -94,7 +94,6 @@ public class PickUserController implements IPickUserController {
         if (!isShowingPickUser(destination)) {
             return false;
         }
-        trackingController.onPeoplePickerClosedByUser(hasOnlyTextContent(), closeWithoutSelectingPeople);
         for (PickUserControllerScreenObserver pickUserControllerScreenObserver : pickUserControllerScreenObservers) {
             pickUserControllerScreenObserver.onHidePickUser(destination, closeWithoutSelectingPeople);
         }

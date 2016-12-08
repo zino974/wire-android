@@ -33,6 +33,7 @@ import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.tracking.events.profile.ResetPassword;
 import com.waz.zclient.controllers.tracking.events.profile.SignOut;
 import com.waz.zclient.core.controllers.tracking.events.session.LoggedOutEvent;
+import com.waz.zclient.core.controllers.tracking.events.settings.EditedUsernameEvent;
 import com.waz.zclient.core.stores.profile.ProfileStoreObserver;
 import com.waz.zclient.pages.BasePreferenceFragment;
 import com.waz.zclient.pages.main.profile.ZetaPreferencesActivity;
@@ -415,6 +416,7 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
     }
 
     private void changeUsername(String currentUsername, boolean cancellable) {
+        getControllerFactory().getTrackingController().tagEvent(new EditedUsernameEvent());
         getChildFragmentManager().beginTransaction()
                                  .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                                  .add(ChangeUsernamePreferenceDialogFragment.newInstance(currentUsername, cancellable),

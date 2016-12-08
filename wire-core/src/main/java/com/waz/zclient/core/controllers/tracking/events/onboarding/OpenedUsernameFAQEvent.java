@@ -15,21 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.controllers.tracking.events.peoplepicker;
+package com.waz.zclient.core.controllers.tracking.events.onboarding;
 
 import android.support.annotation.NonNull;
-import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
 
-public class PeoplePickerSelectSearchUser extends Event {
-
-    public PeoplePickerSelectSearchUser(int position) {
-        attributes.put(Attribute.PEOPLE_PICKER_POSITION, String.valueOf(position));
-    }
-
+public class OpenedUsernameFAQEvent extends Event {
     @NonNull
     @Override
     public String getName() {
-        return "selectedSearchResult";
+        return "onboarding.opened_username_faq";
     }
 }

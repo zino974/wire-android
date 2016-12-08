@@ -15,33 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.controllers.tracking.events.connect;
+package com.waz.zclient.core.controllers.tracking.events.onboarding;
 
 import android.support.annotation.NonNull;
 import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
 
-public class OpenedGenericInviteMenuEvent extends Event {
+public class KeptGeneratedUsernameEvent extends Event {
 
-    public enum EventContext {
-        NO_RESULTS("no_results"),
-        BANNER("banner"),
-        ADDRESSBOOK("addressbook");
-
-        private final String name;
-
-        EventContext(String tagName) {
-            name = tagName;
-        }
-    }
-
-    public OpenedGenericInviteMenuEvent(EventContext eventContext) {
-        attributes.put(Attribute.CONTEXT, eventContext.name);
+    public KeptGeneratedUsernameEvent(boolean assignmentSucceeded) {
+        attributes.put(Attribute.OUTCOME, String.valueOf(assignmentSucceeded));
     }
 
     @NonNull
     @Override
     public String getName() {
-        return "connect.opened_generic_invite_menu";
+        return "onboarding.kept_generated_username";
     }
 }

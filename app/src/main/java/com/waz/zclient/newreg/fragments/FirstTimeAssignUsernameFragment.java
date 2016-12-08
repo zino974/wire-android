@@ -33,6 +33,7 @@ import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.accentcolor.IAccentColorController;
 import com.waz.zclient.core.api.scala.ModelObserver;
+import com.waz.zclient.core.controllers.tracking.events.onboarding.OpenedUsernameFAQEvent;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.ui.text.TypefaceTextView;
 import com.waz.zclient.ui.utils.BitmapUtils;
@@ -44,9 +45,9 @@ import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.images.ImageAssetImageView;
 
-public class FirstTimeAssignUsername extends BaseFragment<FirstTimeAssignUsername.Container> implements OnBackPressedListener {
+public class FirstTimeAssignUsernameFragment extends BaseFragment<FirstTimeAssignUsernameFragment.Container> implements OnBackPressedListener {
 
-    public static final String TAG = FirstTimeAssignUsername.class.getName();
+    public static final String TAG = FirstTimeAssignUsernameFragment.class.getName();
     private static final String ARG_SUGGESTED_USERNAME = "ARG_SUGGESTED_USERNAME";
     private static final String ARG_NAME = "ARG_NAME";
 
@@ -70,7 +71,7 @@ public class FirstTimeAssignUsername extends BaseFragment<FirstTimeAssignUsernam
     };
 
     public static Fragment newInstance(String name, String suggestedUsername) {
-        Fragment fragment = new FirstTimeAssignUsername();
+        Fragment fragment = new FirstTimeAssignUsernameFragment();
         final Bundle arg = new Bundle();
         arg.putString(ARG_NAME, name);
         arg.putString(ARG_SUGGESTED_USERNAME, suggestedUsername);
@@ -132,6 +133,7 @@ public class FirstTimeAssignUsername extends BaseFragment<FirstTimeAssignUsernam
         TextViewUtils.linkifyText(summaryTextView, Color.WHITE, com.waz.zclient.ui.R.string.wire__typeface__light, false, new Runnable() {
             @Override
             public void run() {
+                getControllerFactory().getTrackingController().tagEvent(new OpenedUsernameFAQEvent());
                 getContainer().onOpenUrl(getString(R.string.usernames__learn_more__link));
             }
         });

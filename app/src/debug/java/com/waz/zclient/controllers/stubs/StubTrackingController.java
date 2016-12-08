@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import com.waz.zclient.controllers.tracking.ITrackingController;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
 import com.waz.zclient.controllers.tracking.screens.RegistrationScreen;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
@@ -52,17 +51,7 @@ public class StubTrackingController implements ITrackingController {
   }
 
   @Override
-  public void onPeoplePickerResultsUsed(int numberOfContacts, PeoplePickerResultsUsed.Usage usage) {
-    ;
-  }
-
-  @Override
   public void searchedForPeople() {
-    ;
-  }
-
-  @Override
-  public void onPeoplePickerClosedByUser(boolean searchBoxHasContent, boolean cancelledByUser) {
     ;
   }
 

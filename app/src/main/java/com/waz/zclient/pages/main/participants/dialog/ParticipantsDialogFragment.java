@@ -52,7 +52,6 @@ import com.waz.zclient.controllers.confirmation.IConfirmationController;
 import com.waz.zclient.controllers.globallayout.KeyboardHeightObserver;
 import com.waz.zclient.controllers.tracking.events.group.AddedMemberToGroupEvent;
 import com.waz.zclient.controllers.tracking.events.group.CreatedGroupConversationEvent;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.stores.connect.IConnectStore;
 import com.waz.zclient.core.stores.conversation.ConversationChangeRequester;
@@ -1055,9 +1054,6 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
                                           null, true);
             }
             getControllerFactory().getTrackingController().tagEvent(new CreatedGroupConversationEvent(true, (users.size() + 1)));
-            getControllerFactory().getTrackingController()
-                                  .onPeoplePickerResultsUsed(users.size(),
-                                                             PeoplePickerResultsUsed.Usage.CREATE_GROUP_CONVERSATION);
         } else if (currentConversation.getType() == IConversation.Type.GROUP) {
             currentConversation.addMembers(users);
             if (!getStoreFactory().getNetworkStore().hasInternetConnection()) {
@@ -1068,8 +1064,6 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
                                           null, true);
             }
             getControllerFactory().getTrackingController().tagEvent(new AddedMemberToGroupEvent(getParticipantsCount(), users.size()));
-            getControllerFactory().getTrackingController().onPeoplePickerResultsUsed(users.size(),
-                                                                                     PeoplePickerResultsUsed.Usage.ADD_MEMBERS_TO_EXISTING_CONVERSATION);
         }
         getControllerFactory().getTrackingController().updateSessionAggregates(RangedAttribute.USERS_ADDED_TO_CONVERSATIONS);
         hide();

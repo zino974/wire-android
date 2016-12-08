@@ -44,7 +44,6 @@ import com.waz.zclient.controllers.location.LocationObserver;
 import com.waz.zclient.controllers.navigation.Page;
 import com.waz.zclient.controllers.tracking.events.group.AddedMemberToGroupEvent;
 import com.waz.zclient.controllers.tracking.events.group.CreatedGroupConversationEvent;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.media.SentPictureEvent;
@@ -516,9 +515,6 @@ public class ConversationManagerFragment extends BaseFragment<ConversationManage
                                           null, true);
             }
             getControllerFactory().getTrackingController().tagEvent(new CreatedGroupConversationEvent(true, (users.size() + 1)));
-            getControllerFactory().getTrackingController()
-                                  .onPeoplePickerResultsUsed(users.size(),
-                                                             PeoplePickerResultsUsed.Usage.CREATE_GROUP_CONVERSATION);
         } else if (currentConversation.getType() == IConversation.Type.GROUP) {
             currentConversation.addMembers(users);
             if (!getStoreFactory().getNetworkStore().hasInternetConnection()) {
@@ -529,8 +525,6 @@ public class ConversationManagerFragment extends BaseFragment<ConversationManage
                                           null, true);
             }
             getControllerFactory().getTrackingController().tagEvent(new AddedMemberToGroupEvent(getParticipantsCount(), users.size()));
-            getControllerFactory().getTrackingController().onPeoplePickerResultsUsed(users.size(),
-                                                                                     PeoplePickerResultsUsed.Usage.ADD_MEMBERS_TO_EXISTING_CONVERSATION);
         }
         getControllerFactory().getTrackingController().updateSessionAggregates(RangedAttribute.USERS_ADDED_TO_CONVERSATIONS);
     }

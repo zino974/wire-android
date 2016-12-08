@@ -23,7 +23,6 @@ import android.os.Bundle;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.AVSMetricEvent;
 import com.waz.zclient.core.controllers.tracking.events.Event;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
 import com.waz.zclient.controllers.tracking.screens.RegistrationScreen;
 
@@ -96,16 +95,6 @@ public class DisabledTrackingController implements ITrackingController {
     @Override
     public ApplicationScreen getApplicationScreen() {
         return ApplicationScreen.DISABLED_TRACKING;
-    }
-
-    @Override
-    public void onPeoplePickerResultsUsed(int numberOfContacts, PeoplePickerResultsUsed.Usage usage) {
-
-    }
-
-    @Override
-    public void onPeoplePickerClosedByUser(boolean searchBoxHasContent, boolean cancelledByUser) {
-
     }
 
     @Override

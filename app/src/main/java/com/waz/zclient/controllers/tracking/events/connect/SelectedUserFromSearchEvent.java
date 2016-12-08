@@ -21,27 +21,16 @@ import android.support.annotation.NonNull;
 import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
 
-public class OpenedGenericInviteMenuEvent extends Event {
+public class SelectedUserFromSearchEvent extends Event {
 
-    public enum EventContext {
-        NO_RESULTS("no_results"),
-        BANNER("banner"),
-        ADDRESSBOOK("addressbook");
-
-        private final String name;
-
-        EventContext(String tagName) {
-            name = tagName;
-        }
-    }
-
-    public OpenedGenericInviteMenuEvent(EventContext eventContext) {
-        attributes.put(Attribute.CONTEXT, eventContext.name);
+    public SelectedUserFromSearchEvent(String userConnectionType, boolean isAddingToGroupConversation) {
+        attributes.put(Attribute.TYPE, userConnectionType);
+        attributes.put(Attribute.CONTEXT, isAddingToGroupConversation ? "add_to_conversation" : "startui");
     }
 
     @NonNull
     @Override
     public String getName() {
-        return "connect.opened_generic_invite_menu";
+        return "connect.selected_user_from_search";
     }
 }
