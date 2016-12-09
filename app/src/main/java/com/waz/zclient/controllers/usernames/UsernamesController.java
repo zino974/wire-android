@@ -115,11 +115,16 @@ public class UsernamesController implements IUsernamesController {
     @Override
     public void addUsernamesObserver(UsernamesControllerObserver usernamesControllerObserver) {
         usernamesControllerObservers.add(usernamesControllerObserver);
+    }
+
+    @Override
+    public void addUsernamesObserverAndUpdate(UsernamesControllerObserver usernamesControllerObserver) {
+        addUsernamesObserver(usernamesControllerObserver);
         if (hasGeneratedUsername()) {
             if (generatedUsername.isValid()) {
-                notifyObserversValidUsernameGenerated(generatedUsername.searchedName, generatedUsername.username);
+                usernamesControllerObserver.onValidUsernameGenerated(generatedUsername.searchedName, generatedUsername.username);
             } else {
-                notifyObserversAttemptsExhausted(generatedUsername.searchedName);
+                usernamesControllerObserver.onUsernameAttemptsExhausted(generatedUsername.searchedName);
             }
         } else {
             userModelObserver.forceUpdate();
@@ -129,6 +134,13 @@ public class UsernamesController implements IUsernamesController {
     @Override
     public void removeUsernamesObserver(UsernamesControllerObserver usernamesControllerObserver) {
         usernamesControllerObservers.remove(usernamesControllerObserver);
+    }
+
+    @Override
+    public void closeFirstAssignUsernameScreen() {
+        for (UsernamesControllerObserver observer : usernamesControllerObservers) {
+            observer.onCloseFirstAssignUsernameScreen();
+        }
     }
 
     private void notifyObserversValidUsernameGenerated(String name, String generatedUsername) {

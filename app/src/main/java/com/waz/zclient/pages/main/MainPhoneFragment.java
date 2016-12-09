@@ -28,9 +28,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.waz.api.CredentialsUpdateListener;
 import com.waz.api.IConversation;
 import com.waz.api.Message;
 import com.waz.api.User;
@@ -41,16 +38,10 @@ import com.waz.zclient.controllers.confirmation.ConfirmationObserver;
 import com.waz.zclient.controllers.confirmation.ConfirmationRequest;
 import com.waz.zclient.controllers.confirmation.IConfirmationController;
 import com.waz.zclient.controllers.giphy.GiphyObserver;
-import com.waz.zclient.controllers.navigation.NavigationControllerObserver;
 import com.waz.zclient.controllers.navigation.Page;
 import com.waz.zclient.controllers.onboarding.OnboardingControllerObserver;
 import com.waz.zclient.controllers.singleimage.SingleImageObserver;
-import com.waz.zclient.controllers.usernames.UsernamesControllerObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
-import com.waz.zclient.core.controllers.tracking.events.onboarding.KeptGeneratedUsernameEvent;
-import com.waz.zclient.core.controllers.tracking.events.onboarding.OpenedUsernameSettingsEvent;
-import com.waz.zclient.core.controllers.tracking.events.onboarding.SeenUsernameTakeOverScreenEvent;
-import com.waz.zclient.newreg.fragments.FirstTimeAssignUsernameFragment;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.pages.main.backgroundmain.views.BackgroundFrameLayout;
 import com.waz.zclient.pages.main.conversation.SingleImageFragment;
@@ -62,7 +53,6 @@ import com.waz.zclient.pages.main.giphy.GiphySharingPreviewFragment;
 import com.waz.zclient.pages.main.inappnotification.InAppNotificationFragment;
 import com.waz.zclient.pages.main.onboarding.OnBoardingHintFragment;
 import com.waz.zclient.pages.main.onboarding.OnBoardingHintType;
-import com.waz.zclient.pages.main.profile.ZetaPreferencesActivity;
 import com.waz.zclient.utils.ViewUtils;
 import com.waz.zclient.views.menus.ConfirmationMenu;
 
@@ -75,10 +65,7 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
                                                                                             SingleImageFragment.Container,
                                                                                             GiphyObserver,
                                                                                             ConfirmationObserver,
-                                                                                            AccentColorObserver,
-                                                                                            UsernamesControllerObserver,
-                                                                                            FirstTimeAssignUsernameFragment.Container,
-                                                                                            NavigationControllerObserver {
+                                                                                            AccentColorObserver {
 
     public static final String TAG = MainPhoneFragment.class.getName();
     private ConfirmationMenu confirmationMenu;
@@ -118,7 +105,6 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
         getControllerFactory().getGiphyController().addObserver(this);
         getControllerFactory().getConfirmationController().addConfirmationObserver(this);
         getControllerFactory().getAccentColorController().addAccentColorObserver(this);
-        getControllerFactory().getNavigationController().addNavigationControllerObserver(this);
 
         getControllerFactory().getAccentColorController().addAccentColorObserver(backgroundLayout);
         getControllerFactory().getBackgroundController().addBackgroundObserver(backgroundLayout);
@@ -137,8 +123,6 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
         getControllerFactory().getOnboardingController().removeOnboardingControllerObserver(this);
         getControllerFactory().getConfirmationController().removeConfirmationObserver(this);
         getControllerFactory().getAccentColorController().removeAccentColorObserver(this);
-        getControllerFactory().getNavigationController().removeNavigationControllerObserver(this);
-        getControllerFactory().getUsernameController().removeUsernamesObserver(this);
 
         getControllerFactory().getAccentColorController().removeAccentColorObserver(backgroundLayout);
         getControllerFactory().getBackgroundController().removeBackgroundObserver(backgroundLayout);
@@ -399,94 +383,6 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
             return;
         }
         confirmationMenu.setButtonColor(color);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  UsernamesObserver
-    //
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onValidUsernameGenerated(String name, String generatedUsername) {
-        openUsernameAssignTakeOver(name, generatedUsername);
-    }
-
-    @Override
-    public void onUsernameAttemptsExhausted(String name) {
-        openUsernameAssignTakeOver(name, "");
-    }
-
-    private void openUsernameAssignTakeOver(String name, String username) {
-        if (getControllerFactory().getNavigationController().getCurrentLeftPage() != Page.CONVERSATION_LIST ||
-            getChildFragmentManager().findFragmentByTag(FirstTimeAssignUsernameFragment.TAG) != null) {
-            return;
-        }
-        getChildFragmentManager().beginTransaction()
-            .setCustomAnimations(R.anim.fade_in,
-                R.anim.fade_out,
-                R.anim.fade_in,
-                R.anim.fade_out)
-            .add(R.id.fl__overlay_container,
-                 FirstTimeAssignUsernameFragment.newInstance(name, username),
-                 FirstTimeAssignUsernameFragment.TAG)
-            .addToBackStack(FirstTimeAssignUsernameFragment.TAG)
-            .commit();
-
-        getControllerFactory().getTrackingController().tagEvent(new SeenUsernameTakeOverScreenEvent());
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  FirstTimeAssignUsername.Container
-    //
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onChooseUsernameChosen() {
-        getChildFragmentManager().popBackStackImmediate(FirstTimeAssignUsernameFragment.TAG,
-                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        getControllerFactory().getTrackingController().tagEvent(new OpenedUsernameSettingsEvent());
-        startActivity(ZetaPreferencesActivity.getUsernameEditPreferencesIntent(getActivity()));
-    }
-
-    @Override
-    public void onKeepUsernameChosen(String username) {
-        getChildFragmentManager().popBackStackImmediate(FirstTimeAssignUsernameFragment.TAG,
-                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        getStoreFactory().getZMessagingApiStore().getApi().getSelf().setUsername(username, new CredentialsUpdateListener() {
-            @Override
-            public void onUpdated() {
-                getControllerFactory().getTrackingController().tagEvent(new KeptGeneratedUsernameEvent(true));
-            }
-            @Override
-            public void onUpdateFailed(int code, String message, String label) {
-                Toast.makeText(getActivity(), getString(R.string.username__set__toast_error), Toast.LENGTH_SHORT).show();
-                getControllerFactory().getUsernameController().logout();
-                getControllerFactory().getUsernameController().setUser(getStoreFactory().getZMessagingApiStore().getApi().getSelf());
-                getControllerFactory().getTrackingController().tagEvent(new KeptGeneratedUsernameEvent(false));
-            }
-        });
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  NavigationControllerObserver
-    //
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onPageVisible(Page page) {
-        if (page == Page.CONVERSATION_LIST) {
-            getControllerFactory().getUsernameController().addUsernamesObserver(this);
-        } else {
-            getControllerFactory().getUsernameController().removeUsernamesObserver(this);
-        }
-    }
-
-    @Override
-    public void onPageStateHasChanged(Page page) {
-
     }
 
     public interface Container {

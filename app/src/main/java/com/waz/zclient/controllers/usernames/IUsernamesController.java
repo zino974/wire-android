@@ -37,6 +37,10 @@ public interface IUsernamesController {
 
     void removeUsernamesObserver(UsernamesControllerObserver usernamesControllerObserver);
 
+    void addUsernamesObserverAndUpdate(UsernamesControllerObserver usernamesControllerObserver);
+
+    void closeFirstAssignUsernameScreen();
+
     void logout();
 
     void tearDown();
