@@ -24,6 +24,7 @@ import com.waz.api.IConversation;
 import com.waz.api.KindOfTrackingEvent;
 import com.waz.api.TrackingEvent;
 import com.waz.api.TrackingEventsHandler;
+import com.waz.service.HandlesTrackingService;
 import com.waz.service.call.AvsMetrics;
 import com.waz.service.push.PushTrackingService;
 import com.waz.zclient.controllers.tracking.ITrackingController;
@@ -153,6 +154,11 @@ public class AppTrackingEventsHandler implements TrackingEventsHandler {
         }
         */
         trackingController.tagAVSMetricEvent(new EndedCallAVSMetricsEvent(avsMetrics));
+    }
+
+    @Override
+    public void onHandleValidation(HandlesTrackingService.HandlesValidationTrackingEvent event) {
+        Timber.i("Handles validation %s", event.success() ? "Succeeded" : "Failed");
     }
 
     private boolean isEphemeral(TrackingEvent trackingEvent) {
