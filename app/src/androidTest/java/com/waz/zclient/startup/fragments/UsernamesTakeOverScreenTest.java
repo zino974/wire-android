@@ -21,7 +21,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.waz.api.impl.Self;
 import com.waz.zclient.AppEntryTestActivity;
 import com.waz.zclient.R;
-import com.waz.zclient.newreg.fragments.FirstTimeAssignUsername;
+import com.waz.zclient.newreg.fragments.FirstTimeAssignUsernameFragment;
 import com.waz.zclient.testutils.FragmentTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,19 +45,19 @@ public class UsernamesTakeOverScreenTest extends FragmentTest<AppEntryTestActivi
 
     @Test
     public void verifyNotPossibleToSkip() throws InterruptedException {
-        attachFragment(FirstTimeAssignUsername.newInstance("", ""), FirstTimeAssignUsername.TAG);
+        attachFragment(FirstTimeAssignUsernameFragment.newInstance("", ""), FirstTimeAssignUsernameFragment.TAG);
         pressBack();
         Thread.sleep(500);
-        verify(activity.getFragmentManager().findFragmentByTag(FirstTimeAssignUsername.TAG) != null);
+        verify(activity.getFragmentManager().findFragmentByTag(FirstTimeAssignUsernameFragment.TAG) != null);
     }
 
     @Test
     public void verifyConversationListIsOpenedAfterAcceptingUsername() throws InterruptedException {
-        attachFragment(FirstTimeAssignUsername.newInstance("", ""), FirstTimeAssignUsername.TAG);
+        attachFragment(FirstTimeAssignUsernameFragment.newInstance("", ""), FirstTimeAssignUsernameFragment.TAG);
         Thread.sleep(500);
         onView(withId(R.id.zb__username_first_assign__keep)).perform(click());
         Thread.sleep(500);
-        verify(activity.getFragmentManager().findFragmentByTag(FirstTimeAssignUsername.TAG) == null);
+        verify(activity.getFragmentManager().findFragmentByTag(FirstTimeAssignUsernameFragment.TAG) == null);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class UsernamesTakeOverScreenTest extends FragmentTest<AppEntryTestActivi
         when(mockSelf.getName()).thenReturn("Test User");
         when(mockSelf.getUsername()).thenReturn("");
         when(activity.getStoreFactory().getZMessagingApiStore().getApi().getSelf()).thenReturn(mockSelf);
-        attachFragment(FirstTimeAssignUsername.newInstance(mockSelf.getName(), mockSelf.getUsername()), FirstTimeAssignUsername.TAG);
+        attachFragment(FirstTimeAssignUsernameFragment.newInstance(mockSelf.getName(), mockSelf.getUsername()), FirstTimeAssignUsernameFragment.TAG);
 
         verify(onView(withId(R.id.ttv__name)).check(matches(withText(mockSelf.getName()))));
         verify(onView(withId(R.id.ttv__username)).check(matches(isDisplayed())));

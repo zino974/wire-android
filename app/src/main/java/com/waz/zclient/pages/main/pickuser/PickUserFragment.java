@@ -53,12 +53,14 @@ import com.waz.zclient.controllers.globallayout.KeyboardHeightObserver;
 import com.waz.zclient.controllers.globallayout.KeyboardVisibilityObserver;
 import com.waz.zclient.controllers.navigation.NavigationController;
 import com.waz.zclient.controllers.permission.RequestPermissionsObserver;
+import com.waz.zclient.controllers.tracking.events.connect.EnteredSearchEvent;
+import com.waz.zclient.controllers.tracking.events.connect.OpenedConversationEvent;
 import com.waz.zclient.controllers.tracking.events.connect.OpenedGenericInviteMenuEvent;
+import com.waz.zclient.controllers.tracking.events.connect.SelectedTopUser;
 import com.waz.zclient.controllers.tracking.events.connect.SentConnectRequestEvent;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerSelectSearchUser;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerSelectTopUser;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
 import com.waz.zclient.core.api.scala.ModelObserver;
+import com.waz.zclient.core.controllers.tracking.attributes.ConversationType;
 import com.waz.zclient.core.stores.conversation.ConversationChangeRequester;
 import com.waz.zclient.core.stores.conversation.InboxLoadRequester;
 import com.waz.zclient.core.stores.conversation.OnInboxLoadedListener;
@@ -163,7 +165,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         @Override
         public void onRemovedTokenSpan(User user) {
             getControllerFactory().getPickUserController().removeUser(user);
-            if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+            if (isAddingToConversation()) {
                 setConversationQuickMenuVisible(false);
             }
         }
@@ -236,7 +238,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
 
         if (enter) {
             // Fade animation in participants dialog on tablet
-            if (LayoutSpec.isTablet(getActivity()) && getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+            if (LayoutSpec.isTablet(getActivity()) && isAddingToConversation()) {
                 return new FadeAnimation(getResources().getInteger(R.integer.open_new_conversation__top_conversation__animation_duration), 0f, 1f);
             }
             return new DefaultPageTransitionAnimation(0,
@@ -275,7 +277,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         searchResultRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         searchResultRecyclerView.setAdapter(searchResultAdapter);
         searchResultRecyclerView.addOnItemTouchListener(new SearchResultOnItemTouchListener(getActivity(), this));
-        if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+        if (isAddingToConversation()) {
             searchResultRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -313,7 +315,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
 
         showLoadingBarDelay = getResources().getInteger(R.integer.people_picker__loading_bar__show_delay);
 
-        if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+        if (isAddingToConversation()) {
             genericInviteContainer.setVisibility(View.GONE);
             searchBoxView.setHintText(getString(R.string.pick_user_search__add_to_conversation));
             searchBoxView.showClearButton(false);
@@ -356,7 +358,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         getControllerFactory().getAccentColorController().addAccentColorObserver(this);
         getControllerFactory().getPickUserController().addPickUserSearchControllerObserver(this);
         getControllerFactory().getRequestPermissionsController().addObserver(this);
-        if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION) && !getArguments().getBoolean(ARGUMENT_GROUP_CONVERSATION)) {
+        if (isAddingToConversation() && !getArguments().getBoolean(ARGUMENT_GROUP_CONVERSATION)) {
             new Handler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -389,7 +391,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         genericInviteButton.setOnClickListener(this);
         userSelectionConfirmationButton.setOnClickListener(this);
         errorMessageViewSendInvite.setOnClickListener(this);
-        if (!getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+        if (!isAddingToConversation()) {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -473,7 +475,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
 
     @Override
     public void onTopUsersUpdated(User[] users) {
-        if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+        if (isAddingToConversation()) {
             return;
         }
         getContainer().getLoadingViewIndicator().hide();
@@ -508,7 +510,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
 
         String errorHeader = getString(R.string.people_picker__error_message__no_results);
         String errorBody;
-        if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+        if (isAddingToConversation()) {
             errorBody = getString(R.string.people_picker__error_message__no_results__shared_contacts__add_to_conversation);
         } else {
             errorBody = getControllerFactory().getPickUserController().searchInputIsInvalidEmail() ?
@@ -578,7 +580,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         }
         getContainer().getLoadingViewIndicator().setColor(color);
 
-        if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+        if (isAddingToConversation()) {
             return;
         }
 
@@ -662,7 +664,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
 
         List<User> users = getControllerFactory().getPickUserController().getSelectedUsers();
         int minUsers = 1;
-        if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION) && !getArguments().getBoolean(ARGUMENT_GROUP_CONVERSATION)) {
+        if (isAddingToConversation() && !getArguments().getBoolean(ARGUMENT_GROUP_CONVERSATION)) {
             minUsers = 2;
         }
         if (users.size() >= minUsers) {
@@ -741,23 +743,11 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
             return;
         }
 
-        if (anchorView instanceof ChatheadWithTextFooter) {
-            getControllerFactory().getTrackingController().tagEvent(new PeoplePickerSelectTopUser());
-        } else {
-            int rowType = searchResultAdapter.getItemViewType(position);
-            switch (rowType) {
-                case SearchResultAdapter.ITEM_TYPE_CONNECTED_USER:
-                case SearchResultAdapter.ITEM_TYPE_OTHER_USER:
-                    getControllerFactory().getTrackingController().tagEvent(new PeoplePickerSelectSearchUser(position));
-                    break;
-                case SearchResultAdapter.ITEM_TYPE_CONTACT:
-                case SearchResultAdapter.ITEM_TYPE_CONVERSATION:
-                case SearchResultAdapter.ITEM_TYPE_INITIAL:
-                case SearchResultAdapter.ITEM_TYPE_SECTION_HEADER:
-                case SearchResultAdapter.ITEM_TYPE_TOP_USER:
-                    break;
-            }
-        }
+        TrackingUtils.onUserSelectedInStartUI(getControllerFactory().getTrackingController(),
+                                              user,
+                                              anchorView instanceof ChatheadWithTextFooter,
+                                              isAddingToConversation(),
+                                              searchResultAdapter.getItemViewType(position));
 
         // Selecting user from search results toggles user token and confirmation button
         if (user.getConnectionStatus() == User.ConnectionStatus.ACCEPTED) {
@@ -792,7 +782,8 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
             return;
         }
 
-        getControllerFactory().getTrackingController().tagEvent(new PeoplePickerSelectTopUser());
+        getControllerFactory().getTrackingController().tagEvent(new SelectedTopUser());
+        getControllerFactory().getTrackingController().tagEvent(new OpenedConversationEvent(ConversationType.ONE_TO_ONE_CONVERSATION.name()));
         getStoreFactory().getConversationStore().setCurrentConversation(user.getConversation(),
                                                                         ConversationChangeRequester.START_CONVERSATION);
     }
@@ -802,6 +793,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         KeyboardUtils.hideKeyboard(getActivity());
         getStoreFactory().getConversationStore().setCurrentConversation(conversation,
                                                                         ConversationChangeRequester.START_CONVERSATION);
+        getControllerFactory().getTrackingController().tagEvent(new OpenedConversationEvent(ConversationType.GROUP_CONVERSATION.name()));
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -852,7 +844,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
                     // Launch SMS app directly if contact only has phone numner
                     final String number = contactMethods[0].getStringRepresentation();
                     sendSMSInvite(number);
-                    getControllerFactory().getTrackingController().tagEvent(new OpenedGenericInviteMenuEvent(OpenedGenericInviteMenuEvent.EventContext.STARTUI_CONTACT));
+                    getControllerFactory().getTrackingController().tagEvent(new OpenedGenericInviteMenuEvent(OpenedGenericInviteMenuEvent.EventContext.ADDRESSBOOK));
                     return;
                 }
 
@@ -883,7 +875,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
                                                   if (selectedContactMethod.getKind() == ContactMethod.Kind.SMS) {
                                                       final String number = String.valueOf(itemNames[selected]);
                                                       sendSMSInvite(number);
-                                                      getControllerFactory().getTrackingController().tagEvent(new OpenedGenericInviteMenuEvent(OpenedGenericInviteMenuEvent.EventContext.STARTUI_CONTACT));
+                                                      getControllerFactory().getTrackingController().tagEvent(new OpenedGenericInviteMenuEvent(OpenedGenericInviteMenuEvent.EventContext.ADDRESSBOOK));
                                                   } else {
                                                       selectedContactMethod.invite(" ", null);
                                                       Toast.makeText(getActivity(),
@@ -969,10 +961,11 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
                 if (!hasSelectedUsers) {
                     getStoreFactory().getPickUserStore().searchContacts(filter);
                 }
+                getControllerFactory().getTrackingController().tagEvent(new EnteredSearchEvent(isAddingToConversation()));
                 break;
             case SHOW_TOP_USERS_AS_LIST:
             case SHOW_TOP_USERS_AND_RECOMMENDED:
-                boolean excludeConversationParticipants = getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION) &&
+                boolean excludeConversationParticipants = isAddingToConversation() &&
                                                           getArguments().getBoolean(ARGUMENT_GROUP_CONVERSATION);
                 getStoreFactory().getPickUserStore().loadTopUserList(NUM_SEARCH_RESULTS_TOP_USERS, excludeConversationParticipants);
                 break;
@@ -998,7 +991,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
             errorMessageViewBody.setVisibility(View.GONE);
         }
 
-        if (SHOW_INVITE && !getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+        if (SHOW_INVITE && !isAddingToConversation()) {
             errorMessageViewSendInvite.setVisibility(View.VISIBLE);
         } else {
             errorMessageViewSendInvite.setVisibility(View.GONE);
@@ -1049,8 +1042,8 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
         sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
         startActivity(Intent.createChooser(sharingIntent, shareChooserMessage));
         OpenedGenericInviteMenuEvent.EventContext eventContext = fromSearch ?
-                                                                 OpenedGenericInviteMenuEvent.EventContext.STARTUI_SEARCH :
-                                                                 OpenedGenericInviteMenuEvent.EventContext.STARTUI_BANNER;
+                                                                 OpenedGenericInviteMenuEvent.EventContext.NO_RESULTS :
+                                                                 OpenedGenericInviteMenuEvent.EventContext.BANNER;
         getControllerFactory().getTrackingController().tagEvent(new OpenedGenericInviteMenuEvent(eventContext));
         getControllerFactory().getTrackingController().onApplicationScreen(ApplicationScreen.SEND_GENERIC_INVITE_MENU);
     }
@@ -1058,7 +1051,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
     private void showUser(User user, View anchorView) {
         switch (user.getConnectionStatus()) {
             case ACCEPTED:
-                if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+                if (isAddingToConversation()) {
                     ArrayList<User> users = new ArrayList<>();
                     users.add(user);
                     getContainer().onSelectedUsers(users, ConversationChangeRequester.START_CONVERSATION);
@@ -1098,7 +1091,7 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
             getControllerFactory().isTornDown()) {
             return;
         }
-        if (getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION)) {
+        if (isAddingToConversation()) {
             int numberOfSelectedUsers = getControllerFactory().getPickUserController().getSelectedUsers().size();
             boolean visible = getArguments().getBoolean(ARGUMENT_GROUP_CONVERSATION) ? numberOfSelectedUsers > 0 : numberOfSelectedUsers > 1;
             userSelectionConfirmationContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -1158,20 +1151,23 @@ public class PickUserFragment extends BaseFragment<PickUserFragment.Container> i
     private PickUserDataState getDataState(boolean hasSelectedUsers) {
         PickUserDataState dataState = PickUserDataState.SHOW_TOP_USERS_AND_RECOMMENDED;
 
-        boolean isAddingToConversation = getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION);
         if (!TextUtils.isEmpty(getControllerFactory().getPickUserController().getSearchFilter())) {
-            if (isAddingToConversation) {
+            if (isAddingToConversation()) {
                 dataState = PickUserDataState.SHOW_SEARCH_RESULTS_TO_ADD_TO_CONVERSATION;
             } else {
                 dataState = PickUserDataState.SHOW_SEARCH_RESULTS;
             }
-        } else if (isAddingToConversation) {
+        } else if (isAddingToConversation()) {
             dataState = PickUserDataState.SHOW_ALL_USERS_TO_ADD_TO_CONVERSATION;
         } else if (hasSelectedUsers) {
             dataState = PickUserDataState.SHOW_TOP_USERS_AS_LIST;
         }
 
         return dataState;
+    }
+
+    private boolean isAddingToConversation() {
+        return getArguments().getBoolean(ARGUMENT_ADD_TO_CONVERSATION);
     }
 
     private void closeStartUI() {

@@ -56,7 +56,6 @@ import com.waz.zclient.controllers.tracking.events.group.AddedMemberToGroupEvent
 import com.waz.zclient.controllers.tracking.events.group.CreatedGroupConversationEvent;
 import com.waz.zclient.controllers.tracking.events.group.LeaveGroupConversationEvent;
 import com.waz.zclient.controllers.tracking.events.group.RemoveContactEvent;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.ConversationType;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
@@ -1030,8 +1029,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
             }
             getControllerFactory().getTrackingController().tagEvent(new CreatedGroupConversationEvent(true,
                                                                                                       (users.size() + 1)));
-            getControllerFactory().getTrackingController().onPeoplePickerResultsUsed(users.size(),
-                                                                                     PeoplePickerResultsUsed.Usage.CREATE_GROUP_CONVERSATION);
         } else if (currentConversation.getType() == IConversation.Type.GROUP) {
             currentConversation.addMembers(users);
             getStoreFactory().getInAppNotificationStore().setUserLookingAtPeoplePicker(false);
@@ -1044,8 +1041,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
                                           null, true);
             }
             getControllerFactory().getTrackingController().tagEvent(new AddedMemberToGroupEvent(getParticipantsCount(), users.size()));
-            getControllerFactory().getTrackingController().onPeoplePickerResultsUsed(users.size(),
-                                                                                     PeoplePickerResultsUsed.Usage.ADD_MEMBERS_TO_EXISTING_CONVERSATION);
         }
         getControllerFactory().getTrackingController().updateSessionAggregates(RangedAttribute.USERS_ADDED_TO_CONVERSATIONS);
     }

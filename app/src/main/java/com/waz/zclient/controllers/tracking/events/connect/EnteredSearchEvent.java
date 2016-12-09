@@ -15,30 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.controllers.tracking.events.peoplepicker;
+package com.waz.zclient.controllers.tracking.events.connect;
 
 import android.support.annotation.NonNull;
 import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
-import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
 
-public class PeoplePickerResultsUsed extends Event {
+public class EnteredSearchEvent extends Event {
 
-    public PeoplePickerResultsUsed(int numberOfContacts, PeoplePickerResultsUsed.Usage usage) {
-        rangedAttributes.put(RangedAttribute.NUMBER_OF_CONTACTS_ADDED, numberOfContacts);
-        attributes.put(Attribute.GROUP_CONVERSATION_CREATED,
-                       Boolean.toString(usage == PeoplePickerResultsUsed.Usage.CREATE_GROUP_CONVERSATION));
+    public EnteredSearchEvent(boolean isAddingToGroupConversation) {
+        attributes.put(Attribute.CONTEXT, isAddingToGroupConversation ? "add_to_conversation" : "startui");
     }
 
     @NonNull
     @Override
     public String getName() {
-        return "searchResultsUsed";
-    }
-
-    public enum Usage {
-        NAVIGATE_TO_EXISTING_CONVERSATION,
-        ADD_MEMBERS_TO_EXISTING_CONVERSATION,
-        CREATE_GROUP_CONVERSATION
+        return "connect.entered_search";
     }
 }

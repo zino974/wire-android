@@ -32,6 +32,7 @@ import com.waz.api.UsernameValidation;
 import com.waz.api.UsernameValidationError;
 import com.waz.api.UsernamesRequestCallback;
 import com.waz.zclient.R;
+import com.waz.zclient.core.controllers.tracking.events.settings.SetUsernameEvent;
 import com.waz.zclient.core.stores.IStoreFactory;
 import com.waz.zclient.pages.BaseDialogFragment;
 import com.waz.zclient.utils.ViewUtils;
@@ -145,6 +146,7 @@ public class ChangeUsernamePreferenceDialogFragment extends BaseDialogFragment<C
                 editBoxShakeAnimation();
                 return;
             }
+            getControllerFactory().getTrackingController().tagEvent(new SetUsernameEvent(inputUsername.length()));
             disableEditing();
             getStoreFactory().getZMessagingApiStore().getApi().getSelf().setUsername(inputUsername, setUsernameCallback);
         }

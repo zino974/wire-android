@@ -33,8 +33,6 @@ import com.waz.api.ZMessagingApi;
 import com.waz.zclient.BuildConfig;
 import com.waz.zclient.ZApplication;
 import com.waz.zclient.controllers.tracking.events.launch.AppLaunch;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerClosedByUser;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.controllers.tracking.events.session.Session;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
 import com.waz.zclient.controllers.tracking.screens.RegistrationScreen;
@@ -420,25 +418,6 @@ public class TrackingController implements ITrackingController {
     @Override
     public ApplicationScreen getApplicationScreen() {
         return applicationScreen;
-    }
-
-    ////////////////////////////////////////////
-    //
-    // People Picker
-    //
-    ////////////////////////////////////////////
-
-    @Override
-    public void onPeoplePickerResultsUsed(int numberOfContacts, PeoplePickerResultsUsed.Usage usage) {
-        PeoplePickerResultsUsed event = new PeoplePickerResultsUsed(numberOfContacts, usage);
-        tagEvent(event);
-    }
-
-    @Override
-    public void onPeoplePickerClosedByUser(boolean searchBoxHasOnlyStringContent, boolean cancelledByUser) {
-        if (searchBoxHasOnlyStringContent && cancelledByUser) {
-            tagEvent(new PeoplePickerClosedByUser());
-        }
     }
 
     ////////////////////////////////////////////

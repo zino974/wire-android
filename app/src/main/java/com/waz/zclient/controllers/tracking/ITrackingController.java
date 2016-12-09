@@ -20,7 +20,6 @@ package com.waz.zclient.controllers.tracking;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
 import com.waz.zclient.controllers.tracking.screens.RegistrationScreen;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
@@ -49,10 +48,6 @@ public interface ITrackingController {
 
     void onApplicationScreen(ApplicationScreen screen);
     ApplicationScreen getApplicationScreen();
-
-    // People picker
-    void onPeoplePickerResultsUsed(int numberOfContacts, PeoplePickerResultsUsed.Usage usage);
-    void onPeoplePickerClosedByUser(boolean searchBoxHasContent, boolean cancelledByUser);
 
     void setActivity(Activity activity);
 }

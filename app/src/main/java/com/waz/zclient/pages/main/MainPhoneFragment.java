@@ -47,7 +47,10 @@ import com.waz.zclient.controllers.onboarding.OnboardingControllerObserver;
 import com.waz.zclient.controllers.singleimage.SingleImageObserver;
 import com.waz.zclient.controllers.usernames.UsernamesControllerObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
-import com.waz.zclient.newreg.fragments.FirstTimeAssignUsername;
+import com.waz.zclient.core.controllers.tracking.events.onboarding.KeptGeneratedUsernameEvent;
+import com.waz.zclient.core.controllers.tracking.events.onboarding.OpenedUsernameSettingsEvent;
+import com.waz.zclient.core.controllers.tracking.events.onboarding.SeenUsernameTakeOverScreenEvent;
+import com.waz.zclient.newreg.fragments.FirstTimeAssignUsernameFragment;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.pages.main.backgroundmain.views.BackgroundFrameLayout;
 import com.waz.zclient.pages.main.conversation.SingleImageFragment;
@@ -74,7 +77,7 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
                                                                                             ConfirmationObserver,
                                                                                             AccentColorObserver,
                                                                                             UsernamesControllerObserver,
-                                                                                            FirstTimeAssignUsername.Container,
+                                                                                            FirstTimeAssignUsernameFragment.Container,
                                                                                             NavigationControllerObserver {
 
     public static final String TAG = MainPhoneFragment.class.getName();
@@ -416,7 +419,7 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
 
     private void openUsernameAssignTakeOver(String name, String username) {
         if (getControllerFactory().getNavigationController().getCurrentLeftPage() != Page.CONVERSATION_LIST ||
-            getChildFragmentManager().findFragmentByTag(FirstTimeAssignUsername.TAG) != null) {
+            getChildFragmentManager().findFragmentByTag(FirstTimeAssignUsernameFragment.TAG) != null) {
             return;
         }
         getChildFragmentManager().beginTransaction()
@@ -425,10 +428,12 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
                 R.anim.fade_in,
                 R.anim.fade_out)
             .add(R.id.fl__overlay_container,
-                FirstTimeAssignUsername.newInstance(name, username),
-                FirstTimeAssignUsername.TAG)
-            .addToBackStack(FirstTimeAssignUsername.TAG)
+                 FirstTimeAssignUsernameFragment.newInstance(name, username),
+                 FirstTimeAssignUsernameFragment.TAG)
+            .addToBackStack(FirstTimeAssignUsernameFragment.TAG)
             .commit();
+
+        getControllerFactory().getTrackingController().tagEvent(new SeenUsernameTakeOverScreenEvent());
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -439,23 +444,27 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
 
     @Override
     public void onChooseUsernameChosen() {
-        getChildFragmentManager().popBackStackImmediate(FirstTimeAssignUsername.TAG,
-            FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getChildFragmentManager().popBackStackImmediate(FirstTimeAssignUsernameFragment.TAG,
+                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getControllerFactory().getTrackingController().tagEvent(new OpenedUsernameSettingsEvent());
         startActivity(ZetaPreferencesActivity.getUsernameEditPreferencesIntent(getActivity()));
     }
 
     @Override
     public void onKeepUsernameChosen(String username) {
-        getChildFragmentManager().popBackStackImmediate(FirstTimeAssignUsername.TAG,
-            FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getChildFragmentManager().popBackStackImmediate(FirstTimeAssignUsernameFragment.TAG,
+                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getStoreFactory().getZMessagingApiStore().getApi().getSelf().setUsername(username, new CredentialsUpdateListener() {
             @Override
-            public void onUpdated() { }
+            public void onUpdated() {
+                getControllerFactory().getTrackingController().tagEvent(new KeptGeneratedUsernameEvent(true));
+            }
             @Override
             public void onUpdateFailed(int code, String message, String label) {
                 Toast.makeText(getActivity(), getString(R.string.username__set__toast_error), Toast.LENGTH_SHORT).show();
                 getControllerFactory().getUsernameController().logout();
                 getControllerFactory().getUsernameController().setUser(getStoreFactory().getZMessagingApiStore().getApi().getSelf());
+                getControllerFactory().getTrackingController().tagEvent(new KeptGeneratedUsernameEvent(false));
             }
         });
     }

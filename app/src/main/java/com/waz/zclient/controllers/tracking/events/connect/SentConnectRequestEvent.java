@@ -28,8 +28,7 @@ public class SentConnectRequestEvent extends Event {
     public enum EventContext {
         STARTUI("startui"),
         PARTICIPANTS("participants"),
-        INVITE_CONTACT_LIST("invite_contact_list"),
-        ADD_CONTACT_LIST("add_contact_list"),
+        INVITE_CONTACT_LIST("contact_list"),
         UNKNOWN("unknown");
 
         private final String name;

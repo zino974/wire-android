@@ -15,16 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.controllers.tracking.events.peoplepicker;
+package com.waz.zclient.core.controllers.tracking.events.settings;
 
 import android.support.annotation.NonNull;
+import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
 
-public class PeoplePickerSelectTopUser extends Event {
+
+public class SetUsernameEvent extends Event {
+
+    public SetUsernameEvent(int length) {
+        attributes.put(Attribute.LENGTH, String.valueOf(length));
+    }
 
     @NonNull
     @Override
     public String getName() {
-        return "selectedTopContact";
+        return "settings.set_username";
     }
 }
