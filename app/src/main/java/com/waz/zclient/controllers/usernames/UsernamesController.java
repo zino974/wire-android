@@ -36,7 +36,7 @@ import java.util.WeakHashMap;
 public class UsernamesController implements IUsernamesController {
 
     private static final int USERNAME_MAX_LENGTH = 21;
-    private static final int MAX_ATTEMPTS = 30;
+    private static final int MAX_ATTEMPTS = 50;
     private static final int MAX_RANDOM_TRAILLING_NUMBER = 10000;
 
     private ZApplication application = null;

@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,7 +51,9 @@ public class ChangeUsernamePreferenceDialogFragment extends BaseDialogFragment<C
     private View okButton;
     private View backButton;
     private String inputUsername = "";
+    private String suggestedUsername;
     private boolean editingEnabled = true;
+    private boolean cancelEnabled = true;
 
     private TextWatcher usernameTextWatcher = new TextWatcher() {
         private String lastText;
@@ -134,6 +137,9 @@ public class ChangeUsernamePreferenceDialogFragment extends BaseDialogFragment<C
         @Override
         public void onClick(View view) {
             inputUsername = usernameEditText.getText().toString();
+            if (TextUtils.isEmpty(inputUsername)) {
+                return;
+            }
             IStoreFactory storeFactory = getStoreFactory();
             if (storeFactory != null &&
                 !storeFactory.isTornDown() &&
@@ -197,8 +203,8 @@ public class ChangeUsernamePreferenceDialogFragment extends BaseDialogFragment<C
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        String username = getArguments().getString(ARG_USERNAME, "");
-        boolean cancelEnabled = getArguments().getBoolean(ARG_CANCEL_ENABLED);
+        suggestedUsername = getArguments().getString(ARG_USERNAME, "");
+        cancelEnabled = getArguments().getBoolean(ARG_CANCEL_ENABLED);
 
         View view = inflater.inflate(R.layout.fragment_change_username_preference_dialog, container, false);
         usernameInputLayout = ViewUtils.getView(view, R.id.til__change_username);
@@ -207,15 +213,11 @@ public class ChangeUsernamePreferenceDialogFragment extends BaseDialogFragment<C
         okButton = ViewUtils.getView(view, R.id.tv__ok_button);
         backButton  = ViewUtils.getView(view, R.id.tv__back_button);
 
-        usernameEditText.setText(username);
-        usernameEditText.setSelection(username.length());
+        usernameEditText.setText(suggestedUsername);
+        usernameEditText.setSelection(suggestedUsername.length());
 
         usernameVerifyingIndicator.setType(LoadingIndicatorView.SPINNER);
         usernameVerifyingIndicator.hide();
-
-        if (!cancelEnabled) {
-            backButton.setVisibility(View.GONE);
-        }
 
         setCancelable(false);
         return view;
@@ -228,6 +230,18 @@ public class ChangeUsernamePreferenceDialogFragment extends BaseDialogFragment<C
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!cancelEnabled && getStoreFactory() != null) {
+                    CredentialsUpdateListener emptyCredentialsListener = new CredentialsUpdateListener() {
+                        @Override
+                        public void onUpdated() {
+                        }
+
+                        @Override
+                        public void onUpdateFailed(int code, String message, String label) {
+                        }
+                    };
+                    getStoreFactory().getZMessagingApiStore().getApi().getSelf().setUsername(suggestedUsername, emptyCredentialsListener);
+                }
                 dismiss();
             }
         });
