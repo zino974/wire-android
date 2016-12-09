@@ -823,6 +823,5 @@
 
     <dimen name="usernames__take_over__side_margin">28dp</dimen>
     <dimen name="usernames__take_over__username__bottom_padding">240dp</dimen>
-    <dimen name="usernames__take_over__name__top_margin">-32dp</dimen>
     <dimen name="prefs__username_change__content_height">140dp</dimen>
 </resources>
