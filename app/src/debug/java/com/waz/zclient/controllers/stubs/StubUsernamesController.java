@@ -54,7 +54,17 @@ public class StubUsernamesController implements IUsernamesController {
     }
 
     @Override
+    public void addUsernamesObserverAndUpdate(UsernamesControllerObserver usernamesControllerObserver) {
+
+    }
+
+    @Override
     public void removeUsernamesObserver(UsernamesControllerObserver usernamesControllerObserver) {
+
+    }
+
+    @Override
+    public void closeFirstAssignUsernameScreen() {
 
     }
 

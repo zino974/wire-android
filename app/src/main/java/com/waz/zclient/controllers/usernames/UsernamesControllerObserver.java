@@ -20,4 +20,5 @@ package com.waz.zclient.controllers.usernames;
 public interface UsernamesControllerObserver {
     void onValidUsernameGenerated(String name, String generatedUsername);
     void onUsernameAttemptsExhausted(String name);
+    void onCloseFirstAssignUsernameScreen();
 }

@@ -59,6 +59,7 @@ import com.waz.zclient.controllers.tracking.events.conversation.DeleteConversati
 import com.waz.zclient.controllers.tracking.events.conversation.UnarchivedConversationEvent;
 import com.waz.zclient.controllers.tracking.events.group.CreatedGroupConversationEvent;
 import com.waz.zclient.controllers.tracking.events.group.LeaveGroupConversationEvent;
+import com.waz.zclient.controllers.usernames.UsernamesControllerObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.ConversationType;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.onboarding.KeptGeneratedUsernameEvent;
@@ -116,6 +117,7 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
                                                                                                    PendingConnectRequestManagerFragment.Container,
                                                                                                    ConversationScreenControllerObserver,
                                                                                                    NavigationControllerObserver,
+                                                                                                   UsernamesControllerObserver,
                                                                                                    ConfirmationObserver,
                                                                                                    AccentColorObserver,
                                                                                                    InAppNotificationStoreObserver,
@@ -389,6 +391,9 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
         if (page == Page.CONVERSATION_LIST) {
             boolean enablePager = getStoreFactory().getConversationStore().getCurrentConversation() != null;
             getControllerFactory().getNavigationController().setPagerEnabled(enablePager);
+            getControllerFactory().getUsernameController().addUsernamesObserverAndUpdate(this);
+        } else {
+            getControllerFactory().getUsernameController().removeUsernamesObserver(this);
         }
     }
 
@@ -1211,20 +1216,6 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
         errorDescription.dismiss();
     }
 
-    public void showFirstAssignUsernameScreen(String name, String username) {
-        getChildFragmentManager()
-            .beginTransaction()
-            .setCustomAnimations(R.anim.fade_in,
-                R.anim.fade_out,
-                R.anim.fade_in,
-                R.anim.fade_out)
-            .replace(R.id.fl__conversation_list_main, FirstTimeAssignUsernameFragment.newInstance(name, username), FirstTimeAssignUsernameFragment.TAG)
-            .addToBackStack(FirstTimeAssignUsernameFragment.TAG)
-            .commitAllowingStateLoss();
-
-        getControllerFactory().getTrackingController().tagEvent(new SeenUsernameTakeOverScreenEvent());
-    }
-
     public void hideFirstAssignUsernameScreen() {
         getChildFragmentManager().popBackStackImmediate(FirstTimeAssignUsernameFragment.TAG,
                                                         FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -1238,7 +1229,7 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
 
     @Override
     public void onChooseUsernameChosen() {
-        getContainer().closeFirstAssignUsernameScreen();
+        getControllerFactory().getUsernameController().closeFirstAssignUsernameScreen();
         hideFirstAssignUsernameScreen();
         getControllerFactory().getTrackingController().tagEvent(new OpenedUsernameSettingsEvent());
         startActivity(ZetaPreferencesActivity.getUsernameEditPreferencesIntent(getActivity()));
@@ -1246,7 +1237,7 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
 
     @Override
     public void onKeepUsernameChosen(String username) {
-        getContainer().closeFirstAssignUsernameScreen();
+        getControllerFactory().getUsernameController().closeFirstAssignUsernameScreen();
         hideFirstAssignUsernameScreen();
         getStoreFactory().getZMessagingApiStore().getApi().getSelf().setUsername(username, new CredentialsUpdateListener() {
             @Override
@@ -1263,9 +1254,37 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
         });
     }
 
+    @Override
+    public void onValidUsernameGenerated(String name, String generatedUsername) {
+        showFirstAssignUsernameScreen(name, generatedUsername);
+    }
+
+    @Override
+    public void onUsernameAttemptsExhausted(String name) {
+        showFirstAssignUsernameScreen(name, "");
+    }
+
+    @Override
+    public void onCloseFirstAssignUsernameScreen() {
+
+    }
+
+    private void showFirstAssignUsernameScreen(String name, String username) {
+        getChildFragmentManager()
+            .beginTransaction()
+            .setCustomAnimations(R.anim.fade_in,
+                                 R.anim.fade_out,
+                                 R.anim.fade_in,
+                                 R.anim.fade_out)
+            .replace(R.id.fl__conversation_list_main, FirstTimeAssignUsernameFragment.newInstance(name, username), FirstTimeAssignUsernameFragment.TAG)
+            .addToBackStack(FirstTimeAssignUsernameFragment.TAG)
+            .commitAllowingStateLoss();
+
+        getControllerFactory().getTrackingController().tagEvent(new SeenUsernameTakeOverScreenEvent());
+    }
+
     public interface Container {
         void onOpenUrl(String url);
-        void closeFirstAssignUsernameScreen();
     }
 
 }

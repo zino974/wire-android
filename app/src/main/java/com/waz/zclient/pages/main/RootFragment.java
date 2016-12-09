@@ -51,6 +51,7 @@ import com.waz.zclient.controllers.giphy.GiphyObserver;
 import com.waz.zclient.controllers.location.LocationObserver;
 import com.waz.zclient.controllers.navigation.Page;
 import com.waz.zclient.controllers.navigation.PagerControllerObserver;
+import com.waz.zclient.controllers.usernames.UsernamesControllerObserver;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.events.media.SentPictureEvent;
 import com.waz.zclient.core.stores.connect.IConnectStore;
@@ -103,6 +104,7 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
                                                                        DrawingObserver,
                                                                        LocationObserver,
                                                                        ParticipantsStoreObserver,
+                                                                       UsernamesControllerObserver,
                                                                        ConversationFragment.Container,
                                                                        ConversationListManagerFragment.Container {
     public static final String TAG = RootFragment.class.getName();
@@ -234,6 +236,7 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
         getControllerFactory().getCameraController().addCameraActionObserver(this);
         getControllerFactory().getPickUserController().addPickUserScreenControllerObserver(this);
         getControllerFactory().getGiphyController().addObserver(this);
+        getControllerFactory().getUsernameController().addUsernamesObserverAndUpdate(this);
         getControllerFactory().getDrawingController().addDrawingObserver(this);
         getStoreFactory().getParticipantsStore().addParticipantsStoreObserver(this);
         getControllerFactory().getLocationController().addObserver(this);
@@ -248,6 +251,7 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
         getControllerFactory().getConversationScreenController().removeConversationControllerObservers(this);
         getControllerFactory().getSlidingPaneController().removeObserver(this);
         getControllerFactory().getCameraController().removeCameraActionObserver(this);
+        getControllerFactory().getUsernameController().removeUsernamesObserver(this);
         getControllerFactory().getNavigationController().removePagerControllerObserver(this);
         getStoreFactory().getConversationStore().removeConversationStoreObserver(this);
         getControllerFactory().getPickUserController().removePickUserScreenControllerObserver(this);
@@ -899,27 +903,22 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
         getChildFragmentManager().popBackStack(LocationFragment.TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
-    public void showBlankFragment() {
+    @Override
+    public void onValidUsernameGenerated(String name, String generatedUsername) {
         rightSideShouldBeBlank = true;
         openMessageStream(Page.NONE, BlankFragment.newInstance(), BlankFragment.TAG);
     }
 
-    public void hideBlankFragment() {
-        rightSideShouldBeBlank = false;
-        conversationModelObserver.forceUpdate();
-    }
-
-    public void showFirstTimeAssignUsername(String name, String suggestedUsername) {
-        ConversationListManagerFragment fragment = (ConversationListManagerFragment) getChildFragmentManager().findFragmentByTag(ConversationListManagerFragment.TAG);
-        if (fragment != null) {
-            fragment.showFirstAssignUsernameScreen(name, suggestedUsername);
-            showBlankFragment();
-        }
+    @Override
+    public void onUsernameAttemptsExhausted(String name) {
+        rightSideShouldBeBlank = true;
+        openMessageStream(Page.NONE, BlankFragment.newInstance(), BlankFragment.TAG);
     }
 
     @Override
-    public void closeFirstAssignUsernameScreen() {
-        hideBlankFragment();
+    public void onCloseFirstAssignUsernameScreen() {
+        rightSideShouldBeBlank = false;
+        conversationModelObserver.forceUpdate();
     }
 
     public interface Container {
