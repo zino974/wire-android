@@ -192,6 +192,12 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
             return true;
         }
 
+        fragment = getChildFragmentManager().findFragmentById(R.id.fl__overlay_container);
+        if (fragment instanceof OnBackPressedListener &&
+            ((OnBackPressedListener) fragment).onBackPressed()) {
+            return true;
+        }
+
         return getChildFragmentManager().popBackStackImmediate();
     }
 

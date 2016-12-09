@@ -139,6 +139,14 @@ public class StringUtils {
         return missing;
     }
 
+    public static String formatUsername(String username) {
+        return "@" + username;
+    }
+
+    public static String truncate(String base, int limit) {
+        return base.substring(0, Math.min(limit, base.length()));
+    }
+
     private static class TextDrawing {
         private final Bitmap bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ALPHA_8);
         private final Canvas canvas = new Canvas(bitmap);

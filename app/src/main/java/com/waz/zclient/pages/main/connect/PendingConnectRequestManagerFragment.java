@@ -24,7 +24,6 @@ import android.view.ViewGroup;
 import com.waz.api.IConversation;
 import com.waz.api.NetworkMode;
 import com.waz.api.User;
-import com.waz.zclient.OnBackPressedListener;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.confirmation.ConfirmationCallback;
 import com.waz.zclient.controllers.confirmation.ConfirmationRequest;
@@ -39,19 +38,14 @@ import com.waz.zclient.pages.main.participants.OptionsMenuControl;
 import com.waz.zclient.core.stores.connect.IConnectStore;
 import com.waz.zclient.core.stores.conversation.ConversationChangeRequester;
 import com.waz.zclient.pages.BaseFragment;
-import com.waz.zclient.pages.main.conversation.controller.IConversationScreenController;
 import com.waz.zclient.pages.main.participants.OptionsMenuFragment;
-import com.waz.zclient.pages.main.participants.SingleParticipantFragment;
-import com.waz.zclient.pages.main.participants.dialog.DialogLaunchMode;
 import com.waz.zclient.ui.optionsmenu.OptionsMenu;
 import com.waz.zclient.ui.optionsmenu.OptionsMenuItem;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
 
 public class PendingConnectRequestManagerFragment extends BaseFragment<PendingConnectRequestManagerFragment.Container> implements PendingConnectRequestFragment.Container,
-                                                                                                                                  SingleParticipantFragment.Container,
-                                                                                                                                  OptionsMenuFragment.Container,
-                                                                                                                                  OnBackPressedListener {
+                                                                                                                                  OptionsMenuFragment.Container {
 
     public static final String TAG = PendingConnectRequestManagerFragment.class.getName();
     public static final String ARGUMENT_USER_ID = "ARGUMENT_USER_ID";
@@ -114,50 +108,6 @@ public class PendingConnectRequestManagerFragment extends BaseFragment<PendingCo
     //
     //////////////////////////////////////////////////////////////////////////////////////////
 
-
-    @Override
-    public void openCommonUserProfile(View anchor, User user) {
-        if (LayoutSpec.isTablet(getActivity())) {
-            IConnectStore.UserRequester userRequester = IConnectStore.UserRequester.valueOf(getArguments().getString(ARGUMENT_USER_REQUESTER));
-            if (userRequester == IConnectStore.UserRequester.CONVERSATION) {
-                // Launch common user in new popover
-                getControllerFactory().getConversationScreenController().setPopoverLaunchedMode(DialogLaunchMode.COMMON_USER);
-                getControllerFactory().getPickUserController().showUserProfile(user, anchor);
-            } else {
-                // Lauch common user in existing popover
-                getContainer().openCommonUserProfile(anchor, user);
-            }
-        } else {
-            if (isShowingCommonUserProfile) {
-                return;
-            }
-
-            isShowingCommonUserProfile = true;
-
-            getControllerFactory().getNavigationController().setRightPage(Page.COMMON_USER_PROFILE, TAG);
-
-            UserProfile profileFragment = (UserProfile) getChildFragmentManager().findFragmentById(R.id.fl__pending_connect_request);
-            if (profileFragment != null) {
-                profileFragment.isBelowUserProfile(true);
-            }
-
-            getStoreFactory().getSingleParticipantStore().setUser(user);
-
-            getChildFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(R.anim.open_profile,
-                                     R.anim.close_profile,
-                                     R.anim.open_profile,
-                                     R.anim.close_profile)
-                .replace(R.id.fl__pending_connect_request,
-                         SingleParticipantFragment.newInstance(true,
-                                                               IConnectStore.UserRequester.SEARCH),
-                         SingleParticipantFragment.TAG)
-                .addToBackStack(SingleParticipantFragment.TAG)
-                .commit();
-        }
-    }
-
     @Override
     public void dismissUserProfile() {
         getContainer().dismissUserProfile();
@@ -193,20 +143,6 @@ public class PendingConnectRequestManagerFragment extends BaseFragment<PendingCo
     }
 
     @Override
-    public void showOptionsMenu(final User user) {
-        @IConversationScreenController.ConversationMenuRequester int menuRequester = (userRequester == IConnectStore.UserRequester.SEARCH) ?
-                                                                                     IConversationScreenController.USER_PROFILE_SEARCH :
-                                                                                     IConversationScreenController.CONVERSATION_DETAILS;
-
-        optionsMenuControl.setTitle(user.getDisplayName());
-        optionsMenuControl.createMenu(user.getConversation(),
-                                      menuRequester,
-                                      getControllerFactory().getThemeController().getThemeDependentOptionsTheme());
-        optionsMenuControl.open();
-
-    }
-
-    @Override
     public void onConversationUpdated(IConversation conversation) {
         if (conversation != null && conversation.getType() == IConversation.Type.ONE_TO_ONE) {
             getContainer().onAcceptedPendingOutgoingConnectRequest(conversation);
@@ -235,32 +171,6 @@ public class PendingConnectRequestManagerFragment extends BaseFragment<PendingCo
     @Override
     public void onAcceptedConnectRequest(IConversation conversation) {
         getContainer().onAcceptedConnectRequest(conversation);
-    }
-
-    @Override
-    public void onIgnoredConnectRequest(IConversation conversation) {
-        getContainer().onIgnoredConnectRequest(conversation);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  OnBackPressedListener
-    //
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public boolean onBackPressed() {
-        SingleParticipantFragment singleUserFragment = (SingleParticipantFragment) getChildFragmentManager().findFragmentByTag(SingleParticipantFragment.TAG);
-        if (singleUserFragment != null &&
-            singleUserFragment.onBackPressed()) {
-            return true;
-        }
-
-        if (isShowingCommonUserProfile) {
-            dismissUserProfile();
-        }
-
-        return isShowingCommonUserProfile;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -360,14 +270,12 @@ public class PendingConnectRequestManagerFragment extends BaseFragment<PendingCo
     }
 
     @Override
-    public void onOpenUrl(String url) {
-
+    public boolean onBackPressed() {
+        return false;
     }
 
     public interface Container extends UserProfileContainer {
         void onAcceptedConnectRequest(IConversation conversation);
-
-        void onIgnoredConnectRequest(IConversation conversation);
 
         void onAcceptedPendingOutgoingConnectRequest(IConversation conversation);
 

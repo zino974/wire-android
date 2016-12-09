@@ -27,29 +27,42 @@
               style="?wireBackground"
     >
 
-    <FrameLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/t__pending_connect__toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:clickable="true"
+        app:contentInsetStart="@dimen/content__padding_left"
+        style="?conversationToolbar"
         >
 
-        <FrameLayout
-            android:id="@+id/fl__participant__backbar__container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/wire__padding__big"
-            android:paddingStart="@dimen/wire__padding__big"
-            />
+            <com.waz.zclient.ui.text.TypefaceTextView
+                android:id="@+id/tv__pending_connect_toolbar__title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/wire__padding__regular"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:background="@null"
+                style="?conversationToolbar"
+                />
 
-        <include layout="@layout/rl__participants__header" />
 
-    </FrameLayout>
-
+    </android.support.v7.widget.Toolbar>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         >
+
+        <com.waz.zclient.ui.views.UserDetailsView
+            android:id="@+id/udv__pending_connect__user_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/wire__padding__small"
+            android:layout_gravity="center_horizontal|top"
+            />
 
         <com.waz.zclient.views.images.ImageAssetImageView
             android:id="@+id/iaiv__pending_connect"
@@ -61,16 +74,6 @@
             />
 
     </FrameLayout>
-
-    <com.waz.zclient.pages.main.connect.views.CommonUsersView
-        android:id="@+id/ll__send_connect_request__common_users"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/wire__padding__regular"
-        android:layout_marginBottom="@dimen/wire__padding__small"
-        android:paddingStart="@dimen/wire__padding__big"
-        android:paddingEnd="@dimen/wire__text_size__big"
-        />
 
     <!-- Wrapper with height of accept menu to ensure Common user view stays in fixed position when toggling between Footer & Accept menu -->
     <FrameLayout
@@ -86,45 +89,6 @@
             android:paddingStart="@dimen/wire__padding__big"
             android:paddingEnd="@dimen/wire__padding__big"
             >
-
-            <LinearLayout
-                android:id="@+id/ll__connect_request__accept_menu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:orientation="horizontal"
-                >
-
-                <com.waz.zclient.ui.views.ZetaButton
-                    android:id="@+id/zb__connect_request__ignore_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/framework_confirmation_menu_button_height"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="@dimen/connect_request__common_users__chathead__vertical_padding"
-                    android:gravity="center"
-                    android:text="@string/connect_request__ignore_button__text"
-                    app:font="@string/wire__typeface__light"
-                    android:textAllCaps="true"
-                    android:textSize="@dimen/wire__text_size__small"
-                    android:textColor="@color/text__primary_light"
-                    />
-
-                <com.waz.zclient.ui.views.ZetaButton
-                    android:id="@+id/zb__connect_request__accept_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/framework_confirmation_menu_button_height"
-                    android:layout_weight="1"
-                    android:layout_marginStart="@dimen/connect_request__common_users__chathead__vertical_padding"
-                    android:gravity="center"
-                    android:text="@string/send_connect_request__connect_button__text"
-                    app:font="@string/wire__typeface__light"
-                    android:textAllCaps="true"
-                    android:textSize="@dimen/wire__text_size__small"
-                    android:textColor="@color/text__primary_dark"
-                    />
-
-            </LinearLayout>
-
 
             <!-- Unblock button for blocked users -->
             <com.waz.zclient.ui.views.ZetaButton
@@ -147,9 +111,9 @@
             android:id="@+id/fm__footer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:leftActionText="@string/glyph__conversation"
-            app:rightActionText="@string/glyph__more"
-            app:leftActionLabelText="@string/connect_request__sub_header__pending_label"
+            app:leftActionText="@string/glyph__undo"
+            app:rightActionText="@string/glyph__block"
+            app:leftActionLabelText="@string/connect_request__cancel_request__label"
             />
 
     </FrameLayout>

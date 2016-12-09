@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 import com.waz.api.ConversationsList;
+import com.waz.api.CredentialsUpdateListener;
 import com.waz.api.ErrorType;
 import com.waz.api.ErrorsList;
 import com.waz.api.IConversation;
@@ -51,14 +53,18 @@ import com.waz.zclient.controllers.currentfocus.IFocusController;
 import com.waz.zclient.controllers.navigation.NavigationControllerObserver;
 import com.waz.zclient.controllers.navigation.Page;
 import com.waz.zclient.controllers.tracking.events.connect.BlockingEvent;
+import com.waz.zclient.controllers.tracking.events.connect.OpenedConversationEvent;
 import com.waz.zclient.controllers.tracking.events.conversation.ArchivedConversationEvent;
 import com.waz.zclient.controllers.tracking.events.conversation.DeleteConversationEvent;
 import com.waz.zclient.controllers.tracking.events.conversation.UnarchivedConversationEvent;
 import com.waz.zclient.controllers.tracking.events.group.CreatedGroupConversationEvent;
 import com.waz.zclient.controllers.tracking.events.group.LeaveGroupConversationEvent;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
+import com.waz.zclient.controllers.usernames.UsernamesControllerObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.ConversationType;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
+import com.waz.zclient.core.controllers.tracking.events.onboarding.KeptGeneratedUsernameEvent;
+import com.waz.zclient.core.controllers.tracking.events.onboarding.OpenedUsernameSettingsEvent;
+import com.waz.zclient.core.controllers.tracking.events.onboarding.SeenUsernameTakeOverScreenEvent;
 import com.waz.zclient.core.stores.connect.IConnectStore;
 import com.waz.zclient.core.stores.conversation.ConversationChangeRequester;
 import com.waz.zclient.core.stores.conversation.ConversationStoreObserver;
@@ -66,17 +72,16 @@ import com.waz.zclient.core.stores.conversation.InboxLoadRequester;
 import com.waz.zclient.core.stores.conversation.OnInboxLoadedListener;
 import com.waz.zclient.core.stores.inappnotification.InAppNotificationStoreObserver;
 import com.waz.zclient.core.stores.inappnotification.KnockingEvent;
+import com.waz.zclient.newreg.fragments.FirstTimeAssignUsernameFragment;
 import com.waz.zclient.pages.BaseFragment;
 import com.waz.zclient.pages.main.connect.BlockedUserProfileFragment;
 import com.waz.zclient.pages.main.connect.ConnectRequestLoadMode;
 import com.waz.zclient.pages.main.connect.PendingConnectRequestManagerFragment;
 import com.waz.zclient.pages.main.connect.SendConnectRequestFragment;
-import com.waz.zclient.pages.main.connect.UserProfile;
 import com.waz.zclient.pages.main.conversation.controller.ConversationScreenControllerObserver;
 import com.waz.zclient.pages.main.conversation.controller.IConversationScreenController;
 import com.waz.zclient.pages.main.participants.OptionsMenuControl;
 import com.waz.zclient.pages.main.participants.OptionsMenuFragment;
-import com.waz.zclient.pages.main.participants.SingleParticipantFragment;
 import com.waz.zclient.pages.main.participants.dialog.ParticipantsDialogFragment;
 import com.waz.zclient.pages.main.pickuser.PickUserFragment;
 import com.waz.zclient.pages.main.pickuser.controller.IPickUserController;
@@ -106,16 +111,17 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
                                                                                                    OptionsMenuFragment.Container,
                                                                                                    PickUserFragment.Container,
                                                                                                    CameraFragment.Container,
-                                                                                                   SingleParticipantFragment.Container,
                                                                                                    SendConnectRequestFragment.Container,
                                                                                                    BlockedUserProfileFragment.Container,
                                                                                                    ParticipantsDialogFragment.Container,
                                                                                                    PendingConnectRequestManagerFragment.Container,
                                                                                                    ConversationScreenControllerObserver,
                                                                                                    NavigationControllerObserver,
+                                                                                                   UsernamesControllerObserver,
                                                                                                    ConfirmationObserver,
                                                                                                    AccentColorObserver,
-                                                                                                   InAppNotificationStoreObserver {
+                                                                                                   InAppNotificationStoreObserver,
+                                                                                                   FirstTimeAssignUsernameFragment.Container {
     public static final String TAG = ConversationListManagerFragment.class.getName();
 
     private LoadingIndicatorView startuiLoadingIndicatorView;
@@ -135,6 +141,11 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
         Bundle arguments = new Bundle();
         fragment.setArguments(arguments);
         return fragment;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -380,6 +391,9 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
         if (page == Page.CONVERSATION_LIST) {
             boolean enablePager = getStoreFactory().getConversationStore().getCurrentConversation() != null;
             getControllerFactory().getNavigationController().setPagerEnabled(enablePager);
+            getControllerFactory().getUsernameController().addUsernamesObserverAndUpdate(this);
+        } else {
+            getControllerFactory().getUsernameController().removeUsernamesObserver(this);
         }
     }
 
@@ -421,15 +435,13 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
                 getStoreFactory().getConversationStore().setCurrentConversation(conversation,
                                                                                 requester);
             }
-            getControllerFactory().getTrackingController().onPeoplePickerResultsUsed(1,
-                                                                                     PeoplePickerResultsUsed.Usage.NAVIGATE_TO_EXISTING_CONVERSATION);
+            getControllerFactory().getTrackingController().tagEvent(new OpenedConversationEvent(ConversationType.ONE_TO_ONE_CONVERSATION.name()));
         } else {
             getStoreFactory().getConversationStore().createGroupConversation(users, requester);
             getControllerFactory().getTrackingController().tagEvent(new CreatedGroupConversationEvent(false,
                                                                                                       (users.size() + 1)));
             getControllerFactory().getTrackingController().updateSessionAggregates(RangedAttribute.GROUP_CONVERSATIONS_STARTED);
-            getControllerFactory().getTrackingController().onPeoplePickerResultsUsed(users.size(),
-                                                                                     PeoplePickerResultsUsed.Usage.CREATE_GROUP_CONVERSATION);
+            getControllerFactory().getTrackingController().tagEvent(new OpenedConversationEvent(ConversationType.GROUP_CONVERSATION.name()));
         }
     }
 
@@ -455,17 +467,6 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
             return true;
         }
 
-        SingleParticipantFragment singleUserFragment = (SingleParticipantFragment) getChildFragmentManager().findFragmentByTag(
-            SingleParticipantFragment.TAG);
-        if (singleUserFragment != null &&
-            singleUserFragment.onBackPressed()) {
-            return true;
-        }
-
-        if (getControllerFactory().getPickUserController().isShowingCommonUserProfile()) {
-            getControllerFactory().getPickUserController().hideCommonUserProfile();
-        }
-
         PickUserFragment pickUserFragment = (PickUserFragment) getChildFragmentManager().findFragmentByTag(
             PickUserFragment.TAG);
         if (pickUserFragment != null &&
@@ -476,6 +477,10 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
         if (getControllerFactory().getPickUserController().isShowingPickUser(getCurrentPickerDestination())) {
             getStoreFactory().getInAppNotificationStore().setUserLookingAtPeoplePicker(false);
             getControllerFactory().getPickUserController().hidePickUser(getCurrentPickerDestination(), true);
+            return true;
+        }
+
+        if (getChildFragmentManager().findFragmentByTag(FirstTimeAssignUsernameFragment.TAG) != null) {
             return true;
         }
 
@@ -587,11 +592,7 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
 
     @Override
     public void dismissUserProfile() {
-        if (getControllerFactory().getPickUserController().isShowingCommonUserProfile()) {
-            getControllerFactory().getPickUserController().hideCommonUserProfile();
-        } else {
-            getControllerFactory().getPickUserController().hideUserProfile();
-        }
+        getControllerFactory().getPickUserController().hideUserProfile();
     }
 
     @Override
@@ -602,11 +603,6 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
     @Override
     public void showRemoveConfirmation(User user) {
 
-    }
-
-    @Override
-    public void openCommonUserProfile(View anchor, User commonUser) {
-        getControllerFactory().getPickUserController().showCommonUserProfile(commonUser);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -630,11 +626,6 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
     public void onAcceptedConnectRequest(IConversation conversation) {
         getStoreFactory().getConversationStore().setCurrentConversation(conversation,
                                                                         ConversationChangeRequester.START_CONVERSATION);
-    }
-
-    @Override
-    public void onIgnoredConnectRequest(IConversation conversation) {
-        getStoreFactory().getConversationStore().setCurrentConversationToNext(ConversationChangeRequester.CONNECT_REQUEST_IGNORED);
     }
 
     @Override
@@ -734,50 +725,6 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
         getChildFragmentManager().popBackStackImmediate();
         togglePeoplePicker(true);
     }
-
-    @Override
-    public void onShowCommonUserProfile(final User user) {
-        if (getControllerFactory().getPickUserController().isShowingCommonUserProfile()) {
-            return;
-        }
-
-        UserProfile profileFragment = (UserProfile) getChildFragmentManager().findFragmentById(R.id.fl__conversation_list__profile_overlay);
-        if (profileFragment != null) {
-            profileFragment.isBelowUserProfile(true);
-        }
-
-        getStoreFactory().getSingleParticipantStore().setUser(user);
-
-        getChildFragmentManager()
-            .beginTransaction()
-            .setCustomAnimations(R.anim.fragment_animation__send_connect_request__fade_in,
-                                 R.anim.fragment_animation__send_connect_request__zoom_exit,
-                                 R.anim.fragment_animation__send_connect_request__zoom_enter,
-                                 R.anim.fragment_animation__send_connect_request__fade_out)
-            .replace(R.id.fl__conversation_list__profile_overlay,
-                     SingleParticipantFragment.newInstance(true,
-                                                           IConnectStore.UserRequester.SEARCH),
-                     SingleParticipantFragment.TAG)
-            .addToBackStack(SingleParticipantFragment.TAG)
-            .commit();
-
-        getControllerFactory().getNavigationController().setLeftPage(Page.COMMON_USER_PROFILE, TAG);
-    }
-
-    @Override
-    public void onHideCommonUserProfile() {
-        getChildFragmentManager().popBackStackImmediate();
-
-        Fragment fragment = getChildFragmentManager().findFragmentById(R.id.fl__conversation_list__profile_overlay);
-        if (fragment instanceof SendConnectRequestFragment) {
-            getControllerFactory().getNavigationController().setLeftPage(Page.SEND_CONNECT_REQUEST, TAG);
-        } else if (fragment instanceof PendingConnectRequestManagerFragment) {
-            getControllerFactory().getNavigationController().setLeftPage(Page.PENDING_CONNECT_REQUEST, TAG);
-        } else if (fragment instanceof BlockedUserProfileFragment) {
-            getControllerFactory().getNavigationController().setLeftPage(Page.BLOCK_USER, TAG);
-        }
-    }
-
 
     /**
      * Decides based on state returned from PickUserController whether to show START UI or CONVERSATIONLIST
@@ -1005,16 +952,6 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
     }
 
     @Override
-    public void onShowCommonUser(User user) {
-
-    }
-
-    @Override
-    public void onHideCommonUser() {
-
-    }
-
-    @Override
     public void onAddPeopleToConversation() {
 
     }
@@ -1030,7 +967,6 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
             return;
         }
 
-        optionsMenuControl.setTitle(conversation.getName());
         optionsMenuControl.createMenu(conversation,
                                       requester,
                                       getControllerFactory().getThemeController().getOptionsDarkTheme());
@@ -1280,7 +1216,75 @@ public class ConversationListManagerFragment extends BaseFragment<ConversationLi
         errorDescription.dismiss();
     }
 
+    public void hideFirstAssignUsernameScreen() {
+        getChildFragmentManager().popBackStackImmediate(FirstTimeAssignUsernameFragment.TAG,
+                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  FirstTimeAssignUsername.Container
+    //
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public void onChooseUsernameChosen() {
+        getControllerFactory().getUsernameController().closeFirstAssignUsernameScreen();
+        hideFirstAssignUsernameScreen();
+        getControllerFactory().getTrackingController().tagEvent(new OpenedUsernameSettingsEvent());
+        startActivity(ZetaPreferencesActivity.getUsernameEditPreferencesIntent(getActivity()));
+    }
+
+    @Override
+    public void onKeepUsernameChosen(String username) {
+        getControllerFactory().getUsernameController().closeFirstAssignUsernameScreen();
+        hideFirstAssignUsernameScreen();
+        getStoreFactory().getZMessagingApiStore().getApi().getSelf().setUsername(username, new CredentialsUpdateListener() {
+            @Override
+            public void onUpdated() {
+                getControllerFactory().getTrackingController().tagEvent(new KeptGeneratedUsernameEvent(true));
+            }
+            @Override
+            public void onUpdateFailed(int code, String message, String label) {
+                Toast.makeText(getActivity(), getString(R.string.username__set__toast_error), Toast.LENGTH_SHORT).show();
+                getControllerFactory().getUsernameController().logout();
+                getControllerFactory().getUsernameController().setUser(getStoreFactory().getZMessagingApiStore().getApi().getSelf());
+                getControllerFactory().getTrackingController().tagEvent(new KeptGeneratedUsernameEvent(false));
+            }
+        });
+    }
+
+    @Override
+    public void onValidUsernameGenerated(String name, String generatedUsername) {
+        showFirstAssignUsernameScreen(name, generatedUsername);
+    }
+
+    @Override
+    public void onUsernameAttemptsExhausted(String name) {
+        showFirstAssignUsernameScreen(name, "");
+    }
+
+    @Override
+    public void onCloseFirstAssignUsernameScreen() {
+
+    }
+
+    private void showFirstAssignUsernameScreen(String name, String username) {
+        getChildFragmentManager()
+            .beginTransaction()
+            .setCustomAnimations(R.anim.fade_in,
+                                 R.anim.fade_out,
+                                 R.anim.fade_in,
+                                 R.anim.fade_out)
+            .replace(R.id.fl__conversation_list_main, FirstTimeAssignUsernameFragment.newInstance(name, username), FirstTimeAssignUsernameFragment.TAG)
+            .addToBackStack(FirstTimeAssignUsernameFragment.TAG)
+            .commitAllowingStateLoss();
+
+        getControllerFactory().getTrackingController().tagEvent(new SeenUsernameTakeOverScreenEvent());
+    }
+
     public interface Container {
         void onOpenUrl(String url);
     }
+
 }

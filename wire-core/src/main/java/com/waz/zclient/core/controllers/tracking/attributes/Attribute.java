@@ -65,8 +65,6 @@ public enum Attribute {
 
     FILE_SIZE_BYTES("file_size_bytes"),
 
-    PEOPLE_PICKER_POSITION("position"),
-
     IS_RESENDING("is_resending"),
     FROM_SEARCH("from_search"),
 
@@ -86,6 +84,7 @@ public enum Attribute {
     VALUE("value"),
     USER("user"),
     EFFECT("effect"),
+    LENGTH("length"),
 
     AVS("avs"),
 

@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.controllers.tracking.events.Event;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.controllers.tracking.screens.ApplicationScreen;
 import com.waz.zclient.controllers.tracking.screens.RegistrationScreen;
 import timber.log.Timber;
@@ -112,15 +111,5 @@ public class LoggingTrackingController extends TrackingController {
     public void onApplicationScreen(ApplicationScreen screen) {
         super.onApplicationScreen(screen);
         Timber.i("Tag application screen=[\nname='%s']", screen.toString());
-    }
-
-    @Override
-    public void onPeoplePickerResultsUsed(int numberOfContacts, PeoplePickerResultsUsed.Usage usage) {
-        super.onPeoplePickerResultsUsed(numberOfContacts, usage);
-    }
-
-    @Override
-    public void onPeoplePickerClosedByUser(boolean searchBoxHasContent, boolean cancelledByUser) {
-        super.onPeoplePickerClosedByUser(searchBoxHasContent, cancelledByUser);
     }
 }

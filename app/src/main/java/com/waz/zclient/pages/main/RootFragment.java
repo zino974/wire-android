@@ -51,6 +51,7 @@ import com.waz.zclient.controllers.giphy.GiphyObserver;
 import com.waz.zclient.controllers.location.LocationObserver;
 import com.waz.zclient.controllers.navigation.Page;
 import com.waz.zclient.controllers.navigation.PagerControllerObserver;
+import com.waz.zclient.controllers.usernames.UsernamesControllerObserver;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.events.media.SentPictureEvent;
 import com.waz.zclient.core.stores.connect.IConnectStore;
@@ -103,7 +104,9 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
                                                                        DrawingObserver,
                                                                        LocationObserver,
                                                                        ParticipantsStoreObserver,
-                                                                       ConversationFragment.Container {
+                                                                       UsernamesControllerObserver,
+                                                                       ConversationFragment.Container,
+                                                                       ConversationListManagerFragment.Container {
     public static final String TAG = RootFragment.class.getName();
     private static final Interpolator RIGHT_VIEW_ALPHA_INTERPOLATOR = new Quart.EaseOut();
     private View leftView;
@@ -115,6 +118,7 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
     private boolean panelSliding = false;
     private boolean groupConversation;
     private User otherUser;
+    private boolean rightSideShouldBeBlank = false;
 
     private final ModelObserver<IConversation> conversationModelObserver = new ModelObserver<IConversation>() {
         @Override
@@ -232,6 +236,7 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
         getControllerFactory().getCameraController().addCameraActionObserver(this);
         getControllerFactory().getPickUserController().addPickUserScreenControllerObserver(this);
         getControllerFactory().getGiphyController().addObserver(this);
+        getControllerFactory().getUsernameController().addUsernamesObserverAndUpdate(this);
         getControllerFactory().getDrawingController().addDrawingObserver(this);
         getStoreFactory().getParticipantsStore().addParticipantsStoreObserver(this);
         getControllerFactory().getLocationController().addObserver(this);
@@ -246,6 +251,7 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
         getControllerFactory().getConversationScreenController().removeConversationControllerObservers(this);
         getControllerFactory().getSlidingPaneController().removeObserver(this);
         getControllerFactory().getCameraController().removeCameraActionObserver(this);
+        getControllerFactory().getUsernameController().removeUsernamesObserver(this);
         getControllerFactory().getNavigationController().removePagerControllerObserver(this);
         getStoreFactory().getConversationStore().removeConversationStoreObserver(this);
         getControllerFactory().getPickUserController().removePickUserScreenControllerObserver(this);
@@ -285,6 +291,10 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
         conversationModelObserver.setAndUpdate(toConversation);
         getStoreFactory().getParticipantsStore().setCurrentConversation(toConversation);
 
+        if (rightSideShouldBeBlank) {
+            return;
+        }
+
         getControllerFactory().getBackgroundController().expand(false);
 
         final IConversation.Type type = toConversation.getType();
@@ -320,7 +330,6 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
                         tag = ConversationFragment.TAG;
                         break;
                 }
-
                 openMessageStream(page, fragment, tag);
             }
         });
@@ -663,16 +672,6 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
     }
 
     @Override
-    public void onShowCommonUser(User user) {
-
-    }
-
-    @Override
-    public void onHideCommonUser() {
-
-    }
-
-    @Override
     public void onAddPeopleToConversation() {
 
     }
@@ -824,22 +823,7 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
     }
 
     @Override
-    public void onShowCommonUserProfile(User user) {
-
-    }
-
-    @Override
-    public void onHideCommonUserProfile() {
-
-    }
-
-    @Override
     public void onAcceptedConnectRequest(IConversation conversation) {
-
-    }
-
-    @Override
-    public void onIgnoredConnectRequest(IConversation conversation) {
 
     }
 
@@ -877,12 +861,6 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
     public void showRemoveConfirmation(User user) {
 
     }
-
-    @Override
-    public void openCommonUserProfile(View anchor, User commonUser) {
-
-    }
-
 
     // ParticipantsStoreObserver
 
@@ -923,6 +901,24 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
             getStoreFactory().getConversationStore().sendMessage(location);
         }
         getChildFragmentManager().popBackStack(LocationFragment.TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    @Override
+    public void onValidUsernameGenerated(String name, String generatedUsername) {
+        rightSideShouldBeBlank = true;
+        openMessageStream(Page.NONE, BlankFragment.newInstance(), BlankFragment.TAG);
+    }
+
+    @Override
+    public void onUsernameAttemptsExhausted(String name) {
+        rightSideShouldBeBlank = true;
+        openMessageStream(Page.NONE, BlankFragment.newInstance(), BlankFragment.TAG);
+    }
+
+    @Override
+    public void onCloseFirstAssignUsernameScreen() {
+        rightSideShouldBeBlank = false;
+        conversationModelObserver.forceUpdate();
     }
 
     public interface Container {

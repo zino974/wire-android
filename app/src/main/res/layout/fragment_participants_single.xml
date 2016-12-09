@@ -19,90 +19,72 @@
 
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             android:id="@+id/fl__send_connect_request__background_container"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             style="?wireBackground"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/fl__send_connect_request__background_container"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              style="?wireBackground"
     >
-
-    <FrameLayout
-        android:id="@+id/fl__participant__backbar__container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/wire__padding__big"
-        android:paddingStart="@dimen/wire__padding__big"
-        />
 
     <LinearLayout
         android:id="@+id/ll__single_participant__header_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
+        android:layout_gravity="top"
         >
 
-        <com.waz.zclient.ui.views.e2ee.ShieldView
-            android:id="@+id/sv__otr__verified_shield"
-            android:layout_width="@dimen/wire__icon_button__diameter"
-            android:layout_height="@dimen/wire__icon_button__diameter"
-            android:layout_marginStart="@dimen/wire__padding__big"
-            android:layout_marginTop="@dimen/wire__padding__big"
-            android:paddingTop="@dimen/wire__otr__shield__padding__top"
-            android:paddingStart="@dimen/wire__otr__shield__padding__left"
-            android:paddingEnd="@dimen/wire__otr__shield__padding__right"
-            android:paddingBottom="@dimen/wire__otr__shield__padding__bottom"
-            app:shieldVerified="true"
-            />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:background="@color/participants__header__background_color"
-            android:paddingTop="@dimen/participants__header__top_margin"
-            android:paddingBottom="@dimen/participants__header__bottom_margin"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/t__single_participant__toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:clickable="true"
+            app:contentInsetStart="@dimen/content__padding_left"
+            style="?conversationToolbarNoDivider"
             >
 
-            <com.waz.zclient.ui.text.TypefaceTextView
-                android:id="@+id/ttv__single_participants__header"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:maxLines="3"
-                app:font="@string/wire__typeface__medium"
-                style="?userHeader"
-                />
+                android:layout_height="match_parent"
+                android:layout_gravity="start|center_vertical"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                >
 
-            <com.waz.zclient.ui.text.TypefaceTextView
-                android:id="@+id/ttv__single_participants__sub_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:paddingTop="@dimen/wire__padding__small"
-                android:gravity="center"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textAllCaps="true"
-                app:font="@string/wire__typeface__light"
-                style="?userSubHeader"
-                />
+                <com.waz.zclient.ui.views.e2ee.ShieldView
+                    android:id="@+id/sv__otr__verified_shield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/wire__otr__shield__small_width"
+                    android:layout_marginEnd="@dimen/wire__padding__8"
+                    app:shieldVerified="true"
+                    />
 
-        </LinearLayout>
+                <com.waz.zclient.ui.text.TypefaceTextView
+                    android:id="@+id/tv__single_participant__toolbar__title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/wire__padding__regular"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:background="@null"
+                    style="?conversationToolbarNoDivider"
+                    />
 
-        <com.waz.zclient.ui.text.GlyphTextView
-            android:id="@+id/gtv__single_participants__close"
-            android:layout_gravity="top|right"
-            android:layout_width="@dimen/wire__icon_button__diameter"
-            android:layout_height="@dimen/wire__icon_button__diameter"
-            android:layout_marginEnd="@dimen/wire__padding__big"
-            android:layout_marginTop="@dimen/wire__padding__big"
-            android:gravity="center"
-            android:text="@string/glyph__close"
-            style="?attr/smallIconButton"
+            </LinearLayout>
+
+
+        </android.support.v7.widget.Toolbar>
+
+        <com.waz.zclient.ui.views.UserDetailsView
+            android:id="@+id/udv__single_participant__user_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/wire__padding__small"
+            android:layout_gravity="center_horizontal|top"
             />
 
     </LinearLayout>
+
 
     <FrameLayout
         android:id="@+id/fl__participant__tab__container"

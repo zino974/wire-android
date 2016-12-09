@@ -24,9 +24,9 @@ import com.waz.zclient.core.controllers.tracking.events.Event;
 public class OpenedGenericInviteMenuEvent extends Event {
 
     public enum EventContext {
-        STARTUI_SEARCH("startui_search"),
-        STARTUI_BANNER("startui_banner"),
-        STARTUI_CONTACT("startui_contact");
+        NO_RESULTS("no_results"),
+        BANNER("banner"),
+        ADDRESSBOOK("addressbook");
 
         private final String name;
 

@@ -15,21 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.waz.zclient.controllers.tracking.events.peoplepicker;
+package com.waz.zclient.controllers.usernames;
 
-import android.support.annotation.NonNull;
-import com.waz.zclient.core.controllers.tracking.attributes.Attribute;
-import com.waz.zclient.core.controllers.tracking.events.Event;
+import android.app.Activity;
 
-public class PeoplePickerSelectSearchUser extends Event {
+import com.waz.api.Self;
 
-    public PeoplePickerSelectSearchUser(int position) {
-        attributes.put(Attribute.PEOPLE_PICKER_POSITION, String.valueOf(position));
-    }
+public interface IUsernamesController {
 
-    @NonNull
-    @Override
-    public String getName() {
-        return "selectedSearchResult";
-    }
+    void setActivity(Activity activity);
+
+    boolean hasGeneratedUsername();
+
+    String getGeneratedUsername();
+
+    void startUsernameGenerator(String baseName);
+
+    void setUser(Self self);
+
+    void addUsernamesObserver(UsernamesControllerObserver usernamesControllerObserver);
+
+    void removeUsernamesObserver(UsernamesControllerObserver usernamesControllerObserver);
+
+    void addUsernamesObserverAndUpdate(UsernamesControllerObserver usernamesControllerObserver);
+
+    void closeFirstAssignUsernameScreen();
+
+    void logout();
+
+    void tearDown();
 }

@@ -25,9 +25,12 @@ import com.waz.api.ContactMethod;
 import com.waz.api.IConversation;
 import com.waz.api.Message;
 import com.waz.api.Permission;
+import com.waz.api.User;
 import com.waz.zclient.R;
 import com.waz.zclient.controllers.drawing.DrawingController;
 import com.waz.zclient.controllers.tracking.ITrackingController;
+import com.waz.zclient.controllers.tracking.events.connect.SelectedTopUser;
+import com.waz.zclient.controllers.tracking.events.connect.SelectedUserFromSearchEvent;
 import com.waz.zclient.controllers.tracking.events.connect.SentConnectRequestEvent;
 import com.waz.zclient.controllers.tracking.events.connect.SentInviteToContactEvent;
 import com.waz.zclient.controllers.tracking.events.optionsmenu.OptionsMenuItemSelectedEvent;
@@ -45,6 +48,7 @@ import com.waz.zclient.core.controllers.tracking.events.settings.ChangedContacts
 import com.waz.zclient.core.controllers.tracking.events.settings.ChangedSoundNotificationLevelEvent;
 import com.waz.zclient.core.stores.connect.IConnectStore;
 import com.waz.zclient.pages.extendedcursor.image.ImagePreviewLayout;
+import com.waz.zclient.pages.main.pickuser.SearchResultAdapter;
 import com.waz.zclient.ui.optionsmenu.OptionsMenuItem;
 
 import java.util.Locale;
@@ -170,12 +174,6 @@ public class TrackingUtils {
                 break;
         }
         return type;
-    }
-
-    public static String getMessageSelectionMode(boolean multipleMessagesSelected) {
-        return multipleMessagesSelected ?
-               "multiple" :
-               "single";
     }
 
     public static void tagChangedContactsPermissionEvent(ITrackingController trackingController,
@@ -388,5 +386,24 @@ public class TrackingUtils {
                                                                   conversation.isOtto(),
                                                                   conversation.isEphemeral(),
                                                                   String.valueOf(conversation.getEphemeralExpiration().duration().toSeconds())));
+    }
+
+    public static void onUserSelectedInStartUI(ITrackingController trackingController,
+                                               User user,
+                                               boolean isTopUser,
+                                               boolean isAddingToConversation,
+                                               int rowType) {
+
+        if (isTopUser) {
+            trackingController.tagEvent(new SelectedTopUser());
+        } else {
+            switch (rowType) {
+                case SearchResultAdapter.ITEM_TYPE_CONNECTED_USER:
+                case SearchResultAdapter.ITEM_TYPE_OTHER_USER:
+                    trackingController.tagEvent(new SelectedUserFromSearchEvent(user.getConnectionStatus().toString(),
+                                                                                isAddingToConversation));
+                    break;
+            }
+        }
     }
 }

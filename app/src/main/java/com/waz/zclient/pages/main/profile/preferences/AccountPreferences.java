@@ -33,16 +33,20 @@ import com.waz.zclient.controllers.accentcolor.AccentColorObserver;
 import com.waz.zclient.controllers.tracking.events.profile.ResetPassword;
 import com.waz.zclient.controllers.tracking.events.profile.SignOut;
 import com.waz.zclient.core.controllers.tracking.events.session.LoggedOutEvent;
+import com.waz.zclient.core.controllers.tracking.events.settings.EditedUsernameEvent;
 import com.waz.zclient.core.stores.profile.ProfileStoreObserver;
 import com.waz.zclient.pages.BasePreferenceFragment;
+import com.waz.zclient.pages.main.profile.ZetaPreferencesActivity;
 import com.waz.zclient.pages.main.profile.camera.CameraContext;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.AccentColorPreferenceDialogFragment;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.AddEmailAndPasswordPreferenceDialogFragment;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.AddPhoneNumberPreferenceDialogFragment;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.ChangeEmailPreferenceDialogFragment;
+import com.waz.zclient.pages.main.profile.preferences.dialogs.ChangeUsernamePreferenceDialogFragment;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.VerifyEmailPreferenceFragment;
 import com.waz.zclient.pages.main.profile.preferences.dialogs.VerifyPhoneNumberPreferenceFragment;
 import com.waz.zclient.ui.utils.TextViewUtils;
+import com.waz.zclient.utils.StringUtils;
 import com.waz.zclient.utils.ViewUtils;
 import net.xpece.android.support.preference.EditTextPreference;
 
@@ -53,10 +57,12 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
                                                                                                         AddEmailAndPasswordPreferenceDialogFragment.Container,
                                                                                                         ChangeEmailPreferenceDialogFragment.Container,
                                                                                                         AddPhoneNumberPreferenceDialogFragment.Container,
+                                                                                                        ChangeUsernamePreferenceDialogFragment.Container,
                                                                                                         AccentColorObserver {
 
     public static final String TAG = AccountPreferences.class.getName();
     private EditTextPreference namePreference;
+    private Preference usernamePreference;
     private Preference phonePreference;
     private Preference emailPreference;
     private Preference signOutPreference;
@@ -77,6 +83,7 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
     public void onCreatePreferences2(Bundle savedInstanceState, String rootKey) {
         super.onCreatePreferences2(savedInstanceState, rootKey);
         addPreferencesFromResource(R.xml.preferences_account);
+        boolean shouldShowUsernameEdit = getArguments().getBoolean(ZetaPreferencesActivity.SHOW_USERNAME_EDIT);
         namePreference = (EditTextPreference) findPreference(getString(R.string.pref_account_name_key));
         namePreference.setOnEditTextCreatedListener(new EditTextPreference.OnEditTextCreatedListener() {
             @Override
@@ -114,6 +121,15 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
                 }
                 getStoreFactory().getProfileStore().setMyName(newName);
                 return false;
+            }
+        });
+        usernamePreference = findPreference(getString(R.string.pref_account_username_key));
+        usernamePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                String username = getStoreFactory().getProfileStore().getSelfUser().getUsername();
+                changeUsername(username, true);
+                return true;
             }
         });
         phonePreference = findPreference(getString(R.string.pref_account_phone_key));
@@ -189,7 +205,9 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
                 return true;
             }
         });
-
+        if (shouldShowUsernameEdit) {
+            changeUsername(getControllerFactory().getUsernameController().getGeneratedUsername(), false);
+        }
     }
 
     @Override
@@ -315,6 +333,7 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
                                           getControllerFactory().getTrackingController().tagEvent(new SignOut());
                                           getControllerFactory().getTrackingController().tagEvent(new LoggedOutEvent());
                                           getControllerFactory().getSpotifyController().logout();
+                                          getControllerFactory().getUsernameController().logout();
                                           getStoreFactory().getZMessagingApiStore().logout();
                                       }
                                   },
@@ -396,9 +415,38 @@ public class AccountPreferences extends BasePreferenceFragment<AccountPreference
                                  .commit();
     }
 
+    private void changeUsername(String currentUsername, boolean cancellable) {
+        getControllerFactory().getTrackingController().tagEvent(new EditedUsernameEvent());
+        getChildFragmentManager().beginTransaction()
+                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                                 .add(ChangeUsernamePreferenceDialogFragment.newInstance(currentUsername, cancellable),
+                                      ChangeUsernamePreferenceDialogFragment.TAG)
+                                 .addToBackStack(ChangeUsernamePreferenceDialogFragment.TAG)
+                                 .commit();
+    }
+
     @Override
     public void onAccentColorHasChanged(Object sender, int color) {
         colorPreference.setAccentColor(color);
+    }
+
+    @Override
+    public void onMyUsernameHasChanged(String myUsername) {
+        if (usernamePreference == null) {
+            return;
+        }
+        if (TextUtils.isEmpty(myUsername)) {
+            usernamePreference.setTitle(getString(R.string.pref_account_username_empty_title));
+            usernamePreference.setSummary("");
+        } else {
+            usernamePreference.setTitle(StringUtils.formatUsername(myUsername));
+            usernamePreference.setSummary(getString(R.string.pref_account_username_title));
+        }
+    }
+
+    @Override
+    public void onUsernameChanged(String username) {
+        onMyUsernameHasChanged(username);
     }
 
     public interface Container {

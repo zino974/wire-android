@@ -22,7 +22,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import com.waz.api.Contact;
 import com.waz.api.ContactDetails;
 import com.waz.api.User;
@@ -38,7 +37,7 @@ public class ContactRowView extends FrameLayout implements UserRowView {
     private ContactDetails contactDetails;
     private User user;
     private ChatheadView chathead;
-    private TextView nameView;
+    private ContactListItemTextView contactListItemTextView;
     private ZetaButton contactInviteButton;
     private Callback callback;
 
@@ -46,32 +45,7 @@ public class ContactRowView extends FrameLayout implements UserRowView {
         @Override
         public void updated(ContactDetails model) {
             contactDetails = model;
-            nameView.setText(contactDetails.getDisplayName());
-            chathead.setContactDetails(contactDetails);
-            if (contactDetails.hasBeenInvited()) {
-                contactInviteButton.setVisibility(GONE);
-                setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (callback == null) {
-                            return;
-                        }
-                        callback.onContactListContactClicked(contactDetails);
-                    }
-                });
-                return;
-            }
-            contactInviteButton.setVisibility(VISIBLE);
-            contactInviteButton.setText(getResources().getText(R.string.people_picker__contact_list__contact_selection_button__label));
-            contactInviteButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (callback == null) {
-                        return;
-                    }
-                    callback.onContactListContactClicked(contactDetails);
-                }
-            });
+            redraw();
         }
     };
 
@@ -79,31 +53,7 @@ public class ContactRowView extends FrameLayout implements UserRowView {
         @Override
         public void updated(User model) {
             user = model;
-            nameView.setText(user.getName());
-            chathead.setUser(user);
-            switch (user.getConnectionStatus()) {
-                case CANCELLED:
-                case UNCONNECTED:
-                    contactInviteButton.setVisibility(VISIBLE);
-                    contactInviteButton.setText(getResources().getText(R.string.people_picker__contact_list__contact_selection_button__label));
-                    break;
-                case ACCEPTED:
-                    setSelected(callback.isUserSelected(user));
-                    contactInviteButton.setVisibility(GONE);
-                    break;
-                case PENDING_FROM_USER:
-                    contactInviteButton.setVisibility(GONE);
-                    break;
-            }
-            contactInviteButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (callback == null) {
-                        return;
-                    }
-                    callback.onContactListUserClicked(user);
-                }
-            });
+            redraw();
         }
     };
 
@@ -128,15 +78,13 @@ public class ContactRowView extends FrameLayout implements UserRowView {
         if (contact == null) {
             return;
         }
-        if (contact.getDetails() == null) {
-            contactDetails = null;
-        }
+        userModelObserver.clear();
+        contactDetailsModelObserver.clear();
+        contactDetails = null;
+        user = null;
         contactDetailsModelObserver.setAndUpdate(contact.getDetails());
-
-        if (contact.getUser() == null) {
-            user = null;
-        }
         userModelObserver.setAndUpdate(contact.getUser());
+        contactListItemTextView.setContact(contact);
     }
 
     public void setAccentColor(int color) {
@@ -144,13 +92,13 @@ public class ContactRowView extends FrameLayout implements UserRowView {
     }
 
     public void applyDarkTheme() {
-        nameView.setTextColor(getResources().getColor(R.color.text__primary_dark));
+        contactListItemTextView.applyDarkTheme();
     }
 
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.list_row_contactlist_user, this, true);
         chathead = ViewUtils.getView(this, R.id.cv__contactlist__user__chathead);
-        nameView = ViewUtils.getView(this, R.id.ttv__contactlist__user__name);
+        contactListItemTextView = ViewUtils.getView(this, R.id.clitv__contactlist__user__text_view);
         contactInviteButton = ViewUtils.getView(this, R.id.zb__contactlist__user_selected_button);
     }
 
@@ -170,6 +118,75 @@ public class ContactRowView extends FrameLayout implements UserRowView {
     public void setSelected(boolean selected) {
         super.setSelected(selected);
         chathead.setSelected(selected);
+    }
+
+    private void redraw() {
+        if (user != null) {
+            drawUser();
+        } else if (contactDetails != null) {
+            drawContact();
+        }
+    }
+
+    private void drawUser() {
+        if (user == null) {
+            return;
+        }
+        chathead.setUser(user);
+        switch (user.getConnectionStatus()) {
+            case CANCELLED:
+            case UNCONNECTED:
+                contactInviteButton.setVisibility(VISIBLE);
+                contactInviteButton.setText(getResources().getText(R.string.people_picker__contact_list__contact_selection_button__label));
+                break;
+            case ACCEPTED:
+                setSelected(callback.isUserSelected(user));
+                contactInviteButton.setVisibility(GONE);
+                break;
+            case PENDING_FROM_USER:
+                contactInviteButton.setVisibility(GONE);
+                break;
+        }
+        contactInviteButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (callback == null) {
+                    return;
+                }
+                callback.onContactListUserClicked(user);
+            }
+        });
+    }
+
+    private void drawContact() {
+        if (contactDetails == null) {
+            return;
+        }
+        chathead.setContactDetails(contactDetails);
+        if (contactDetails.hasBeenInvited()) {
+            contactInviteButton.setVisibility(GONE);
+            setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (callback == null) {
+                        return;
+                    }
+                    callback.onContactListContactClicked(contactDetails);
+                }
+            });
+            return;
+        }
+        contactInviteButton.setVisibility(VISIBLE);
+        contactInviteButton.setText(getResources().getText(R.string.people_picker__contact_list__contact_selection_button__label));
+        contactInviteButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (callback == null) {
+                    return;
+                }
+                callback.onContactListContactClicked(contactDetails);
+            }
+        });
     }
 
     public interface Callback {

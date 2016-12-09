@@ -52,7 +52,6 @@ import com.waz.zclient.controllers.confirmation.IConfirmationController;
 import com.waz.zclient.controllers.globallayout.KeyboardHeightObserver;
 import com.waz.zclient.controllers.tracking.events.group.AddedMemberToGroupEvent;
 import com.waz.zclient.controllers.tracking.events.group.CreatedGroupConversationEvent;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
 import com.waz.zclient.core.stores.connect.IConnectStore;
 import com.waz.zclient.core.stores.conversation.ConversationChangeRequester;
@@ -192,10 +191,7 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
                                    int posY,
                                    int dialogWidth,
                                    int dialogHeight) {
-        if (getControllerFactory().getConversationScreenController().getPopoverLaunchMode() == DialogLaunchMode.COMMON_USER) {
-            dialogTranslationX = posX + (rect.width() - dialogWidth) / 2;
-            marker.setVisibility(View.VISIBLE);
-        } else if (getControllerFactory().getConversationScreenController().getPopoverLaunchMode() == DialogLaunchMode.CONVERSATION_TOOLBAR) {
+        if (getControllerFactory().getConversationScreenController().getPopoverLaunchMode() == DialogLaunchMode.CONVERSATION_TOOLBAR) {
             int screenWidth = ViewUtils.getRealDisplayWidth(getActivity());
             dialogTranslationX = screenWidth / 2 - dialogWidth / 2;
             marker.setVisibility(View.INVISIBLE);
@@ -346,7 +342,6 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
                 }
                 break;
             case AVATAR:
-            case COMMON_USER:
             case SEARCH:
                 getControllerFactory().getPickUserController().hideUserProfile();
                 break;
@@ -752,23 +747,6 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
     }
 
     @Override
-    public void onShowCommonUser(User user) {
-        Fragment fragment = getChildFragmentManager().findFragmentByTag(ParticipantFragment.TAG);
-        if (fragment instanceof ConversationScreenControllerObserver) {
-            ((ConversationScreenControllerObserver) fragment).onShowCommonUser(user);
-        }
-    }
-
-    @Override
-    public void onHideCommonUser() {
-        Fragment fragment = getChildFragmentManager().findFragmentByTag(ParticipantFragment.TAG);
-        if (fragment instanceof ConversationScreenControllerObserver) {
-            ((ConversationScreenControllerObserver) fragment).onHideCommonUser();
-        }
-
-    }
-
-    @Override
     public void onAddPeopleToConversation() {
         Fragment fragment = getChildFragmentManager().findFragmentByTag(ParticipantFragment.TAG);
         if (fragment instanceof ConversationScreenControllerObserver) {
@@ -919,12 +897,8 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
 
     @Override
     public void dismissSingleUserProfile() {
-        if (getControllerFactory().getConversationScreenController().getPopoverLaunchMode() == DialogLaunchMode.COMMON_USER) {
-            getControllerFactory().getPickUserController().hideCommonUserProfile();
-        } else {
-            getControllerFactory().getDialogBackgroundImageController().setUser(user);
-            animateBetweenMainAndDetail(true);
-        }
+        getControllerFactory().getDialogBackgroundImageController().setUser(user);
+        animateBetweenMainAndDetail(true);
     }
 
     @Override
@@ -940,13 +914,6 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
     @Override
     public void onConnectRequestWasSentToUser() {
         getControllerFactory().getPickUserController().hideUserProfile();
-    }
-
-    @Override
-    public void openCommonUserProfile(View anchor, User commonUser) {
-        getControllerFactory().getDialogBackgroundImageController().setUser(commonUser);
-        getStoreFactory().getSingleParticipantStore().setUser(commonUser);
-        animateBetweenMainAndDetail(false);
     }
 
     /**
@@ -1019,17 +986,6 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
         setVisible(false);
     }
 
-    @Override
-    public void onShowCommonUserProfile(User user) {
-
-    }
-
-    @Override
-    public void onHideCommonUserProfile() {
-        setVisible(false);
-    }
-
-
     //////////////////////////////////////////////////////////////////////////////////////////
     //
     //  ConfirmationObserver
@@ -1066,11 +1022,6 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
     }
 
     @Override
-    public void onIgnoredConnectRequest(IConversation conversation) {
-
-    }
-
-    @Override
     public void onAcceptedPendingOutgoingConnectRequest(IConversation conversation) {
 
     }
@@ -1103,9 +1054,6 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
                                           null, true);
             }
             getControllerFactory().getTrackingController().tagEvent(new CreatedGroupConversationEvent(true, (users.size() + 1)));
-            getControllerFactory().getTrackingController()
-                                  .onPeoplePickerResultsUsed(users.size(),
-                                                             PeoplePickerResultsUsed.Usage.CREATE_GROUP_CONVERSATION);
         } else if (currentConversation.getType() == IConversation.Type.GROUP) {
             currentConversation.addMembers(users);
             if (!getStoreFactory().getNetworkStore().hasInternetConnection()) {
@@ -1116,8 +1064,6 @@ public class ParticipantsDialogFragment extends BaseFragment<ParticipantsDialogF
                                           null, true);
             }
             getControllerFactory().getTrackingController().tagEvent(new AddedMemberToGroupEvent(getParticipantsCount(), users.size()));
-            getControllerFactory().getTrackingController().onPeoplePickerResultsUsed(users.size(),
-                                                                                     PeoplePickerResultsUsed.Usage.ADD_MEMBERS_TO_EXISTING_CONVERSATION);
         }
         getControllerFactory().getTrackingController().updateSessionAggregates(RangedAttribute.USERS_ADDED_TO_CONVERSATIONS);
         hide();

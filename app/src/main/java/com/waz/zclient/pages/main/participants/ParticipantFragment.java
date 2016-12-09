@@ -56,7 +56,6 @@ import com.waz.zclient.controllers.tracking.events.group.AddedMemberToGroupEvent
 import com.waz.zclient.controllers.tracking.events.group.CreatedGroupConversationEvent;
 import com.waz.zclient.controllers.tracking.events.group.LeaveGroupConversationEvent;
 import com.waz.zclient.controllers.tracking.events.group.RemoveContactEvent;
-import com.waz.zclient.controllers.tracking.events.peoplepicker.PeoplePickerResultsUsed;
 import com.waz.zclient.core.api.scala.ModelObserver;
 import com.waz.zclient.core.controllers.tracking.attributes.ConversationType;
 import com.waz.zclient.core.controllers.tracking.attributes.RangedAttribute;
@@ -71,7 +70,6 @@ import com.waz.zclient.pages.main.connect.BlockedUserProfileFragment;
 import com.waz.zclient.pages.main.connect.ConnectRequestLoadMode;
 import com.waz.zclient.pages.main.connect.PendingConnectRequestFragment;
 import com.waz.zclient.pages.main.connect.SendConnectRequestFragment;
-import com.waz.zclient.pages.main.connect.UserProfile;
 import com.waz.zclient.pages.main.conversation.controller.ConversationScreenControllerObserver;
 import com.waz.zclient.pages.main.conversation.controller.IConversationScreenController;
 import com.waz.zclient.pages.main.participants.dialog.DialogLaunchMode;
@@ -558,17 +556,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
         }
     }
 
-    @Override
-    public void editingHeader(boolean editing) {
-        if (LayoutSpec.isTablet(getActivity())) {
-            return;
-        }
-        if (editing) {
-            ViewUtils.fadeOutView(bodyContainer);
-        } else {
-            ViewUtils.fadeInView(bodyContainer);
-        }
-    }
 
     @Override
     public void onClickedEmptyBackground() {
@@ -596,20 +583,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
         getContainer().dismissDialog();
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // ParticipantBodyFragment.Container,
-    //
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void showOptionsMenu(final User user) {
-        optionsMenuControl.setTitle(user.getDisplayName());
-        optionsMenuControl.createMenu(user.getConversation(),
-                                      IConversationScreenController.USER_PROFILE_PARTICIPANTS,
-                                      getControllerFactory().getThemeController().getThemeDependentOptionsTheme());
-        optionsMenuControl.open();
-    }
 
     @Override
     public void onConversationUpdated(IConversation conversation) { }
@@ -651,11 +624,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
             return true;
         }
 
-        if (getControllerFactory().getConversationScreenController().isShowingCommonUser()) {
-            getControllerFactory().getConversationScreenController().hideCommonUser();
-            return true;
-        }
-
         if (getControllerFactory().getConversationScreenController().isShowingUser()) {
             getControllerFactory().getConversationScreenController().hideUser();
             return true;
@@ -682,7 +650,16 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
     public void onHideParticipants(boolean backOrButtonPressed, boolean hideByConversationChange, boolean isSingleConversation) { }
 
     @Override
-    public void onShowEditConversationName(boolean show) { }
+    public void onShowEditConversationName(boolean show) {
+        if (LayoutSpec.isTablet(getActivity())) {
+            return;
+        }
+        if (show) {
+            ViewUtils.fadeOutView(bodyContainer);
+        } else {
+            ViewUtils.fadeInView(bodyContainer);
+        }
+    }
 
     @Override
     public void setListOffset(int offset) { }
@@ -733,7 +710,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
             return;
         }
 
-        optionsMenuControl.setTitle(conversation.getName());
         optionsMenuControl.createMenu(conversation,
                                       requester,
                                       getControllerFactory().getThemeController().getThemeDependentOptionsTheme());
@@ -916,45 +892,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
         animateParticipantsWithConnectUserProfile(true);
     }
 
-    @Override
-    public void onShowCommonUser(final User user) {
-        if (getControllerFactory().getConversationScreenController().isShowingCommonUser()) {
-            return;
-        }
-
-        UserProfile profileFragment = (UserProfile) getChildFragmentManager().findFragmentById(R.id.fl__participant__overlay);
-        if (profileFragment != null) {
-            profileFragment.isBelowUserProfile(true);
-        }
-
-        getStoreFactory().getSingleParticipantStore().setUser(user);
-
-        getChildFragmentManager()
-            .beginTransaction()
-            .setCustomAnimations(R.anim.open_profile, R.anim.close_profile, R.anim.open_profile, R.anim.close_profile)
-            .replace(R.id.fl__participant__overlay,
-                     SingleParticipantFragment.newInstance(true,
-                                                           IConnectStore.UserRequester.PARTICIPANTS),
-                     SingleParticipantFragment.TAG)
-            .addToBackStack(SingleParticipantFragment.TAG)
-            .commit();
-    }
-
-    @Override
-    public void onHideCommonUser() {
-        if (!getControllerFactory().getConversationScreenController().isShowingCommonUser()) {
-            return;
-        }
-        getChildFragmentManager().popBackStackImmediate();
-
-        if (LayoutSpec.isTablet(getActivity())) {
-            UserProfile profileFragment = (UserProfile) getChildFragmentManager().findFragmentById(R.id.fl__participant__overlay);
-            if (profileFragment != null) {
-                profileFragment.isBelowUserProfile(false);
-            }
-        }
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////////
     //
     //  UserProfileContainer
@@ -1021,21 +958,12 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
 
     @Override
     public void dismissUserProfile() {
-        if (getControllerFactory().getConversationScreenController().isShowingCommonUser()) {
-            getControllerFactory().getConversationScreenController().hideCommonUser();
-        } else {
             getControllerFactory().getConversationScreenController().hideUser();
-        }
     }
 
     @Override
     public void dismissSingleUserProfile() {
         dismissUserProfile();
-    }
-
-    @Override
-    public void openCommonUserProfile(View anchor, final User commonUser) {
-        getControllerFactory().getConversationScreenController().showCommonUser(commonUser);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -1049,11 +977,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
         getControllerFactory().getConversationScreenController().hideUser();
         getStoreFactory().getConversationStore().setCurrentConversation(conversation,
                                                                         ConversationChangeRequester.START_CONVERSATION);
-    }
-
-    @Override
-    public void onIgnoredConnectRequest(IConversation conversation) {
-        getStoreFactory().getConversationStore().setCurrentConversationToNext(ConversationChangeRequester.CONNECT_REQUEST_IGNORED);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -1106,8 +1029,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
             }
             getControllerFactory().getTrackingController().tagEvent(new CreatedGroupConversationEvent(true,
                                                                                                       (users.size() + 1)));
-            getControllerFactory().getTrackingController().onPeoplePickerResultsUsed(users.size(),
-                                                                                     PeoplePickerResultsUsed.Usage.CREATE_GROUP_CONVERSATION);
         } else if (currentConversation.getType() == IConversation.Type.GROUP) {
             currentConversation.addMembers(users);
             getStoreFactory().getInAppNotificationStore().setUserLookingAtPeoplePicker(false);
@@ -1120,8 +1041,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
                                           null, true);
             }
             getControllerFactory().getTrackingController().tagEvent(new AddedMemberToGroupEvent(getParticipantsCount(), users.size()));
-            getControllerFactory().getTrackingController().onPeoplePickerResultsUsed(users.size(),
-                                                                                     PeoplePickerResultsUsed.Usage.ADD_MEMBERS_TO_EXISTING_CONVERSATION);
         }
         getControllerFactory().getTrackingController().updateSessionAggregates(RangedAttribute.USERS_ADDED_TO_CONVERSATIONS);
     }
@@ -1267,12 +1186,6 @@ public class ParticipantFragment extends BaseFragment<ParticipantFragment.Contai
 
     @Override
     public void onHideUserProfile() { }
-
-    @Override
-    public void onShowCommonUserProfile(User user) { }
-
-    @Override
-    public void onHideCommonUserProfile() { }
 
     //////////////////////////////////////////////////////////////////////////////////////////
     //

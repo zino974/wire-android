@@ -454,6 +454,7 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         getStoreFactory().getProfileStore().setUser(self);
         getControllerFactory().getAccentColorController().setColor(AccentColorChangeRequester.LOGIN,
                                                                    self.getAccent().getColor());
+        getControllerFactory().getUsernameController().setUser(self);
 
         final Intent intent = getIntent();
         if (IntentUtils.isLaunchFromNotificationIntent(intent)) {
@@ -493,6 +494,7 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
             }
             IntentUtils.clearLaunchIntentExtra(intent);
         }
+
         setIntent(intent);
         openMainPage();
     }
@@ -741,6 +743,7 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         getControllerFactory().getTrackingController().tagEvent(new SignOut());
         getControllerFactory().getTrackingController().tagEvent(new LoggedOutEvent());
         getStoreFactory().getZMessagingApiStore().logout();
+        getControllerFactory().getUsernameController().logout();
     }
 
     @Override
@@ -975,5 +978,10 @@ public class MainActivity extends BaseActivity implements MainPhoneFragment.Cont
         if (!unsupported.isEmpty()) {
             userPreferencesController.setUnsupportedEmoji(unsupported, Emojis.VERSION);
         }
+    }
+
+    @Override
+    public void onMyUsernameHasChanged(String myUsername) {
+
     }
 }

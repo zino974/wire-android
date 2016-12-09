@@ -24,7 +24,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.waz.api.IConversation;
 import com.waz.zclient.R;
-import com.waz.zclient.pages.main.connect.views.CommonUsersCallback;
 import com.waz.zclient.pages.main.connect.views.ConnectRequestInboxRow;
 import com.waz.zclient.ui.utils.TextViewUtils;
 import com.waz.zclient.utils.LayoutSpec;
@@ -42,12 +41,10 @@ public class ConnectRequestInboxAdapter extends BaseAdapter {
     private int accentColor;
     private Context context;
     private ConnectActionsCallback connectActionsCallback;
-    private CommonUsersCallback commonUsersCallback;
 
-    public ConnectRequestInboxAdapter(Context context, ConnectActionsCallback connectActionsCallback, CommonUsersCallback commonUsersCallback) {
+    public ConnectRequestInboxAdapter(Context context, ConnectActionsCallback connectActionsCallback) {
         this.context = context;
         this.connectActionsCallback = connectActionsCallback;
-        this.commonUsersCallback = commonUsersCallback;
     }
 
     public void reset() {
@@ -99,8 +96,7 @@ public class ConnectRequestInboxAdapter extends BaseAdapter {
             convertView = new ConnectRequestInboxRow(parent.getContext());
 
             viewHolder = new ViewHolder();
-            viewHolder.nameView = ViewUtils.getView(convertView, R.id.taet__participants__header);
-            viewHolder.subheaderView = ViewUtils.getView(convertView, R.id.ttv__participants__sub_header);
+            viewHolder.nameView = ViewUtils.getView(convertView, R.id.ttv__connect_request__display_name);
             viewHolder.separatorView = ViewUtils.getView(convertView, R.id.v__connect_request__separator_line);
 
             convertView.setTag(viewHolder);
@@ -110,11 +106,10 @@ public class ConnectRequestInboxAdapter extends BaseAdapter {
 
         // Set valuesCon
         IConversation request = getItem(position);
-        viewHolder.nameView.setText(context.getString(R.string.connect_request__inbox__header, request.getName()));
+        viewHolder.nameView.setText(request.getName());
         TextViewUtils.boldText(viewHolder.nameView);
 
         ((ConnectRequestInboxRow) convertView).setConnectActionCallback(connectActionsCallback);
-        ((ConnectRequestInboxRow) convertView).setCommonUsersCallback(commonUsersCallback);
         ((ConnectRequestInboxRow) convertView).setAccentColor(accentColor);
         ((ConnectRequestInboxRow) convertView).loadUser(request.getOtherParticipant());
 
@@ -131,7 +126,6 @@ public class ConnectRequestInboxAdapter extends BaseAdapter {
 
     public static class ViewHolder {
         TextView nameView;
-        TextView subheaderView;
         View separatorView;
     }
 }

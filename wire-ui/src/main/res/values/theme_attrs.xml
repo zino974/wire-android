@@ -44,6 +44,7 @@
 
     <!-- Conversation Toolbar -->
     <attr name="conversationToolbar" format="reference" />
+    <attr name="conversationToolbarNoDivider" format="reference" />
     <attr name="conversationToolbarBackground" format="reference" />
     <attr name="conversationToolbarIconVideo" format="reference" />
     <attr name="conversationToolbarIconCall" format="reference" />
@@ -87,6 +88,7 @@
     <attr name="wireDivider" format="reference" />
     <attr name="tabIndicatorLabel" format="reference" />
     <attr name="wirePrimaryTextColor" format="color" />
+    <attr name="wireSecondaryTextColor" format="color" />
     <attr name="wirePrimaryTextColorReverted" format="color" />
 
     <!-- StartUI error labels -->
@@ -97,6 +99,7 @@
     <attr name="startUiCloseButton" format="reference" />
 
     <attr name="startUiUserRowLabel" format="reference" />
+    <attr name="startUiUserRowSubLabel" format="reference" />
     <attr name="startUiHeaderRowLabel" format="reference" />
 
     <!-- Media Player -->

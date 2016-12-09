@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -51,19 +52,24 @@ import com.waz.zclient.views.menus.ConfirmationMenu;
 
 
 public class MainTabletFragment extends BaseFragment<MainTabletFragment.Container> implements
-        OnBackPressedListener,
-        InAppNotificationFragment.Container,
-        RootFragment.Container,
-        SingleImageObserver,
-        SingleImageFragment.Container,
-        ConfirmationObserver,
-        AccentColorObserver {
+                                                                                   OnBackPressedListener,
+                                                                                   InAppNotificationFragment.Container,
+                                                                                   RootFragment.Container,
+                                                                                   SingleImageObserver,
+                                                                                   SingleImageFragment.Container,
+                                                                                   ConfirmationObserver,
+                                                                                   AccentColorObserver {
 
     public static final String TAG = MainTabletFragment.class.getName();
     private static final String ARG_LOCK_EXPANDED = "ARG_LOCK_EXPANDED";
 
     private ConfirmationMenu confirmationMenu;
     private BackgroundFrameLayout backgroundLayout;
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //

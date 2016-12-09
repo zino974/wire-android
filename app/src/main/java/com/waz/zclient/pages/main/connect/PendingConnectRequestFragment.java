@@ -17,13 +17,14 @@
  */
 package com.waz.zclient.pages.main.connect;
 
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.waz.api.CommonConnections;
 import com.waz.api.IConversation;
@@ -36,14 +37,13 @@ import com.waz.zclient.core.stores.connect.ConnectStoreObserver;
 import com.waz.zclient.core.stores.connect.IConnectStore;
 import com.waz.zclient.core.stores.conversation.OnConversationLoadedListener;
 import com.waz.zclient.pages.BaseFragment;
-import com.waz.zclient.pages.main.connect.views.CommonUsersCallback;
-import com.waz.zclient.pages.main.connect.views.CommonUsersView;
-import com.waz.zclient.pages.main.participants.ParticipantBackbarFragment;
 import com.waz.zclient.pages.main.participants.ProfileAnimation;
 import com.waz.zclient.pages.main.participants.ProfileSourceAnimation;
 import com.waz.zclient.pages.main.participants.ProfileTabletAnimation;
 import com.waz.zclient.pages.main.participants.dialog.DialogLaunchMode;
-import com.waz.zclient.ui.text.GlyphTextView;
+import com.waz.zclient.ui.theme.ThemeUtils;
+import com.waz.zclient.ui.utils.KeyboardUtils;
+import com.waz.zclient.ui.views.UserDetailsView;
 import com.waz.zclient.ui.views.ZetaButton;
 import com.waz.zclient.utils.LayoutSpec;
 import com.waz.zclient.utils.ViewUtils;
@@ -55,8 +55,7 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
                                                                                                                     OnConversationLoadedListener,
                                                                                                                     ConnectStoreObserver,
                                                                                                                     AccentColorObserver,
-                                                                                                                    UpdateListener,
-                                                                                                                    ParticipantBackbarFragment.Container {
+                                                                                                                    UpdateListener {
 
     public static final String TAG = PendingConnectRequestFragment.class.getName();
     public static final String ARGUMENT_USER_ID = "ARGUMENT_USER_ID";
@@ -75,15 +74,11 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
     private boolean isShowingFooterMenu;
 
     private boolean isBelowUserProfile;
-    private ZetaButton ignoreButton;
-    private ZetaButton acceptButton;
+    private UserDetailsView userDetailsView;
     private ZetaButton unblockButton;
-    private LinearLayout acceptMenu;
     private FooterMenu footerMenu;
-    private TextView subHeaderView;
-    private GlyphTextView closeButton;
-    private CommonUsersView commonUsersView;
-    private TextView participentsHeader;
+    private Toolbar toolbar;
+    private TextView displayNameTextView;
     private ImageAssetImageView imageAssetImageViewProfile;
 
     public static PendingConnectRequestFragment newInstance(String userId,
@@ -157,6 +152,14 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        updateToolbarNavigationIcon(newConfig);
+        toolbar.setContentInsetsRelative(getResources().getDimensionPixelSize(R.dimen.content__padding_left),
+                                         toolbar.getContentInsetEnd());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup viewContainer, Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             userId = savedInstanceState.getString(ARGUMENT_USER_ID);
@@ -174,53 +177,36 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
 
         View rootView = inflater.inflate(R.layout.fragment_connect_request_pending, viewContainer, false);
 
-        ignoreButton = ViewUtils.getView(rootView, R.id.zb__connect_request__ignore_button);
-        acceptButton = ViewUtils.getView(rootView, R.id.zb__connect_request__accept_button);
+        userDetailsView =  ViewUtils.getView(rootView, R.id.udv__pending_connect__user_details);
         unblockButton = ViewUtils.getView(rootView, R.id.zb__connect_request__unblock_button);
-        acceptMenu = ViewUtils.getView(rootView, R.id.ll__connect_request__accept_menu);
         footerMenu = ViewUtils.getView(rootView, R.id.fm__footer);
-        subHeaderView = ViewUtils.getView(rootView, R.id.ttv__participants__sub_header);
-        closeButton = ViewUtils.getView(rootView, R.id.gtv__participants__close);
-        commonUsersView = ViewUtils.getView(rootView, R.id.ll__send_connect_request__common_users);
-        participentsHeader = ViewUtils.getView(rootView, R.id.taet__participants__header);
+        toolbar = ViewUtils.getView(rootView, R.id.t__pending_connect__toolbar);
+        displayNameTextView = ViewUtils.getView(rootView, R.id.tv__pending_connect_toolbar__title);
         imageAssetImageViewProfile = ViewUtils.getView(rootView, R.id.iaiv__pending_connect);
         imageAssetImageViewProfile.setDisplayType(ImageAssetImageView.DisplayType.CIRCLE);
         imageAssetImageViewProfile.setSaturation(0);
 
-        // Close button & backbar
-        switch (userRequester) {
-            case CONVERSATION:
-                closeButton.setClickable(false);
-                closeButton.setVisibility(View.INVISIBLE);
-                break;
-            case PARTICIPANTS:
-                if (LayoutSpec.isTablet(getActivity())) {
-                    closeButton.setClickable(false);
-                    closeButton.setVisibility(View.INVISIBLE);
-
-                    getChildFragmentManager().beginTransaction()
-                                             .add(R.id.fl__participant__backbar__container,
-                                                  ParticipantBackbarFragment.newInstance(),
-                                                  ParticipantBackbarFragment.TAG)
-                                             .commit();
-                } else {
-                    closeButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            getContainer().dismissUserProfile();
-                        }
-                    });
-                }
-                break;
-            default:
-                closeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        getContainer().dismissUserProfile();
-                    }
-                });
-                break;
+        updateToolbarNavigationIcon();
+        if (userRequester == IConnectStore.UserRequester.PARTICIPANTS) {
+            toolbar.setBackground(null);
         }
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (userRequester) {
+                    case CONVERSATION:
+                        if (LayoutSpec.isTablet(getContext()) && ViewUtils.isInLandscape(getContext())) {
+                            return;
+                        }
+                        getActivity().onBackPressed();
+                        KeyboardUtils.closeKeyboardIfShown(getActivity());
+                        break;
+                    default:
+                        getContainer().dismissUserProfile();
+                        break;
+                }
+            }
+        });
 
         View backgroundContainer = ViewUtils.getView(rootView, R.id.ll__pending_connect__background_container);
         if (getControllerFactory().getConversationScreenController().getPopoverLaunchMode() == DialogLaunchMode.AVATAR ||
@@ -232,9 +218,7 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
 
         // Hide views until connection status of user is determined
         footerMenu.setVisibility(View.GONE);
-        acceptMenu.setVisibility(View.GONE);
         unblockButton.setVisibility(View.GONE);
-        commonUsersView.setVisibility(View.GONE);
 
         return rootView;
     }
@@ -283,16 +267,11 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
 
     @Override
     public void onDestroyView() {
+        userDetailsView.recycle();
         imageAssetImageViewProfile = null;
-        ignoreButton = null;
-        acceptButton = null;
         unblockButton = null;
-        acceptMenu = null;
         footerMenu = null;
-        subHeaderView = null;
-        closeButton = null;
-        commonUsersView = null;
-        participentsHeader = null;
+        displayNameTextView = null;
         if (conversation != null) {
             conversation.removeUpdateListener(this);
             conversation = null;
@@ -318,11 +297,6 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
     //////////////////////////////////////////////////////////////////////////////////////////
 
     private void setFooterForOutgoingConnectRequest(final User user) {
-        // Hide accept / ignore buttons
-        acceptMenu.setVisibility(View.GONE);
-        ignoreButton.setOnClickListener(null);
-        acceptButton.setOnClickListener(null);
-
         // Show footer
         footerMenu.setVisibility(View.VISIBLE);
         isShowingFooterMenu = true;
@@ -330,79 +304,40 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
         footerMenu.setCallback(new FooterMenuCallback() {
             @Override
             public void onLeftActionClicked() {
-                // do nothing
+                user.cancelConnection();
             }
 
             @Override
             public void onRightActionClicked() {
-                getContainer().showOptionsMenu(user);
+                user.block();
             }
         });
     }
 
 
     private void setFooterForIncomingConnectRequest(final User user) {
-        isShowingFooterMenu = userRequester == IConnectStore.UserRequester.PARTICIPANTS;
-
-        // Footer menu
-        if (isShowingFooterMenu) {
-            footerMenu.setRightActionText(getString(R.string.glyph__minus));
-
-            footerMenu.setCallback(new FooterMenuCallback() {
-                @Override
-                public void onLeftActionClicked() {
-                    // Show Accept menu, hide Footer menu
-                    toggleAcceptAndFooterMenu(false);
-                }
-
-                @Override
-                public void onRightActionClicked() {
-                    getContainer().showRemoveConfirmation(user);
-                }
-            });
+        if (userRequester != IConnectStore.UserRequester.PARTICIPANTS)  {
+            return;
         }
 
-        // Accept / ignore buttons
-        ignoreButton.setEnabled(true);
-        ignoreButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (userRequester == IConnectStore.UserRequester.PARTICIPANTS) {
-                    // Hide Accept menu, show Footer menu
-                    toggleAcceptAndFooterMenu(true);
-                } else {
-                    ignoreButton.setEnabled(false);
-                    user.ignoreConnection();
-                    getContainer().dismissUserProfile();
-                }
-                getContainer().onIgnoredConnectRequest(conversation);
-            }
-        });
+        footerMenu.setVisibility(View.VISIBLE);
+        footerMenu.setRightActionText(getString(R.string.glyph__minus));
 
-        acceptButton.setEnabled(true);
-        acceptButton.setOnClickListener(new View.OnClickListener() {
+        footerMenu.setCallback(new FooterMenuCallback() {
             @Override
-            public void onClick(View v) {
-                acceptButton.setEnabled(false);
+            public void onLeftActionClicked() {
                 IConversation conversation = user.acceptConnection();
                 getContainer().onAcceptedConnectRequest(conversation);
             }
+
+            @Override
+            public void onRightActionClicked() {
+                getContainer().showRemoveConfirmation(user);
+            }
         });
 
-        // Init accept and footer menu visibility
-        toggleAcceptAndFooterMenu(isShowingFooterMenu);
-    }
-
-    private void toggleAcceptAndFooterMenu(boolean showFooterMenu) {
-        if (showFooterMenu) {
-            acceptMenu.setVisibility(View.GONE);
-            footerMenu.setVisibility(View.VISIBLE);
-        } else {
-            acceptMenu.setVisibility(View.VISIBLE);
-            footerMenu.setVisibility(View.GONE);
-        }
-
-        isShowingFooterMenu = showFooterMenu;
+        footerMenu.setLeftActionText(getString(R.string.glyph__plus));
+        footerMenu.setLeftActionLabelText(getString(R.string.send_connect_request__connect_button__text));
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -458,16 +393,11 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
         }
 
         imageAssetImageViewProfile.connectImageAsset(user.getPicture());
+        userDetailsView.setUser(user);
 
         // Load common users
         getStoreFactory().getConnectStore().loadCommonConnections(user.getCommonConnections());
-        participentsHeader.setText(user.getName());
-
-        if (user.getConnectionStatus() == User.ConnectionStatus.PENDING_FROM_OTHER) {
-            subHeaderView.setText(user.getEmail());
-        } else {
-            subHeaderView.setText("");
-        }
+        displayNameTextView.setText(user.getName());
 
         switch (user.getConnectionStatus()) {
             case PENDING_FROM_OTHER:
@@ -484,29 +414,7 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
 
     @Override
     public void onCommonConnectionsUpdated(CommonConnections commonConnections) {
-        if (commonConnections.getTotalCount() == 0) {
-            commonUsersView.setVisibility(View.GONE);
-            return;
-        } else {
-            commonUsersView.setVisibility(View.VISIBLE);
-            if (LayoutSpec.isTablet(getActivity())) {
-                ViewUtils.setWidth(imageAssetImageViewProfile, getResources().getDimensionPixelSize(R.dimen.profile__image__width_small));
-                ViewUtils.setHeight(imageAssetImageViewProfile, getResources().getDimensionPixelSize(R.dimen.profile__image__height_small));
-            }
-        }
-
-        commonUsersView.setVisibility(View.VISIBLE);
-
-        CommonUsersCallback commonUserOnClickCallback = new CommonUsersCallback() {
-            @Override
-            public void onCommonUserClicked(View anchor, User user) {
-                getContainer().openCommonUserProfile(anchor, user);
-            }
-        };
-
-        commonUsersView.setCommonUsers(commonConnections.getTopConnections(),
-                                       commonConnections.getTotalCount(),
-                                       commonUserOnClickCallback);
+        // do nothing
     }
 
     @Override
@@ -522,13 +430,40 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
 
     @Override
     public void onAccentColorHasChanged(Object sender, int color) {
-        ignoreButton.setIsFilled(false);
-        ignoreButton.setAccentColor(color);
-        acceptButton.setAccentColor(color);
-
         unblockButton.setIsFilled(false);
         unblockButton.setAccentColor(color);
-        subHeaderView.setTextColor(color);
+    }
+
+    private void updateToolbarNavigationIcon() {
+        updateToolbarNavigationIcon(null);
+    }
+
+    private void updateToolbarNavigationIcon(Configuration newConfig) {
+        if (LayoutSpec.isPhone(getContext())) {
+            return;
+        }
+        if (userRequester == IConnectStore.UserRequester.CONVERSATION &&
+            (ViewUtils.isInLandscape(getContext()) ||
+             (newConfig != null && ViewUtils.isInLandscape(newConfig)))) {
+            toolbar.setNavigationIcon(null);
+        } else {
+            switch (userRequester) {
+                case CONVERSATION:
+                    if (ThemeUtils.isDarkTheme(getContext())) {
+                        toolbar.setNavigationIcon(R.drawable.ic_action_menu_light);
+                    } else {
+                        toolbar.setNavigationIcon(R.drawable.ic_action_menu_dark);
+                    }
+                    break;
+                default:
+                    if (ThemeUtils.isDarkTheme(getContext())) {
+                        toolbar.setNavigationIcon(R.drawable.action_back_light);
+                    } else {
+                        toolbar.setNavigationIcon(R.drawable.action_back_dark);
+                    }
+                    break;
+            }
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -544,10 +479,6 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
 
     public interface Container extends UserProfileContainer {
         void onAcceptedConnectRequest(IConversation conversation);
-
-        void onIgnoredConnectRequest(IConversation conversation);
-
-        void showOptionsMenu(User user);
 
         void onConversationUpdated(IConversation conversation);
     }
