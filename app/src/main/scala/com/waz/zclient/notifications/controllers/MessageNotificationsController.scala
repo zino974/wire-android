@@ -34,6 +34,7 @@ import com.waz.ZLog.verbose
 import com.waz.api.NotificationsHandler.NotificationType
 import com.waz.api.NotificationsHandler.NotificationType._
 import com.waz.bitmap
+import com.waz.model.NotId
 import com.waz.service.ZMessaging
 import com.waz.service.push.NotificationService.NotificationInfo
 import com.waz.threading.Threading
@@ -72,6 +73,12 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
 
   lazy val clearIntent = NotificationsAndroidService.clearNotificationsIntent(context)
 
+  val displayedNots = Signal(Seq.empty[NotId])
+
+  notsService.zip(displayedNots) {
+    case (service, displayed) => service.markAsDisplayed(displayed)
+  }
+
   notifications.zip(shouldBeSilent).on(Threading.Ui) {
     case (nots, silent) =>
       val (ephemeral, normal) = nots.partition(_.isEphemeral)
@@ -82,9 +89,9 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
   private def handleNotifications(nots: Seq[NotificationInfo], silent: Boolean, notifId: Int): Unit = {
     verbose(s"Notifications updated: shouldBeSilent: $silent, $nots")
     if (nots.isEmpty) notManager.cancel(notifId)
-    else {
+    else if (!nots.forall(_.hasBeenDisplayed)) { //Only show notifications if there are any that haven't yet been displayed to the user
       val notification =
-        if (notifId == ZETA_EPHEMERAL_NOTIFICATION_ID) getEphemeralNotification(nots.size, silent)
+        if (notifId == ZETA_EPHEMERAL_NOTIFICATION_ID) getEphemeralNotification(nots.size, silent, nots.maxBy(_.time).time)
         else if (nots.size == 1) getSingleMessageNotification(nots.head, silent)
         else getMultipleMessagesNotification(nots, silent)
 
@@ -97,6 +104,7 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
 
       notManager.notify(notifId, notification)
     }
+    displayedNots ! nots.map(_.id)
   }
 
   private def attachNotificationLed(notification: Notification) = {
@@ -154,7 +162,7 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     else RingtoneUtils.getUriForRawId(context, returnDefault)
   }
 
-  private def getEphemeralNotification(size: Int, silent: Boolean): Notification = {
+  private def getEphemeralNotification(size: Int, silent: Boolean, displayTime: Instant): Notification = {
     val details = getString(R.string.notification__message__ephemeral_details)
     val title = getQuantityString(R.plurals.notification__message__ephemeral, size, Integer.valueOf(size))
 
@@ -165,6 +173,8 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     bigTextStyle.bigText(details)
 
     builder
+      .setShowWhen(true)
+      .setWhen(displayTime.toEpochMilli)
       .setSmallIcon(R.drawable.ic_menu_logo)
       .setLargeIcon(getAppIcon)
       .setContentTitle(title)
@@ -196,6 +206,8 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     builder
       .setSmallIcon(R.drawable.ic_menu_logo)
       .setLargeIcon(getAppIcon)
+      .setShowWhen(true)
+      .setWhen(n.time.toEpochMilli)
       .setContentTitle(title)
       .setContentText(spannableString)
       .setContentIntent(getNotificationAppLaunchIntent(cxt, n.convId.str, requestBase))
@@ -236,6 +248,8 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
       .setBigContentTitle(title)
 
     val builder = new NotificationCompat.Builder(cxt)
+      .setShowWhen(true)
+      .setWhen(ns.maxBy(_.time).time.toEpochMilli)
       .setSmallIcon(R.drawable.ic_menu_logo)
       .setLargeIcon(getAppIcon).setNumber(ns.size)
       .setContentTitle(title)
