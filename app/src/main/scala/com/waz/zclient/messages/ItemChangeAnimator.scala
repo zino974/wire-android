@@ -17,74 +17,45 @@
   */
 package com.waz.zclient.messages
 
+import java.util
+
 import android.animation.Animator.AnimatorListener
+import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.animation.{Animator, ValueAnimator}
 import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.RecyclerView.{ItemAnimator, ViewHolder}
+import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.View
-import com.waz.utils.returning
-import com.waz.zclient.R
-import com.waz.zclient.ui.animation.interpolators.penner.Expo
-import com.waz.zclient.utils.ContextUtils.getDimen
-import com.waz.zclient.utils.RichView
+import com.waz.zclient.messages.parts.footer.FooterPartView
+import com.waz.zclient.ui.animation.interpolators.penner.Elastic.EaseIn
 
 class ItemChangeAnimator extends DefaultItemAnimator {
 
-  private var pendingChanges = Set.empty[ViewHolder]
-  private var anims = Set.empty[ValueAnimator]
+  private var pendingChanges = Set.empty[MessageViewHolder]
+  private var anims = Set.empty[FooterHideAnimator]
 
-  override def animateChange(oldHolder: ViewHolder, newHolder: ViewHolder, preInfo: ItemAnimator.ItemHolderInfo, postInfo: ItemAnimator.ItemHolderInfo): Boolean = {
-    super.animateChange(oldHolder, newHolder, preInfo, postInfo)
-  }
+  // always reuse view holder, we will handle animations ourselves
+  override def canReuseUpdatedViewHolder(viewHolder: ViewHolder, payloads: util.List[AnyRef]): Boolean = true
 
-  //Setting a payload in notifyItemChanged(int pos, Object payload) ensures that the old viewHolder is re-used, allowing
-  //us to manually control animations. If this method returns true, then the animations will be run later on the UI thread
-  //when the ReyclerView calls our #runPendingAnimations implementation
   override def animateChange(oldHolder: ViewHolder, newHolder: ViewHolder, fromX: Int, fromY: Int, toX: Int, toY: Int): Boolean = {
-    if (oldHolder == newHolder) {
-      pendingChanges += oldHolder
-      true
-    } else super.animateChange(oldHolder, newHolder, fromX, fromY, toX, toY)
+    newHolder match {
+      case vh: MessageViewHolder if vh.view.isFooterHiding =>
+        pendingChanges += vh
+      case _ =>
+    }
+    super.animateChange(oldHolder, newHolder, fromX, fromY, toX, toY)
   }
 
-//  override def runPendingAnimations(): Unit = {
-//    super.runPendingAnimations()
-//    if (pendingChanges.nonEmpty) {
-//      val changer: Runnable = new Runnable() {
-//        def run() = {
-//          for (change <- pendingChanges) {
-//            animateChangeImpl(change)
-//          }
-//        }
-//      }
-//      changer.run()
-//    }
-//  }
-
-//  def animateChangeImpl(viewHolder: ViewHolder): Unit = {
-//    val holder = viewHolder.asInstanceOf[MessageViewHolder]
-//    holder.view.getFooter.foreach {
-//      case footer if shouldAnimateFooter(holder) =>
-//        returning(new FooterAnimator(footer, holder)) { anim =>
-//          pendingChanges -= viewHolder
-//          anims += anim
-//          anim.start()
-//        }
-//      case footer if shouldAnimateTimestamp(holder) =>
-//        returning(new TimestampLikesAnimator(footer, holder)) { anim =>
-//          pendingChanges -= viewHolder
-//          anims += anim
-//          anim.start()
-//        }
-//      case _ => //no animation
-//    }
-//  }
-//
-//  def shouldAnimateFooter(h: MessageViewHolder) = h.shouldDisplayFooter && !h.view.getFooter.exists(_.isVisible) ||
-//    !h.shouldDisplayFooter && h.view.getFooter.exists(_.isVisible)
-//
-//  def shouldAnimateTimestamp(h: MessageViewHolder) = h.hasLikes && h.isFocused && h.view.getFooter.exists(_.getContentTranslation == 0f) ||
-//    h.hasLikes && !h.isFocused && h.view.getFooter.exists(_.getContentTranslation > 0f)
+  override def runPendingAnimations(): Unit = {
+    super.runPendingAnimations()
+    anims ++= pendingChanges flatMap { vh =>
+      vh.view.getFooter map { footer =>
+        footer.setVisibility(View.VISIBLE)
+        FooterHideAnimator(vh, footer)
+      }
+    }
+    pendingChanges = Set.empty
+    anims foreach { _.start() }
+  }
 
   override def endAnimations(): Unit = {
     anims.foreach(_.end())
@@ -95,77 +66,36 @@ class ItemChangeAnimator extends DefaultItemAnimator {
 
   override def isRunning: Boolean = super.isRunning || pendingChanges.nonEmpty || anims.nonEmpty
 
-  abstract class StartEndAnimator(holder: ViewHolder) extends ValueAnimator with AnimatorListener with ValueAnimator.AnimatorUpdateListener {
-    setFloatValues(0, 1)
+  /**
+    * Animates footer size to hide it.
+    * Note: this animator changes view layout params, this is ugly, inefficient, causes layout pass on every frame,
+    * but I could't find any better way to achieve desired result in RecyclerView.
+    */
+  case class FooterHideAnimator(holder: MessageViewHolder, footer: FooterPartView) extends ValueAnimator with AnimatorListener with AnimatorUpdateListener {
+    setFloatValues(0f, 1f)
     addListener(this)
     addUpdateListener(this)
+    val height = footer.getHeight
+    val lp = footer.getLayoutParams
 
-    override def onAnimationStart(animation: Animator): Unit = {
-      dispatchChangeStarting(holder, false)
+    override def onAnimationUpdate(animation: ValueAnimator): Unit = {
+      lp.height = height - (height * animation.getAnimatedFraction).toInt
+      footer.setLayoutParams(lp)
     }
+
+    override def onAnimationStart(animation: Animator): Unit =
+      dispatchChangeStarting(holder, false)
 
     override def onAnimationEnd(animation: Animator): Unit = {
       anims -= this
+      holder.view.removeListPart(footer)
+      lp.height = height
+      footer.setLayoutParams(lp)
       dispatchChangeFinished(holder, false)
     }
 
     override def onAnimationRepeat(animation: Animator): Unit = ()
 
     override def onAnimationCancel(animation: Animator): Unit = onAnimationEnd(animation)
-  }
-
-//  class FooterAnimator(footer: View, holder: MessageViewHolder) extends StartEndAnimator(holder) {
-//
-//    private val closing = !holder.shouldDisplayFooter
-//    private val openHeight = getDimen(R.dimen.content__footer__height)(holder.itemView.getContext).toInt //TODO must be a better way
-//
-//    setInterpolator(new Expo.EaseInOut)
-//
-//    override def onAnimationStart(animation: Animator): Unit = {
-//      if (!closing) footer.setVisible(true)
-//      super.onAnimationEnd(animation)
-//    }
-//
-//    override def onAnimationEnd(animation: Animator): Unit = {
-//      if (closing) footer.setVisible(false)
-//      super.onAnimationEnd(animation)
-//    }
-//
-//    override def onAnimationUpdate(animation: ValueAnimator): Unit = {
-//      val heightDelta = (openHeight * animation.getAnimatedFraction).toInt
-//      footer.getLayoutParams.height = if (closing) openHeight - heightDelta else heightDelta
-//      footer.requestLayout()
-//    }
-//  }
-
-//  class TimestampLikesAnimator(footer: Footer, holder: MessageViewHolder) extends StartEndAnimator(holder) {
-//
-//    private val animateDown = holder.hasLikes && holder.isFocused && footer.getContentTranslation == 0f
-//
-//    private val translationHeight = getDimen(R.dimen.content__footer__height)(holder.itemView.getContext).toInt //TODO must be a better way
-//
-//    override def onAnimationStart(animation: Animator): Unit = {
-//      super.onAnimationStart(animation)
-//    }
-//
-//    override def onAnimationEnd(animation: Animator): Unit = {
-//      footer.setContentTranslationY(if (animateDown) translationHeight else 0)
-//      super.onAnimationEnd(animation)
-//    }
-//
-//    override def onAnimationUpdate(animation: ValueAnimator): Unit = {
-//      val transDelta = translationHeight * animation.getAnimatedFraction
-//      footer.setContentTranslationY(if (animateDown) transDelta else translationHeight - transDelta)
-//    }
-//  }
-}
-
-object ItemChangeAnimator {
-
-  trait ChangeInfo
-  object ChangeInfo {
-    case object Focus extends ChangeInfo
-    case object Likes extends ChangeInfo
-    case object Unknown extends ChangeInfo
   }
 }

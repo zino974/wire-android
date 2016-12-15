@@ -17,17 +17,21 @@
   */
 package com.waz.zclient.messages.parts.footer
 
+import android.animation.ValueAnimator
+import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.content.Context
+import android.graphics.{Canvas, Rect}
 import android.util.AttributeSet
 import android.widget.{FrameLayout, TextView}
 import com.waz.ZLog.ImplicitTag._
 import com.waz.model.{MessageContent, MessageData}
 import com.waz.service.messages.MessageAndLikes
 import com.waz.threading.Threading
+import com.waz.utils.events.Signal
 import com.waz.zclient.messages.MessageView.MsgBindOptions
 import com.waz.zclient.messages.{MessageViewPart, MsgPart}
+import com.waz.zclient.ui.animation.interpolators.penner.Quad.EaseOut
 import com.waz.zclient.ui.utils.TextViewUtils
-import com.waz.zclient.utils.ContextUtils._
 import com.waz.zclient.utils._
 import com.waz.zclient.{R, ViewHelper}
 
@@ -46,12 +50,36 @@ class FooterPartView(context: Context, attrs: AttributeSet, style: Int) extends 
   val isLiked = controller.isLiked
   val focused = controller.focused
 
-  val height = getDimen(R.dimen.content__footer__height).toInt
+  val height = Signal[Int]()
+  val contentOffset = Signal[Float]
+  val contentTranslate = for {
+    h <- height
+    o <- contentOffset
+  } yield h * o
+
+  val anim = new ValueAnimator() {
+    setFloatValues(0f, 1f)
+    addUpdateListener(new AnimatorUpdateListener {
+      override def onAnimationUpdate(animation: ValueAnimator) =
+        contentOffset ! animation.getAnimatedFraction - 1.0f
+    })
+  }
 
   private val likeButton: LikeButton = findById(R.id.like__button)
   private val timeStampAndStatus: TextView = findById(R.id.timestamp_and_status)
-
   private val likeDetails: LikeDetailsView = findById(R.id.like_details)
+
+  setClipChildren(true)
+
+  height { h =>
+    setClipBounds(new Rect(0, 0, getWidth, h))
+  }
+
+  contentTranslate { t =>
+    likeButton.setTranslationY(t)
+    likeDetails.setTranslationY(t)
+    timeStampAndStatus.setTranslationY(t)
+  }
 
   likeButton.init(controller)
   likeDetails.init(controller)
@@ -70,10 +98,28 @@ class FooterPartView(context: Context, attrs: AttributeSet, style: Int) extends 
     likeDetails.setVisible(!st)
   }
 
+  override def onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int): Unit = {
+    height ! (bottom - top)
+    super.onLayout(changed, left, top, right, bottom)
+  }
+
+  override def onDraw(canvas: Canvas): Unit = {
+    canvas.clipRect(0, 0, getWidth, getHeight)
+    super.onDraw(canvas)
+  }
+
   override def set(msg: MessageData, part: Option[MessageContent], opts: MsgBindOptions): Unit = ()
 
   override def set(msg: MessageAndLikes, part: Option[MessageContent], opts: MsgBindOptions): Unit = {
     controller.isSelfMessage.publish(opts.isSelf, Threading.Ui)
     controller.messageAndLikes.publish(msg, Threading.Ui)
+
+    anim.cancel()
+    contentOffset ! 0
+  }
+
+  def slideContentIn(): Unit = {
+    anim.cancel()
+    anim.start()
   }
 }
