@@ -1,4 +1,4 @@
-/*
+/**
  * Wire
  * Copyright (C) 2016 Wire Swiss GmbH
  *
@@ -9,13 +9,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.waz.zclient.conversation
 
 import com.waz.ZLog._
@@ -28,12 +27,17 @@ import com.waz.service.ZMessaging
 import com.waz.service.assets.AssetService.BitmapResult
 import com.waz.service.assets.AssetService.BitmapResult.BitmapLoaded
 import com.waz.service.images.BitmapSignal
+import com.waz.threading.SerialDispatchQueue
 import com.waz.ui.MemoryImageCache.BitmapRequest.Regular
 import com.waz.utils.events.Signal
 import com.waz.zclient.{Injectable, Injector}
 
 //testable!
 protected class CollectionController(implicit injector: Injector) extends Injectable {
+
+  private implicit val tag: LogTag = logTagFor[CollectionController]
+
+  private implicit val dispatcher = new SerialDispatchQueue(name = "CollectionController")
 
   val zms = inject[Signal[ZMessaging]]
 
@@ -46,12 +50,14 @@ protected class CollectionController(implicit injector: Injector) extends Inject
   val images = assetStorage.zip(currentConv.zip(msgStorage).flatMap {
     case (id, msgs) => Signal.future(loadImages(id, msgs))
   }).map {
-    case (as, ids) => ids.map(as.signal)
+    case (as, ids) => ids.map {
+      case (a, t) => (as.signal(a), t)
+    }
   }
 
   private def loadImages(conv: ConvId, storage: MessagesStorage) = {
     verbose(s"loadCursor for $conv")
-    storage.find(m => m.convId == conv && m.msgType == Message.Type.ASSET, MessageDataDao.findByType(conv, Message.Type.ASSET)(_), _.assetId)
+    storage.find(m => m.convId == conv && m.msgType == Message.Type.ASSET, MessageDataDao.findByType(conv, Message.Type.ASSET)(_), m => (m.assetId, m.time)).map(_.sortBy(_._2))
   }
 
   def bitmapSignal(assetId: AssetId, width: Int) = zms.flatMap { zms =>

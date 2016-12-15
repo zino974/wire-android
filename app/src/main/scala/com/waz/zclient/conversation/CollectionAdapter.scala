@@ -1,4 +1,4 @@
-/*
+/**
  * Wire
  * Copyright (C) 2016 Wire Swiss GmbH
  *
@@ -9,13 +9,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.waz.zclient.conversation
 
 import android.content.Context
@@ -41,7 +40,7 @@ class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context
   override def getItemCount: Int = images.currentValue.map(_.size).getOrElse(0)
 
   override def onBindViewHolder(holder: CollViewHolder, position: Int): Unit =
-    holder.setAsset(images.currentValue.getOrElse(Seq.empty)(position), ctrler.bitmapSignal, screenWidth / columns)
+    holder.setAsset(images.currentValue.getOrElse(Seq.empty)(position)._1, ctrler.bitmapSignal, screenWidth / columns)
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int): CollViewHolder =
     CollViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_image, parent, false).asInstanceOf[AspectRatioImageView])
