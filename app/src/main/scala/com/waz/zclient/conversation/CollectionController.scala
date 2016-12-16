@@ -18,17 +18,17 @@
 package com.waz.zclient.conversation
 
 import com.waz.ZLog._
-import com.waz.api.Message
+import com.waz.api.{IConversation, Message}
 import com.waz.bitmap.BitmapUtils
 import com.waz.content.MessagesStorage
-import com.waz.model.{AssetData, AssetId, ConvId}
 import com.waz.model.MessageData.MessageDataDao
+import com.waz.model.{AssetData, AssetId, ConvId}
 import com.waz.service.ZMessaging
 import com.waz.service.assets.AssetService.BitmapResult
 import com.waz.service.assets.AssetService.BitmapResult.BitmapLoaded
 import com.waz.service.images.BitmapSignal
 import com.waz.threading.SerialDispatchQueue
-import com.waz.ui.MemoryImageCache.BitmapRequest.Regular
+import com.waz.ui.MemoryImageCache.BitmapRequest.Single
 import com.waz.utils.events.Signal
 import com.waz.zclient.{Injectable, Injector}
 
@@ -55,14 +55,18 @@ protected class CollectionController(implicit injector: Injector) extends Inject
     }
   }
 
+  val conversation = zms.zip(currentConv) flatMap { case (zms, convId) => zms.convsStorage.signal(convId) }
+
+  val conversationName = conversation map (data => if (data.convType == IConversation.Type.GROUP) data.name.filter(!_.isEmpty).getOrElse(data.generatedName) else data.generatedName)
+
   private def loadImages(conv: ConvId, storage: MessagesStorage) = {
     verbose(s"loadCursor for $conv")
-    storage.find(m => m.convId == conv && m.msgType == Message.Type.ASSET, MessageDataDao.findByType(conv, Message.Type.ASSET)(_), m => (m.assetId, m.time)).map(_.sortBy(_._2))
+    storage.find(m => m.convId == conv && m.msgType == Message.Type.ASSET, MessageDataDao.findByType(conv, Message.Type.ASSET)(_), m => (m.assetId, m.time)).map(_.sortBy(_._2).reverse)
   }
 
   def bitmapSignal(assetId: AssetId, width: Int) = zms.flatMap { zms =>
     zms.assetsStorage.signal(assetId).flatMap {
-      case data@AssetData.IsImage() => BitmapSignal(data, Regular(width), zms.imageLoader, zms.imageCache)
+      case data@AssetData.IsImage() => BitmapSignal(data, Single(width), zms.imageLoader, zms.imageCache)
       case _ => Signal.empty[BitmapResult]
     }
   }.map {

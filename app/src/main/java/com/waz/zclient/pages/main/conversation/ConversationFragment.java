@@ -288,9 +288,17 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
                 return;
             }
             if (model.getType() == IConversation.Type.ONE_TO_ONE) {
-                toolbar.inflateMenu(R.menu.conversation_header_menu_video);
+                if (BuildConfig.SHOW_DEVELOPER_OPTIONS) {
+                    toolbar.inflateMenu(R.menu.conversation_header_menu_video_collection);
+                } else {
+                    toolbar.inflateMenu(R.menu.conversation_header_menu_video);
+                }
             } else {
-                toolbar.inflateMenu(R.menu.conversation_header_menu_audio);
+                if (BuildConfig.SHOW_DEVELOPER_OPTIONS) {
+                    toolbar.inflateMenu(R.menu.conversation_header_menu_audio_collection);
+                } else {
+                    toolbar.inflateMenu(R.menu.conversation_header_menu_audio);
+                }
             }
         }
     };
@@ -1518,6 +1526,11 @@ public class ConversationFragment extends BaseFragment<ConversationFragment.Cont
 
     @Override
     public void openCollection() {
+
+    }
+
+    @Override
+    public void closeCollection() {
 
     }
 

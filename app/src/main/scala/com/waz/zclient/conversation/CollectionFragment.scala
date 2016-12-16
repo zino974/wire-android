@@ -19,8 +19,11 @@ package com.waz.zclient.conversation
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.{GridLayoutManager, LinearLayoutManager, RecyclerView}
+import android.support.v7.widget.{GridLayoutManager, LinearLayoutManager, RecyclerView, Toolbar}
+import android.view.View.OnClickListener
 import android.view.{LayoutInflater, View, ViewGroup}
+import android.widget.TextView
+import com.waz.threading.Threading
 import com.waz.zclient.pages.BaseFragment
 import com.waz.zclient.pages.main.conversation.collections.CollectionItemDecorator
 import com.waz.zclient.utils.ViewUtils
@@ -30,8 +33,19 @@ class CollectionFragment extends BaseFragment[CollectionFragment.Container] with
 
   private implicit lazy val context: Context = getContext
 
+   lazy val controller = new CollectionController
+
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
     val view = inflater.inflate(R.layout.fragment_collection, container, false)
+
+    val name: TextView  = ViewUtils.getView(view, R.id.tv__collection_toolbar__name)
+    controller.conversationName.on(Threading.Ui)(name.setText)
+
+    val toolbar: Toolbar = ViewUtils.getView(view, R.id.t_collection_toolbar)
+    toolbar.setNavigationOnClickListener(new OnClickListener {
+      override def onClick(v: View): Unit = getControllerFactory.getGiphyController.closeCollection()
+    })
+
     val recyclerView: RecyclerView = ViewUtils.getView(view, R.id.rv__collection)
     val columns = 4;
     val adapter = new CollectionAdapter(ViewUtils.getRealDisplayWidth(context), columns)

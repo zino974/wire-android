@@ -18,13 +18,9 @@
 package com.waz.zclient.pages.main.conversation.collections;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import com.waz.zclient.conversation.CollectionAdapter;
 
 
@@ -56,7 +52,7 @@ public class CollectionItemDecorator extends RecyclerView.ItemDecoration {
                 continue;
             }
             if (i == 0 || isFirstUnderHeader(position)) {
-                View header = getHeaderView(parent, position);
+                View header = adapter.getHeaderView(parent, position);
                 int translationX = parent.getLeft();
                 int translationY = Math.max(itemView.getTop() - header.getHeight(), 0);
                 tempRect.set(translationX, translationY, translationX + header.getWidth(),
@@ -79,30 +75,9 @@ public class CollectionItemDecorator extends RecyclerView.ItemDecoration {
         }
         boolean underHeader = isUnderHeader(itemPosition);
         if (underHeader) {
-            View header = getHeaderView(parent, itemPosition);
+            View header = adapter.getHeaderView(parent, itemPosition);
             outRect.top = header.getHeight();
         }
-    }
-
-    private View getHeaderView(RecyclerView parent, int position) {
-        // TODO add real header (from adapter?)
-        TextView header = new TextView(parent.getContext());
-        header.setText("header with id " + adapter.getHeaderId(position));
-        header.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-        header.setTextColor(Color.RED);
-
-        if (header.getLayoutParams() == null) {
-            header.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        }
-
-        int widthSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.UNSPECIFIED);
-        int heightSpec = View.MeasureSpec.makeMeasureSpec(parent.getHeight(), View.MeasureSpec.EXACTLY);
-        int childWidth = ViewGroup.getChildMeasureSpec(widthSpec, parent.getPaddingLeft() + parent.getPaddingRight(), header.getLayoutParams().width);
-        int childHeight = ViewGroup.getChildMeasureSpec(heightSpec, parent.getPaddingTop() + parent.getPaddingBottom(), header.getLayoutParams().height);
-        header.measure(childWidth, childHeight);
-        header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());
-
-        return header;
     }
 
     private boolean isUnderHeader(int itemPosition) {

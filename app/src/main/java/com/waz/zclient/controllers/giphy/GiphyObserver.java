@@ -30,4 +30,5 @@ public interface GiphyObserver {
 
     //TODO - being lazy - this should go somewhere else
     void openCollection();
+    void closeCollection();
 }

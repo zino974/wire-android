@@ -80,4 +80,9 @@ public class StubGiphyController implements IGiphyController {
     public void openCollection() {
 
     }
+
+  @Override
+  public void closeCollection() {
+
+  }
 }

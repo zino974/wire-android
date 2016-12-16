@@ -174,6 +174,9 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
                                                                     FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 }
                 return true;
+            } else if (topFragment instanceof CollectionFragment) {
+                getChildFragmentManager().popBackStackImmediate(CollectionFragment.TAG(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                return true;
             }
 
         }
@@ -369,6 +372,12 @@ public class MainPhoneFragment extends BaseFragment<MainPhoneFragment.Container>
                                       CollectionFragment.TAG())
                                  .addToBackStack(CollectionFragment.TAG())
                                  .commit();
+    }
+
+    @Override
+    public void closeCollection() {
+        getChildFragmentManager().popBackStackImmediate(CollectionFragment.TAG(),
+                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////

@@ -41,4 +41,6 @@ public interface IGiphyController {
     boolean isInputAllowedForGiphy(String input);
 
     void openCollection();
+
+    void closeCollection();
 }

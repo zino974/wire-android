@@ -567,6 +567,14 @@ public class RootFragment extends BaseFragment<RootFragment.Container> implement
     }
 
     @Override
+    public void closeCollection() {
+        Fragment fragment = getChildFragmentManager().findFragmentById(R.id.fl__root__giphy);
+        if (fragment != null) {
+            getChildFragmentManager().beginTransaction().remove(fragment).commit();
+        }
+    }
+
+    @Override
     public void onOpenCamera(CameraContext cameraContext) {
         getChildFragmentManager().beginTransaction().add(R.id.fl__root__camera,
                                                          CameraFragment.newInstance(cameraContext),
