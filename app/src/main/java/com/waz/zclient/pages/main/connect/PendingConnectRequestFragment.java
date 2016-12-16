@@ -305,6 +305,7 @@ public class PendingConnectRequestFragment extends BaseFragment<PendingConnectRe
             @Override
             public void onLeftActionClicked() {
                 user.cancelConnection();
+                getActivity().onBackPressed();
             }
 
             @Override
