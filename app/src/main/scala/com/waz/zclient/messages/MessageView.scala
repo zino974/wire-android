@@ -54,7 +54,6 @@ class MessageView(context: Context, attrs: AttributeSet, style: Int)
   private var data: MessageAndLikes = MessageAndLikes.Empty
 
   private var hasFooter = false
-  private var animateFooter = false
 
   setClipChildren(false)
   setClipToPadding(false)
@@ -112,8 +111,11 @@ class MessageView(context: Context, attrs: AttributeSet, style: Int)
     setPadding(0, pad, 0, 0)
     setParts(mAndL, parts, opts)
 
-    if (hasFooter && animateFooter)
-      getFooter foreach (_.slideContentIn())
+    if (animateFooter)
+      getFooter foreach { footer =>
+        if (hasFooter) footer.slideContentIn()
+        else footer.slideContentOut()
+      }
   }
 
   def isFooterHiding = !hasFooter && getFooter.isDefined

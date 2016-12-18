@@ -51,7 +51,10 @@ class MessagesListView(context: Context, attrs: AttributeSet, style: Int) extend
   setHasFixedSize(true)
   setLayoutManager(layoutManager)
   setAdapter(adapter)
-  setItemAnimator(new ItemChangeAnimator)
+  setItemAnimator(new DefaultItemAnimator {
+    // always reuse view holder, we will handle animations ourselves
+    override def canReuseUpdatedViewHolder(viewHolder: ViewHolder, payloads: util.List[AnyRef]): Boolean = true
+  })
 
   scrollController.onScroll { case Scroll(pos, smooth) =>
     verbose(s"Scrolling to pos: $pos, smooth: $smooth")

@@ -116,9 +116,7 @@ class RecyclerCursor(val conv: ConvId, zms: ZMessaging, adapter: RecyclerNotifie
       window.reload(c, position)
     }
 
-    val msg = c(position)
-    verbose(s"Fetching for position: $position")
-    msg
+    c(position)
   })
 
   def lastReadIndex() = cursor.fold(-1)(_.lastReadIndex)
