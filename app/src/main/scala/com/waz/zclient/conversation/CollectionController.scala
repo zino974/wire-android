@@ -55,7 +55,7 @@ protected class CollectionController(initialMsgTypes: Seq[Message.Type] = Seq(Me
       case ((id, msgs), limit) => Signal.future(loadMessagesByType(id, msgs, limit, msgType))
     }).map {
       case (as, ids) => ids.map {
-        case (a, t) => (as.signal(a), t)
+        case (message, instant) => (message, as.signal(message.assetId))
       }
     }
   }.toMap))
@@ -65,7 +65,7 @@ protected class CollectionController(initialMsgTypes: Seq[Message.Type] = Seq(Me
   val conversationName = conversation map (data => if (data.convType == IConversation.Type.GROUP) data.name.filter(!_.isEmpty).getOrElse(data.generatedName) else data.generatedName)
 
   private def loadMessagesByType(conv: ConvId, storage: MessagesStorage, limit:Int, messageType:Message.Type) = {
-    storage.find(m => m.convId == conv && m.msgType == messageType, MessageDataDao.findByType(conv, messageType)(_), m => (m.assetId, m.time)).map(results => results.sortBy(_._2).reverse.take(if (limit > 0) limit else results.length))
+    storage.find(m => m.convId == conv && m.msgType == messageType, MessageDataDao.findByType(conv, messageType)(_), m => (m, m.time)).map(results => results.sortBy(_._2).reverse.take(if (limit > 0) limit else results.length))
   }
 
   def bitmapSignal(assetId: AssetId, width: Int) = zms.flatMap { zms =>

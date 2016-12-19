@@ -40,7 +40,7 @@ import org.threeten.bp.{Instant, LocalDateTime, ZoneId}
 //For now just handling images
 class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context: Context, injector: Injector, eventContext: EventContext) extends RecyclerView.Adapter[CollectionAdapter.CollViewHolder] with Injectable {
 
-  val ctrler = new CollectionController(Seq(CollectionController.Images), 3)
+  val ctrler = new CollectionController(Seq(CollectionController.Images))
   val images = ctrler.collectionMessages.flatMap(_.getOrElse(CollectionController.Images, Signal.empty))
 
   images.onChanged.on(Threading.Ui) { _ => notifyDataSetChanged() }
@@ -48,13 +48,13 @@ class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context
   override def getItemCount: Int = images.currentValue.map(_.size).getOrElse(0)
 
   override def onBindViewHolder(holder: CollViewHolder, position: Int): Unit =
-    holder.setAsset(images.currentValue.getOrElse(Seq.empty)(position)._1, ctrler.bitmapSignal, screenWidth / columns, ResourceUtils.getRandomAccentColor(context))
+    holder.setAsset(images.currentValue.getOrElse(Seq.empty)(position)._2, ctrler.bitmapSignal, screenWidth / columns, ResourceUtils.getRandomAccentColor(context))
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int): CollViewHolder =
     CollViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_image, parent, false).asInstanceOf[AspectRatioImageView])
 
   def getHeaderId(position: Int): Int = {
-    val time = images.currentValue.getOrElse(Seq.empty)(position)._2
+    val time = images.currentValue.getOrElse(Seq.empty)(position)._1.time
     val now = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate
 
     // TODO just testing headers here...
