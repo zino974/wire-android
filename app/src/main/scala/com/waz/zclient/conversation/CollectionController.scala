@@ -33,7 +33,7 @@ import com.waz.utils.events.Signal
 import com.waz.zclient.{Injectable, Injector}
 
 //testable!
-protected class CollectionController(implicit injector: Injector) extends Injectable {
+protected class CollectionController(initialMsgTypes: Seq[Message.Type] = Seq(Message.Type.ASSET), initialLimit: Int = 0)(implicit injector: Injector) extends Injectable {
 
   private implicit val tag: LogTag = logTagFor[CollectionController]
 
@@ -47,21 +47,25 @@ protected class CollectionController(implicit injector: Injector) extends Inject
 
   val assetStorage = zms.map(_.assetsStorage)
 
-  val images = assetStorage.zip(currentConv.zip(msgStorage).flatMap {
-    case (id, msgs) => Signal.future(loadImages(id, msgs))
-  }).map {
-    case (as, ids) => ids.map {
-      case (a, t) => (as.signal(a), t)
+  val searchLimit = Signal[Int](initialLimit)
+  val searchTypes = Signal[Seq[Message.Type]](initialMsgTypes)
+
+  val collectionMessages = searchTypes.flatMap (msgTypes => Signal(msgTypes.map { msgType =>
+    msgType -> assetStorage.zip(currentConv.zip(msgStorage).zip(searchLimit).flatMap {
+      case ((id, msgs), limit) => Signal.future(loadMessagesByType(id, msgs, limit, msgType))
+    }).map {
+      case (as, ids) => ids.map {
+        case (a, t) => (as.signal(a), t)
+      }
     }
-  }
+  }.toMap))
 
   val conversation = zms.zip(currentConv) flatMap { case (zms, convId) => zms.convsStorage.signal(convId) }
 
   val conversationName = conversation map (data => if (data.convType == IConversation.Type.GROUP) data.name.filter(!_.isEmpty).getOrElse(data.generatedName) else data.generatedName)
 
-  private def loadImages(conv: ConvId, storage: MessagesStorage) = {
-    verbose(s"loadCursor for $conv")
-    storage.find(m => m.convId == conv && m.msgType == Message.Type.ASSET, MessageDataDao.findByType(conv, Message.Type.ASSET)(_), m => (m.assetId, m.time)).map(_.sortBy(_._2).reverse)
+  private def loadMessagesByType(conv: ConvId, storage: MessagesStorage, limit:Int, messageType:Message.Type) = {
+    storage.find(m => m.convId == conv && m.msgType == messageType, MessageDataDao.findByType(conv, messageType)(_), m => (m.assetId, m.time)).map(results => results.sortBy(_._2).reverse.take(if (limit > 0) limit else results.length))
   }
 
   def bitmapSignal(assetId: AssetId, width: Int) = zms.flatMap { zms =>
@@ -74,4 +78,10 @@ protected class CollectionController(implicit injector: Injector) extends Inject
     case _ => None
   }
 
+}
+
+object CollectionController{
+  val Links = Message.Type.RICH_MEDIA
+  val Images = Message.Type.ASSET
+  val Others = Message.Type.ANY_ASSET
 }

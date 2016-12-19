@@ -40,8 +40,8 @@ import org.threeten.bp.{Instant, LocalDateTime, ZoneId}
 //For now just handling images
 class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context: Context, injector: Injector, eventContext: EventContext) extends RecyclerView.Adapter[CollectionAdapter.CollViewHolder] with Injectable {
 
-  val ctrler = new CollectionController
-  val images = ctrler.images
+  val ctrler = new CollectionController(Seq(CollectionController.Images), 3)
+  val images = ctrler.collectionMessages.flatMap(_.getOrElse(CollectionController.Images, Signal.empty))
 
   images.onChanged.on(Threading.Ui) { _ => notifyDataSetChanged() }
 
