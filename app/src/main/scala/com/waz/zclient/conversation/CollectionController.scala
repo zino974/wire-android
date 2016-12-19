@@ -33,7 +33,7 @@ import com.waz.utils.events.Signal
 import com.waz.zclient.{Injectable, Injector}
 
 //testable!
-protected class CollectionController(initialMsgTypes: Seq[Message.Type] = Seq(Message.Type.ASSET), initialLimit: Int = 0)(implicit injector: Injector) extends Injectable {
+protected class CollectionController(initialMsgTypes: Seq[Message.Type] = Seq(Message.Type.ANY_ASSET), initialLimit: Int = 0)(implicit injector: Injector) extends Injectable {
 
   private implicit val tag: LogTag = logTagFor[CollectionController]
 

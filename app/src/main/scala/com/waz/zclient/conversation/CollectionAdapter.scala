@@ -21,14 +21,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.RecyclerView.ViewHolder
 import android.util.TypedValue
 import android.view.ViewGroup.LayoutParams
 import android.view.{LayoutInflater, View, ViewGroup}
-import android.widget.LinearLayout
+import android.widget.{LinearLayout, TextView}
+import com.waz.ZLog._
 import com.waz.model.{AssetData, AssetId}
 import com.waz.threading.Threading
 import com.waz.utils.events.{EventContext, Signal}
-import com.waz.zclient.conversation.CollectionAdapter.CollViewHolder
+import com.waz.zclient.conversation.CollectionAdapter.{CollViewHolder, FileViewHolder}
 import com.waz.zclient.pages.main.conversation.views.AspectRatioImageView
 import com.waz.zclient.ui.text.TypefaceTextView
 import com.waz.zclient.ui.utils.ResourceUtils
@@ -38,20 +40,50 @@ import org.threeten.bp.temporal.ChronoUnit
 import org.threeten.bp.{Instant, LocalDateTime, ZoneId}
 
 //For now just handling images
-class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context: Context, injector: Injector, eventContext: EventContext) extends RecyclerView.Adapter[CollectionAdapter.CollViewHolder] with Injectable {
+class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context: Context, injector: Injector, eventContext: EventContext) extends RecyclerView.Adapter[ViewHolder] with Injectable {
 
-  val ctrler = new CollectionController(Seq(CollectionController.Images))
+  private implicit val tag: LogTag = logTagFor[CollectionAdapter]
+
+  val ctrler = new CollectionController(Seq(CollectionController.Images, CollectionController.Others))
+  val all = ctrler.collectionMessages.flatMap(_.getOrElse(_, Signal.empty))
   val images = ctrler.collectionMessages.flatMap(_.getOrElse(CollectionController.Images, Signal.empty))
+  val files = ctrler.collectionMessages.flatMap(_.getOrElse(CollectionController.Others, Signal.empty))
+  var contentMode = CollectionAdapter.VIEW_MODE_IMAGES
 
   images.onChanged.on(Threading.Ui) { _ => notifyDataSetChanged() }
 
-  override def getItemCount: Int = images.currentValue.map(_.size).getOrElse(0)
+  override def getItemCount: Int = {
+    contentMode match {
+      case CollectionAdapter.VIEW_MODE_ALL => 0 //TODO
+      case CollectionAdapter.VIEW_MODE_FILES => files.currentValue.map(_.size).getOrElse(0)
+      case CollectionAdapter.VIEW_MODE_IMAGES => images.currentValue.map(_.size).getOrElse(0)
+      case _ => 0
+    }
+  }
 
-  override def onBindViewHolder(holder: CollViewHolder, position: Int): Unit =
-    holder.setAsset(images.currentValue.getOrElse(Seq.empty)(position)._2, ctrler.bitmapSignal, screenWidth / columns, ResourceUtils.getRandomAccentColor(context))
+  override def getItemViewType(position: Int): Int = {
+    contentMode match {
+      case CollectionAdapter.VIEW_MODE_ALL => 0 //TODO
+      case CollectionAdapter.VIEW_MODE_FILES => CollectionAdapter.VIEW_TYPE_FILE
+      case CollectionAdapter.VIEW_MODE_IMAGES => CollectionAdapter.VIEW_TYPE_IMAGE
+      case _ => 0
+    }
+  }
 
-  override def onCreateViewHolder(parent: ViewGroup, viewType: Int): CollViewHolder =
-    CollViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_image, parent, false).asInstanceOf[AspectRatioImageView])
+  override def onBindViewHolder(holder: ViewHolder, position: Int): Unit = {
+    verbose(s"ASDF loadCursor for $position")
+    holder match {
+      case f: FileViewHolder => f.setAsset(files.currentValue.getOrElse(Seq.empty)(position)._2)
+      case c: CollViewHolder => c.setAsset(images.currentValue.getOrElse(Seq.empty)(position)._2,
+        ctrler.bitmapSignal, screenWidth / columns, ResourceUtils.getRandomAccentColor(context))
+    }
+  }
+
+  override def onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+    viewType match {
+      case CollectionAdapter.VIEW_TYPE_FILE => FileViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_file, parent, false).asInstanceOf[TextView])
+      case CollectionAdapter.VIEW_TYPE_IMAGE => CollViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_image, parent, false).asInstanceOf[AspectRatioImageView])
+    }
 
   def getHeaderId(position: Int): Int = {
     val time = images.currentValue.getOrElse(Seq.empty)(position)._1.time
@@ -59,11 +91,11 @@ class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context
 
     // TODO just testing headers here...
     if (now == LocalDateTime.ofInstant(time, ZoneId.systemDefault()).toLocalDate())
-      Header.today
+      DetailsHeader.today
     else if (now.minus(1, ChronoUnit.DAYS) == LocalDateTime.ofInstant(time, ZoneId.systemDefault()).toLocalDate())
-      Header.yesterday
+      DetailsHeader.yesterday
     else
-      Header.agesAgo
+      DetailsHeader.agesAgo
   }
 
   def getHeaderView(parent: RecyclerView, position: Int): View = {
@@ -90,16 +122,16 @@ class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context
 
   private def getHeaderText(headerId: Int): String = {
     headerId match {
-      case Header.today => "TODAY"
-      case Header.yesterday => "YESTERDAY"
-      case Header.agesAgo => "AGES AGO"
+      case DetailsHeader.today => "TODAY"
+      case DetailsHeader.yesterday => "YESTERDAY"
+      case DetailsHeader.agesAgo => "AGES AGO"
       case _ => "Whatever"
     }
   }
 
 }
 
-object Header {
+object DetailsHeader {
   val today: Int = 0
   val yesterday: Int = 1
   val agesAgo: Int = 2
@@ -107,10 +139,24 @@ object Header {
 
 object CollectionAdapter {
 
+  val VIEW_MODE_ALL: Int = 0
+  val VIEW_MODE_IMAGES: Int = 1
+  val VIEW_MODE_FILES: Int = 2
+
+  val VIEW_TYPE_IMAGE = 0;
+  val VIEW_TYPE_FILE = 1;
+
+  case class FileViewHolder(view: TextView)(implicit eventContext: EventContext) extends RecyclerView.ViewHolder(view) {
+
+    def setAsset(asset: Signal[AssetData]) = asset.on(Threading.Ui) { a =>
+      view.setText(a.fileExtension)
+    }
+
+  }
+
   case class CollViewHolder(view: AspectRatioImageView)(implicit eventContext: EventContext) extends RecyclerView.ViewHolder(view) {
 
     def setAsset(asset: Signal[AssetData], bitmap: (AssetId, Int) => Signal[Option[Bitmap]], width: Int, color: Int) = asset.on(Threading.Ui) { a =>
-
       view.setAspectRatio(1)
       view.setImageBitmap(null)
       view.setBackgroundColor(color)
