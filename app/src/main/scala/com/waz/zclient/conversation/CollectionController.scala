@@ -32,8 +32,10 @@ import com.waz.ui.MemoryImageCache.BitmapRequest.Single
 import com.waz.utils.events.Signal
 import com.waz.zclient.{Injectable, Injector}
 
+import scala.concurrent.Future
+
 //testable!
-protected class CollectionController(initialMsgTypes: Seq[Message.Type] = Seq(Message.Type.ANY_ASSET), initialLimit: Int = 0)(implicit injector: Injector) extends Injectable {
+protected class CollectionController(implicit injector: Injector) extends Injectable {
 
   private implicit val tag: LogTag = logTagFor[CollectionController]
 
@@ -46,26 +48,25 @@ protected class CollectionController(initialMsgTypes: Seq[Message.Type] = Seq(Me
   val msgStorage = zms.map(_.messagesStorage)
 
   val assetStorage = zms.map(_.assetsStorage)
+  
+  def messagesByType(tpe: CollectionController.Type, limit: Int = 0) = (for {
+    msgs <- msgStorage
+    convId <- currentConv
+  } yield {
+    (msgs, convId)
+  }).flatMap { case (msgs, convId) =>
+    Signal.future(Future.sequence(tpe.msgTypes.map(t => loadMessagesByType(convId, msgs, limit, t))).map(_.flatten))
+  }
 
-  val searchLimit = Signal[Int](initialLimit)
-  val searchTypes = Signal[Seq[Message.Type]](initialMsgTypes)
-
-  val collectionMessages = searchTypes.flatMap (msgTypes => Signal(msgTypes.map { msgType =>
-    msgType -> assetStorage.zip(currentConv.zip(msgStorage).zip(searchLimit).flatMap {
-      case ((id, msgs), limit) => Signal.future(loadMessagesByType(id, msgs, limit, msgType))
-    }).map {
-      case (as, ids) => ids.map {
-        case (message, instant) => (message, as.signal(message.assetId))
-      }
-    }
-  }.toMap))
+  def assetSignal(id: AssetId) = assetStorage.flatMap(_.signal(id))
 
   val conversation = zms.zip(currentConv) flatMap { case (zms, convId) => zms.convsStorage.signal(convId) }
 
   val conversationName = conversation map (data => if (data.convType == IConversation.Type.GROUP) data.name.filter(!_.isEmpty).getOrElse(data.generatedName) else data.generatedName)
 
-  private def loadMessagesByType(conv: ConvId, storage: MessagesStorage, limit:Int, messageType:Message.Type) = {
-    storage.find(m => m.convId == conv && m.msgType == messageType, MessageDataDao.findByType(conv, messageType)(_), m => (m, m.time)).map(results => results.sortBy(_._2).reverse.take(if (limit > 0) limit else results.length))
+  //TODO - consider making messageType a Seq and passing that logic down to SE - (if we don't use a cursor)
+  private def loadMessagesByType(conv: ConvId, storage: MessagesStorage, limit: Int, messageType: Message.Type) = {
+    storage.find(m => m.convId == conv && m.msgType == messageType, MessageDataDao.findByType(conv, messageType)(_), identity).map(results => results.sortBy(_.time).reverse.take(if (limit > 0) limit else results.length))
   }
 
   def bitmapSignal(assetId: AssetId, width: Int) = zms.flatMap { zms =>
@@ -80,8 +81,27 @@ protected class CollectionController(initialMsgTypes: Seq[Message.Type] = Seq(Me
 
 }
 
-object CollectionController{
-  val Links = Message.Type.RICH_MEDIA
-  val Images = Message.Type.ASSET
-  val Others = Message.Type.ANY_ASSET
+object CollectionController {
+
+  trait Type {
+    val msgTypes: Seq[Message.Type]
+  }
+
+  case object Links extends Type {
+    override val msgTypes = Seq(Message.Type.RICH_MEDIA)
+  }
+
+  case object Images extends Type {
+    override val msgTypes = Seq(Message.Type.ASSET)
+  }
+
+  //Now we can add more types to this sequence for the "others" category
+  case object Files extends Type {
+    override val msgTypes = Seq(Message.Type.ANY_ASSET)
+  }
+
+  case object All extends Type {
+    //feels a little bit messy... maybe think of a neater way to represent the types
+    override val msgTypes = Links.msgTypes ++ Images.msgTypes ++ Files.msgTypes
+  }
 }

@@ -33,7 +33,7 @@ class CollectionFragment extends BaseFragment[CollectionFragment.Container] with
 
   private implicit lazy val context: Context = getContext
 
-   lazy val controller = new CollectionController
+  lazy val controller = new CollectionController
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
     val view = inflater.inflate(R.layout.fragment_collection, container, false)
@@ -47,8 +47,8 @@ class CollectionFragment extends BaseFragment[CollectionFragment.Container] with
     })
 
     val recyclerView: RecyclerView = ViewUtils.getView(view, R.id.rv__collection)
-    val columns = 4;
-    val adapter = new CollectionAdapter(ViewUtils.getRealDisplayWidth(context), columns)
+    val columns = 4
+    val adapter = new CollectionAdapter(ViewUtils.getRealDisplayWidth(context), columns, controller)
     recyclerView.setAdapter(adapter)
     recyclerView.addItemDecoration(new CollectionItemDecorator(adapter, columns))
     val layoutManager = new GridLayoutManager(context, columns, LinearLayoutManager.VERTICAL, false)

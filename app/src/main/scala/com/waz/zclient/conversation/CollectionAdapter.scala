@@ -27,9 +27,10 @@ import android.view.ViewGroup.LayoutParams
 import android.view.{LayoutInflater, View, ViewGroup}
 import android.widget.{LinearLayout, TextView}
 import com.waz.ZLog._
-import com.waz.model.{AssetData, AssetId}
+import com.waz.model.{AssetData, AssetId, MessageData}
 import com.waz.threading.Threading
 import com.waz.utils.events.{EventContext, Signal}
+import com.waz.utils.returning
 import com.waz.zclient.conversation.CollectionAdapter.{CollViewHolder, FileViewHolder}
 import com.waz.zclient.pages.main.conversation.views.AspectRatioImageView
 import com.waz.zclient.ui.text.TypefaceTextView
@@ -40,14 +41,31 @@ import org.threeten.bp.temporal.ChronoUnit
 import org.threeten.bp.{Instant, LocalDateTime, ZoneId}
 
 //For now just handling images
-class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context: Context, injector: Injector, eventContext: EventContext) extends RecyclerView.Adapter[ViewHolder] with Injectable {
+class CollectionAdapter(screenWidth: Int, columns: Int, ctrler: CollectionController)(implicit context: Context, injector: Injector, eventContext: EventContext) extends RecyclerView.Adapter[ViewHolder] with Injectable {
 
   private implicit val tag: LogTag = logTagFor[CollectionAdapter]
 
-  val ctrler = new CollectionController(Seq(CollectionController.Images, CollectionController.Others))
-  val all = ctrler.collectionMessages.flatMap(_.getOrElse(_, Signal.empty))
-  val images = ctrler.collectionMessages.flatMap(_.getOrElse(CollectionController.Images, Signal.empty))
-  val files = ctrler.collectionMessages.flatMap(_.getOrElse(CollectionController.Others, Signal.empty))
+  /**
+    * If signals don't have any subscribers, then by default they don't bother computing their values whenever changes are published to them,
+    * until they get their first subscriber. If we then try to call Signal#getCurrentValue on such a signal, we'll probably get None or something undefined.
+    * There are two ways around this, either call Signal#disableAutoWiring on any signals you wish to be able to access, or have a temporary var that keeps
+    * track of the current value, and set listeners to update that var.
+    *
+    * I'm starting to prefer the second way, as it's a little bit more explicit as to what's happening. Both ways should be used cautiously!!
+    */
+
+  val all = ctrler.messagesByType(CollectionController.All)
+  private var _all = Seq.empty[MessageData]
+  all(_all = _)
+
+  val images = ctrler.messagesByType(CollectionController.Images)
+  private var _images = Seq.empty[MessageData]
+  images(_images = _)
+
+  val files = ctrler.messagesByType(CollectionController.Files)
+  private var _files = Seq.empty[MessageData]
+  files(_files = _)
+
   var contentMode = CollectionAdapter.VIEW_MODE_IMAGES
 
   images.onChanged.on(Threading.Ui) { _ => notifyDataSetChanged() }
@@ -73,20 +91,23 @@ class CollectionAdapter(val screenWidth: Int, val columns: Int)(implicit context
   override def onBindViewHolder(holder: ViewHolder, position: Int): Unit = {
     verbose(s"ASDF loadCursor for $position")
     holder match {
-      case f: FileViewHolder => f.setAsset(files.currentValue.getOrElse(Seq.empty)(position)._2)
-      case c: CollViewHolder => c.setAsset(images.currentValue.getOrElse(Seq.empty)(position)._2,
-        ctrler.bitmapSignal, screenWidth / columns, ResourceUtils.getRandomAccentColor(context))
+      case f: FileViewHolder => assetSignal(_files, position).foreach(f.setAsset)
+      case c: CollViewHolder => assetSignal(_images, position).foreach(s => c.setAsset(s, ctrler.bitmapSignal, screenWidth / columns, ResourceUtils.getRandomAccentColor(context)))
     }
   }
 
+  private def assetSignal(col: Seq[MessageData], pos: Int): Option[Signal[AssetData]] = col.lift(pos).map(m => ctrler.assetSignal(m.assetId))
+
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
     viewType match {
-      case CollectionAdapter.VIEW_TYPE_FILE => FileViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_file, parent, false).asInstanceOf[TextView])
+//      case CollectionAdapter.VIEW_TYPE_FILE => FileViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_file, parent, false).asInstanceOf[TextView])
+      case CollectionAdapter.VIEW_TYPE_FILE => FileViewHolder(new TextView(parent.getContext))
       case CollectionAdapter.VIEW_TYPE_IMAGE => CollViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_image, parent, false).asInstanceOf[AspectRatioImageView])
+      case _ => returning(null.asInstanceOf[ViewHolder])(_ => error(s"Unexpected ViewType: $viewType"))
     }
 
   def getHeaderId(position: Int): Int = {
-    val time = images.currentValue.getOrElse(Seq.empty)(position)._1.time
+    val time = images.currentValue.getOrElse(Seq.empty)(position).time
     val now = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate
 
     // TODO just testing headers here...
@@ -143,8 +164,8 @@ object CollectionAdapter {
   val VIEW_MODE_IMAGES: Int = 1
   val VIEW_MODE_FILES: Int = 2
 
-  val VIEW_TYPE_IMAGE = 0;
-  val VIEW_TYPE_FILE = 1;
+  val VIEW_TYPE_IMAGE = 0
+  val VIEW_TYPE_FILE = 1
 
   case class FileViewHolder(view: TextView)(implicit eventContext: EventContext) extends RecyclerView.ViewHolder(view) {
 
