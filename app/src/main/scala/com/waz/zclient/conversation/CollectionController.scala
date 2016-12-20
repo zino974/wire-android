@@ -102,6 +102,6 @@ object CollectionController {
 
   case object All extends Type {
     //feels a little bit messy... maybe think of a neater way to represent the types
-    override val msgTypes = Links.msgTypes ++ Images.msgTypes ++ Files.msgTypes
+    override val msgTypes = Images.msgTypes ++ Files.msgTypes
   }
 }

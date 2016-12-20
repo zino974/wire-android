@@ -27,6 +27,7 @@ import android.view.ViewGroup.LayoutParams
 import android.view.{LayoutInflater, View, ViewGroup}
 import android.widget.{LinearLayout, TextView}
 import com.waz.ZLog._
+import com.waz.api.Message
 import com.waz.model.{AssetData, AssetId, MessageData}
 import com.waz.threading.Threading
 import com.waz.utils.events.{EventContext, Signal}
@@ -54,7 +55,7 @@ class CollectionAdapter(screenWidth: Int, columns: Int, ctrler: CollectionContro
     * I'm starting to prefer the second way, as it's a little bit more explicit as to what's happening. Both ways should be used cautiously!!
     */
 
-  val all = ctrler.messagesByType(CollectionController.All)
+  val all = ctrler.messagesByType(CollectionController.All, 8)
   private var _all = Seq.empty[MessageData]
   all(_all = _)
 
@@ -66,13 +67,32 @@ class CollectionAdapter(screenWidth: Int, columns: Int, ctrler: CollectionContro
   private var _files = Seq.empty[MessageData]
   files(_files = _)
 
-  var contentMode = CollectionAdapter.VIEW_MODE_IMAGES
+  var contentMode = CollectionAdapter.VIEW_MODE_ALL
 
-  images.onChanged.on(Threading.Ui) { _ => notifyDataSetChanged() }
+  images.onChanged.on(Threading.Ui) { _ =>
+    contentMode match {
+      case CollectionAdapter.VIEW_MODE_IMAGES => notifyDataSetChanged()
+      case _ =>
+    }
+  }
+
+  files.onChanged.on(Threading.Ui) { _ =>
+    contentMode match {
+      case CollectionAdapter.VIEW_MODE_FILES => notifyDataSetChanged()
+      case _ =>
+    }
+  }
+
+  all.onChanged.on(Threading.Ui) { _ =>
+    contentMode match {
+      case CollectionAdapter.VIEW_MODE_ALL => notifyDataSetChanged()
+      case _ =>
+    }
+  }
 
   override def getItemCount: Int = {
     contentMode match {
-      case CollectionAdapter.VIEW_MODE_ALL => 0 //TODO
+      case CollectionAdapter.VIEW_MODE_ALL => all.currentValue.map(_.size).getOrElse(0)
       case CollectionAdapter.VIEW_MODE_FILES => files.currentValue.map(_.size).getOrElse(0)
       case CollectionAdapter.VIEW_MODE_IMAGES => images.currentValue.map(_.size).getOrElse(0)
       case _ => 0
@@ -81,7 +101,12 @@ class CollectionAdapter(screenWidth: Int, columns: Int, ctrler: CollectionContro
 
   override def getItemViewType(position: Int): Int = {
     contentMode match {
-      case CollectionAdapter.VIEW_MODE_ALL => 0 //TODO
+      case CollectionAdapter.VIEW_MODE_ALL => {
+        all.currentValue.getOrElse(Seq.empty)(position).msgType match {
+          case Message.Type.ANY_ASSET => CollectionAdapter.VIEW_TYPE_FILE
+          case Message.Type.ASSET => CollectionAdapter.VIEW_TYPE_IMAGE
+        }
+      }
       case CollectionAdapter.VIEW_MODE_FILES => CollectionAdapter.VIEW_TYPE_FILE
       case CollectionAdapter.VIEW_MODE_IMAGES => CollectionAdapter.VIEW_TYPE_IMAGE
       case _ => 0
@@ -91,7 +116,7 @@ class CollectionAdapter(screenWidth: Int, columns: Int, ctrler: CollectionContro
   override def onBindViewHolder(holder: ViewHolder, position: Int): Unit = {
     verbose(s"ASDF loadCursor for $position")
     holder match {
-      case f: FileViewHolder => assetSignal(_files, position).foreach(f.setAsset)
+      case f: FileViewHolder => assetSignal(_files, position).foreach(s => f.setAsset(s, ResourceUtils.getRandomAccentColor(context)))
       case c: CollViewHolder => assetSignal(_images, position).foreach(s => c.setAsset(s, ctrler.bitmapSignal, screenWidth / columns, ResourceUtils.getRandomAccentColor(context)))
     }
   }
@@ -100,23 +125,51 @@ class CollectionAdapter(screenWidth: Int, columns: Int, ctrler: CollectionContro
 
   override def onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
     viewType match {
-//      case CollectionAdapter.VIEW_TYPE_FILE => FileViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_file, parent, false).asInstanceOf[TextView])
-      case CollectionAdapter.VIEW_TYPE_FILE => FileViewHolder(new TextView(parent.getContext))
+      case CollectionAdapter.VIEW_TYPE_FILE => {
+        verbose(s"ASDF CollectionAdapter.VIEW_TYPE_FILE")
+        FileViewHolder(new TextView(parent.getContext))
+      }
       case CollectionAdapter.VIEW_TYPE_IMAGE => CollViewHolder(LayoutInflater.from(parent.getContext).inflate(R.layout.row_collection_image, parent, false).asInstanceOf[AspectRatioImageView])
       case _ => returning(null.asInstanceOf[ViewHolder])(_ => error(s"Unexpected ViewType: $viewType"))
     }
 
-  def getHeaderId(position: Int): Int = {
-    val time = images.currentValue.getOrElse(Seq.empty)(position).time
-    val now = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate
+  def isFullSpan(position: Int): Boolean = {
+    getItemViewType(position) match {
+      case CollectionAdapter.VIEW_TYPE_FILE => true
+      case CollectionAdapter.VIEW_TYPE_IMAGE => false
+    }
+  }
 
-    // TODO just testing headers here...
-    if (now == LocalDateTime.ofInstant(time, ZoneId.systemDefault()).toLocalDate())
-      DetailsHeader.today
-    else if (now.minus(1, ChronoUnit.DAYS) == LocalDateTime.ofInstant(time, ZoneId.systemDefault()).toLocalDate())
-      DetailsHeader.yesterday
-    else
-      DetailsHeader.agesAgo
+  def getItem(position: Int): MessageData = {
+    contentMode match {
+      case CollectionAdapter.VIEW_MODE_ALL => all.currentValue.getOrElse(Seq.empty)(position)
+      case CollectionAdapter.VIEW_MODE_IMAGES => images.currentValue.getOrElse(Seq.empty)(position)
+      case CollectionAdapter.VIEW_MODE_FILES => files.currentValue.getOrElse(Seq.empty)(position)
+    }
+  }
+
+  def getHeaderId(position: Int): Int = {
+    contentMode match {
+      case CollectionAdapter.VIEW_MODE_ALL => {
+        all.currentValue.getOrElse(Seq.empty)(position).msgType match {
+          case Message.Type.ANY_ASSET => Header.mainFiles
+          case Message.Type.ASSET => Header.mainImages
+          case Message.Type.RICH_MEDIA => Header.mainLinks
+        }
+      }
+      case _ => {
+        val time = getItem(position).time
+        val now = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate
+
+        // TODO just testing headers here...
+        if (now == LocalDateTime.ofInstant(time, ZoneId.systemDefault()).toLocalDate())
+          Header.subToday
+        else if (now.minus(1, ChronoUnit.DAYS) == LocalDateTime.ofInstant(time, ZoneId.systemDefault()).toLocalDate())
+          Header.subYesterday
+        else
+          Header.subAgesAgo
+      }
+    }
   }
 
   def getHeaderView(parent: RecyclerView, position: Int): View = {
@@ -143,19 +196,25 @@ class CollectionAdapter(screenWidth: Int, columns: Int, ctrler: CollectionContro
 
   private def getHeaderText(headerId: Int): String = {
     headerId match {
-      case DetailsHeader.today => "TODAY"
-      case DetailsHeader.yesterday => "YESTERDAY"
-      case DetailsHeader.agesAgo => "AGES AGO"
+      case Header.`mainImages` => "PICTURES"
+      case Header.`mainFiles` => "FILES"
+      case Header.`mainLinks` => "LINKS"
+      case Header.`subToday` => "TODAY"
+      case Header.`subYesterday` => "YESTERDAY"
+      case Header.`subAgesAgo` => "AGES AGO"
       case _ => "Whatever"
     }
   }
 
 }
 
-object DetailsHeader {
-  val today: Int = 0
-  val yesterday: Int = 1
-  val agesAgo: Int = 2
+object Header {
+  val mainImages: Int = 0
+  val mainFiles: Int = 1
+  val mainLinks: Int = 2
+  val subToday: Int = 3
+  val subYesterday: Int = 4
+  val subAgesAgo: Int = 5
 }
 
 object CollectionAdapter {
@@ -169,8 +228,9 @@ object CollectionAdapter {
 
   case class FileViewHolder(view: TextView)(implicit eventContext: EventContext) extends RecyclerView.ViewHolder(view) {
 
-    def setAsset(asset: Signal[AssetData]) = asset.on(Threading.Ui) { a =>
-      view.setText(a.fileExtension)
+    def setAsset(asset: Signal[AssetData], color: Int) = asset.on(Threading.Ui) { a =>
+      view.setBackgroundColor(color)
+      view.setText(a.fileExtension + " test ")
     }
 
   }
